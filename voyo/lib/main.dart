@@ -30,8 +30,10 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+          scaffoldBackgroundColor: const Color(0xFFFCFAD3)
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+
+      home: const MyHomePage(title: 'Page  acceuil'),
     );
   }
 }
@@ -81,11 +83,21 @@ class _MyHomePageState extends State<MyHomePage> {
         // TRY THIS: Try changing the color here to a specific color (to
         // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
         // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: const Color(0xFFFCFAD3),
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
+        title:
+          Container(
+            decoration: TitleDecoration(),
+            height: 45,
+            child: Stack(
+              children: [
+                Align(child: Text(widget.title)),
+                Positioned(left: 0, child: Image.asset('assets/images/Logo Voyo.png'),width: 100,height: 50,),
+              ],
+            ),
+          ),
+        ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
@@ -115,11 +127,74 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      bottomNavigationBar: new Container(
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            Expanded(
+                flex: 1,
+                child : Container(
+                  padding: const EdgeInsets.all(8.0),
+                  child : new FloatingActionButton(
+                  backgroundColor: Color(0xFFFEC534),
+                  onPressed: _incrementCounter,
+                  tooltip: 'Increment',
+                  child: Container( child : const Icon(Icons.message),),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(topRight: Radius.circular(50),
+                    ),
+                  ),
+                    elevation: 0,
+                  ),
+                ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              child:new FloatingActionButton(
+                backgroundColor: Color(0xFFFE881C),
+                onPressed: _incrementCounter,
+                tooltip: 'Increment',
+                child: Container( child : const Icon(Icons.home), width: 100,),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(50),
+                  ),
+                ),
+                elevation: 0,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all( Radius.circular(50),
+                ),
+                color: Color(0xFFFCFAD3),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child:Container(
+                padding: const EdgeInsets.all(8.0),
+                child : new FloatingActionButton(
+                backgroundColor: Color(0xFFFEC534),
+                onPressed: _incrementCounter,
+                tooltip: 'Increment',
+                child: Container( child : const Icon(Icons.people),),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(50),
+                  ),
+                ),
+                elevation: 0,
+              ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
+BoxDecoration TitleDecoration() {
+  return BoxDecoration(
+    border: Border(
+      bottom: BorderSide(width: 4,color: Color(0xFFFEC534)),
+    ),
+  );
+}
+
