@@ -132,56 +132,72 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             Expanded(
-                flex: 1,
-                child : Container(
-                  padding: const EdgeInsets.all(8.0),
+              flex: 1,
+              child:Container(
+                height: 80,
+                child : Expanded(
                   child : new FloatingActionButton(
-                  backgroundColor: Color(0xFFFEC534),
-                  onPressed: _incrementCounter,
-                  tooltip: 'Increment',
-                  child: Container( child : const Icon(Icons.message),),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(topRight: Radius.circular(50),
+                    backgroundColor: Color( 0xFFFEC534),
+                    onPressed: _incrementCounter,
+                    tooltip: 'Increment',
+                    child: Container(
+                      child : const Icon(Icons.message),
                     ),
-                  ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(topRight: Radius.circular(30),
+                      ),
+                    ),
                     elevation: 0,
                   ),
                 ),
+              ),
             ),
             Container(
-              padding: const EdgeInsets.all(8.0),
-              child:new FloatingActionButton(
-                backgroundColor: Color(0xFFFE881C),
-                onPressed: _incrementCounter,
-                tooltip: 'Increment',
-                child: Container( child : const Icon(Icons.home), width: 100,),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(50),
-                  ),
-                ),
-                elevation: 0,
-              ),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.all( Radius.circular(50),
+                borderRadius: BorderRadius.only( topLeft: Radius.circular(50),topRight: Radius.circular(50),
                 ),
-                color: Color(0xFFFCFAD3),
+                color: Color(0xFFFEC534),
+              ),
+              padding: const EdgeInsets.only( bottom: 8),
+              child : Container(
+                padding: const EdgeInsets.all(8.0),
+                child:new FloatingActionButton(
+                  backgroundColor: Color(0xFFFE881C),
+                  onPressed: _incrementCounter,
+                  tooltip: 'Increment',
+                  child: Container( child : const Icon(Icons.home), width: 100,),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(50),
+                    ),
+                  ),
+                  elevation: 0,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(bottomLeft:Radius.circular(50),bottomRight:Radius.circular(50),
+                  ),
+                  color: Color(0xFFFCFAD3),
+                ),
               ),
             ),
             Expanded(
               flex: 1,
               child:Container(
-                padding: const EdgeInsets.all(8.0),
-                child : new FloatingActionButton(
-                backgroundColor: Color(0xFFFEC534),
-                onPressed: _incrementCounter,
-                tooltip: 'Increment',
-                child: Container( child : const Icon(Icons.people),),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(50),
+                height: 80,
+                child : Expanded(
+                  child : new FloatingActionButton(
+                    backgroundColor: Color( 0xFFFEC534),
+                    onPressed: _incrementCounter,
+                    tooltip: 'Increment',
+                    child: Container(
+                      child : const Icon(Icons.people),
+                    ),
+                      shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(topLeft: Radius.circular(30),
+                      ),
+                    ),
+                    elevation: 0,
                   ),
                 ),
-                elevation: 0,
-              ),
               ),
             ),
           ],
