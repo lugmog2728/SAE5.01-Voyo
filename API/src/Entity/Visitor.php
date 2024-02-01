@@ -11,9 +11,13 @@ use Doctrine\ORM\Mapping as ORM;
 class Visitor
 {
     #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
     #[ORM\OneToOne(inversedBy: 'visitor', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $identifiant = null;
+    private ?User $idUser = null;
 
     #[ORM\Column(length: 100)]
     private ?string $street = null;
@@ -99,14 +103,14 @@ class Visitor
         return $this;
     }
 
-    public function getIdentifiant(): ?User
+    public function getIdUser(): ?User
     {
-        return $this->identifiant;
+        return $this->idUser;
     }
 
-    public function setIdentifiant(User $identifiant): static
+    public function setIdUser(User $idUser): static
     {
-        $this->identifiant = $identifiant;
+        $this->idUser = $idUser;
 
         return $this;
     }
