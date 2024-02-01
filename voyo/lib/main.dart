@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'globals.dart' as AppColors;
 
 void main() {
   runApp(const MyApp());
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
-          scaffoldBackgroundColor: const Color(0xFFFCFAD3)
+          scaffoldBackgroundColor: AppColors.backgroundColor
       ),
 
       home: const MyHomePage(title: 'Page  acceuil'),
@@ -59,6 +60,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -72,145 +74,106 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: const Color(0xFFFCFAD3),
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title:
-          Container(
-            decoration: TitleDecoration(),
-            height: 45,
-            child: Stack(
-              children: [
-                Align(child: Text(widget.title)),
-                Positioned(left: 0, child: Image.asset('assets/images/Logo Voyo.png'),width: 100,height: 50,),
-              ],
-            ),
-          ),
-        ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: new Container(
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            Expanded(
-              flex: 1,
-              child:Container(
-                height: 80,
-                child : Expanded(
-                  child : new FloatingActionButton(
-                    backgroundColor: Color( 0xFFFEC534),
-                    onPressed: _incrementCounter,
-                    tooltip: 'Increment',
-                    child: Container(
-                      child : const Icon(Icons.message),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(topRight: Radius.circular(30),
-                      ),
-                    ),
-                    elevation: 0,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only( topLeft: Radius.circular(50),topRight: Radius.circular(50),
-                ),
-                color: Color(0xFFFEC534),
-              ),
-              padding: const EdgeInsets.only( bottom: 8),
-              child : Container(
-                padding: const EdgeInsets.all(8.0),
-                child:new FloatingActionButton(
-                  backgroundColor: Color(0xFFFE881C),
-                  onPressed: _incrementCounter,
-                  tooltip: 'Increment',
-                  child: Container( child : const Icon(Icons.home), width: 100,),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(50),
-                    ),
-                  ),
-                  elevation: 0,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(bottomLeft:Radius.circular(50),bottomRight:Radius.circular(50),
-                  ),
-                  color: Color(0xFFFCFAD3),
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child:Container(
-                height: 80,
-                child : Expanded(
-                  child : new FloatingActionButton(
-                    backgroundColor: Color( 0xFFFEC534),
-                    onPressed: _incrementCounter,
-                    tooltip: 'Increment',
-                    child: Container(
-                      child : const Icon(Icons.people),
-                    ),
-                      shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular(30),
-                      ),
-                    ),
-                    elevation: 0,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    return Menu(
+        const Center(
+          child: Text("content"),
+          )
+    ,widget);
   }
 }
 BoxDecoration TitleDecoration() {
   return BoxDecoration(
     border: Border(
-      bottom: BorderSide(width: 4,color: Color(0xFFFEC534)),
+      bottom: BorderSide(width: 4,color: AppColors.secondaryColor),
     ),
   );
 }
-
+Scaffold Menu(content, widget){
+  return Scaffold(
+    appBar: AppBar(
+      backgroundColor: AppColors.backgroundColor,
+      title:
+      Container(
+        decoration: TitleDecoration(),
+        height: 45,
+        child: Stack(
+          children: [
+            Align(child: Text(widget.title)),
+            Positioned(left: 0,width: 100,height: 50, child: Image.asset('assets/images/Logo Voyo.png'),),
+          ],
+        ),
+      ),
+    ),
+    body: content,
+    bottomNavigationBar: Row(
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        Expanded(
+          flex: 1,
+          child:SizedBox(
+            height: 80,
+            child : Expanded(
+              child : FloatingActionButton(
+                backgroundColor: AppColors.secondaryColor,
+                onPressed: null,
+                tooltip: 'Increment',
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(topRight: Radius.circular(30),
+                  ),
+                ),
+                elevation: 0,
+                child: const Icon(Icons.message),
+              ),
+            ),
+          ),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.only( topLeft: Radius.circular(50),topRight: Radius.circular(50),
+            ),
+            color: AppColors.secondaryColor,
+          ),
+          padding: const EdgeInsets.only( bottom: 8),
+          child : Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.only(bottomLeft:Radius.circular(50),bottomRight:Radius.circular(50),
+              ),
+              color: AppColors.backgroundColor,
+            ),
+            child:FloatingActionButton(
+              backgroundColor: AppColors.primaryColor,
+              onPressed: null,
+              tooltip: 'Increment',
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(50),
+                ),
+              ),
+              elevation: 0,
+              child: const SizedBox( width: 100, child : Icon(Icons.home),),
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child:SizedBox(
+            height: 80,
+            child : Expanded(
+              child : FloatingActionButton(
+                backgroundColor: AppColors.secondaryColor,
+                onPressed: null,
+                tooltip: 'Increment',
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(30),
+                  ),
+                ),
+                elevation: 0,
+                child: const Icon(Icons.people),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
