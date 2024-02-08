@@ -1,13 +1,14 @@
 library my_prj.globals;
 
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'home.dart' as homePage;
 
 Color primaryColor =  const Color(0xFFFE881C);
 Color secondaryColor = const Color(0xFFFEC534);
 Color backgroundColor = const Color(0xFFFCFAD3);
 Color inputColor = const Color(0xFFFEE486);
+Color subInputColor = const Color(0xFFE4CC76);
 
 BoxDecoration TitleDecoration() {
   return BoxDecoration(
@@ -17,9 +18,10 @@ BoxDecoration TitleDecoration() {
   );
 }
 
-Scaffold Menu(content, widget){
+Scaffold Menu(content, widget,context){
   return Scaffold(
     appBar: AppBar(
+      automaticallyImplyLeading: false,
       backgroundColor: backgroundColor,
       title:
       Container(
@@ -45,7 +47,7 @@ Scaffold Menu(content, widget){
               child : FloatingActionButton(
                 backgroundColor: secondaryColor,
                 onPressed: null,
-                tooltip: 'Increment',
+                tooltip: 'Account',
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(topRight: Radius.circular(30),
                   ),
@@ -72,8 +74,15 @@ Scaffold Menu(content, widget){
             ),
             child:FloatingActionButton(
               backgroundColor: primaryColor,
-              onPressed: null,
-              tooltip: 'Increment',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const homePage.HomePage(
+                          title: "Page acceuil")),
+                );
+              },
+              tooltip: 'Home',
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(50),
                 ),
@@ -91,7 +100,7 @@ Scaffold Menu(content, widget){
               child : FloatingActionButton(
                 backgroundColor: secondaryColor,
                 onPressed: null,
-                tooltip: 'Increment',
+                tooltip: 'Chat',
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(topLeft: Radius.circular(30),
                   ),

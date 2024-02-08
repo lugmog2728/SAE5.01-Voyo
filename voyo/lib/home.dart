@@ -1,5 +1,7 @@
+
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
+import 'visite.dart' as visitePage;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -24,7 +26,7 @@ class _HomePageState extends State<HomePage> {
                 child: Wrap(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.only(left: 4.0,right: 4.0,bottom: 2),
                         child: Expanded(
                           child: TextFormField(
                             textAlign: TextAlign.center,
@@ -42,7 +44,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.only(left: 4.0,right: 4.0,bottom: 2),
                         child: Expanded(
                           child: TextFormField(
                             textAlign: TextAlign.center,
@@ -60,7 +62,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.only(left: 4.0,right: 4.0,bottom: 2),
                         child: Expanded(
                           child: TextFormField(
                             textAlign: TextAlign.center,
@@ -80,8 +82,83 @@ class _HomePageState extends State<HomePage> {
                     ]
                 ),
               ),
+              Visitor("thomas","thomas","lyon","13","26",context),
+              Visitor("thomas","thomas","lyon","13","26",context),
+              Visitor("thomas","thomas","lyon","13","26",context),
             ]
         ),
-        widget);
+        widget,
+    context);
   }
+}
+Padding Visitor(name,surname,city,rate,cost,context) {
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Expanded(
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppGlobal.inputColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+        ),
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                  alignment: Alignment.center,
+                  height: 100,
+                  width: 100,
+                  color: AppGlobal.subInputColor,
+                  child: const Text(
+                    "Photo",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.black,),
+                  )
+              ),
+            ),
+            Expanded(
+              flex: 8,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Wrap(
+                  direction: Axis.vertical,
+                  children: [
+                    Text(name,style: TextStyle(color: Colors.black,),),
+                    Text(surname,style: TextStyle(color: Colors.black,),),
+                    Text(city,style: TextStyle(color: Colors.black,),),
+                    Text(rate+"€/h",style: TextStyle(color: Colors.black,),),
+                    Image.asset('assets/images/etoile.png', width: 100,)
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  child: Text(
+                      cost+"€",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.black,)
+                  ),
+                  alignment: Alignment.center,
+                  height: 100,
+                  width: 100,
+                ),
+              ),
+            ),
+          ],
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const visitePage.VisitePage(title: "Demande de visite")),
+          );
+        },
+      ),
+    ),
+  );
 }
