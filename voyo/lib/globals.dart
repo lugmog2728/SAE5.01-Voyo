@@ -8,6 +8,7 @@ Color primaryColor =  const Color(0xFFFE881C);
 Color secondaryColor = const Color(0xFFFEC534);
 Color backgroundColor = const Color(0xFFFCFAD3);
 Color inputColor = const Color(0xFFFEE486);
+Color buttonback = const Color(0xFFFFFEE8);
 
 BoxDecoration TitleDecoration() {
   return BoxDecoration(

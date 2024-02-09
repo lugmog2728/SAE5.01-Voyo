@@ -31,7 +31,7 @@ class _ConnexionPageState extends State<ConnexionPage> {
                             decoration: InputDecoration(
                               hintText: "Identifiant",
                               filled: true,
-                              fillColor: AppGlobal.inputColor,
+                              fillColor: AppGlobal.buttonback,
                               border: InputBorder.none,
                             ),
                             onSaved: (String? value) {
@@ -49,7 +49,7 @@ class _ConnexionPageState extends State<ConnexionPage> {
                             decoration: InputDecoration(
                               hintText: "Mot de passe",
                               filled: true,
-                              fillColor: AppGlobal.inputColor,
+                              fillColor: AppGlobal.buttonback,
                               border: InputBorder.none,
                             ),
                             onSaved: (String? value) {
@@ -59,8 +59,14 @@ class _ConnexionPageState extends State<ConnexionPage> {
                           ),
                         ),
                       ),
-                      Expanded(child: ElevatedButton(
-                        child: Text(
+                      Center(child: ElevatedButton(
+
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.yellow,
+                          onPrimary: Colors.white,
+                        ),
+                        onPressed: () {},
+                        child: const Text(
                           'Connexion',
                           style: TextStyle(
 
@@ -68,11 +74,23 @@ class _ConnexionPageState extends State<ConnexionPage> {
 
                           ),
                         ),
+                      )
+                      ),
+                      Center(child: ElevatedButton(
+
                         style: ElevatedButton.styleFrom(
                           primary: Colors.yellow,
                           onPrimary: Colors.white,
                         ),
                         onPressed: () {},
+                        child: const Text(
+                          'Créer un compte',
+                          style: TextStyle(
+
+                            color: Colors.black,
+
+                          ),
+                        ),
                       )
                       )
 
