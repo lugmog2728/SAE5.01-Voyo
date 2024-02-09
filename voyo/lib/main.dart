@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
-import 'home.dart' as home;
+import 'connexion.dart' as connexionPage;
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: AppGlobal.backgroundColor
       ),
 
-      home: const home.HomePage(title: 'Page acceuil'),
+      home: const connexionPage.ConnexionPage(title: 'Connexion'),
     );
   }
 }

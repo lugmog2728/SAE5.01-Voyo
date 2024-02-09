@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
                           child: TextFormField(
                             textAlign: TextAlign.center,
                             decoration: InputDecoration(
-                              hintText: "Addresse",
+                              hintText: "Type de logement",
                               filled: true,
                               fillColor: AppGlobal.inputColor,
                               border: InputBorder.none,

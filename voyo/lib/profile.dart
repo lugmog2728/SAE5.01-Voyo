@@ -55,18 +55,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: const Text("Photo"),
                 ),
               ),
-            Column(
-              children: [
-                Text(
-                  
-                )
-                )
-              ],
-            )
             ]
           ),
         ]
-      ), widget
+      ), widget,context
     );
   }
 }

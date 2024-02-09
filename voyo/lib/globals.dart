@@ -1,8 +1,9 @@
 library my_prj.globals;
 
-
 import 'package:flutter/material.dart';
 import 'home.dart' as homePage;
+import 'chat.dart' as chatPage;
+import 'profile.dart' as profilPage;
 
 Color primaryColor =  const Color(0xFFFE881C);
 Color secondaryColor = const Color(0xFFFEC534);
@@ -47,14 +48,21 @@ Scaffold Menu(content, widget,context){
             child : Expanded(
               child : FloatingActionButton(
                 backgroundColor: secondaryColor,
-                onPressed: null,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const profilPage.ProfilePage(
+                            title: "Profile")),
+                  );
+                },
                 tooltip: 'Account',
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(topRight: Radius.circular(30),
                   ),
                 ),
                 elevation: 0,
-                child: const Icon(Icons.message),
+                child: const Icon(Icons.person),
               ),
             ),
           ),
@@ -100,14 +108,21 @@ Scaffold Menu(content, widget,context){
             child : Expanded(
               child : FloatingActionButton(
                 backgroundColor: secondaryColor,
-                onPressed: null,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const chatPage.ChatPage(
+                            title: "Discussion")),
+                  );
+                },
                 tooltip: 'Chat',
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(topLeft: Radius.circular(30),
                   ),
                 ),
                 elevation: 0,
-                child: const Icon(Icons.people),
+                child: const Icon(Icons.message),
               ),
             ),
           ),

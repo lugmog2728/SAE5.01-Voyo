@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
+import 'home.dart' as homePage;
 
 class ConnexionPage extends StatefulWidget {
   const ConnexionPage({super.key, required this.title});
@@ -65,7 +66,14 @@ class _ConnexionPageState extends State<ConnexionPage> {
                           primary: Colors.yellow,
                           onPrimary: Colors.white,
                         ),
-                        onPressed: () {},
+                        onPressed:  () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const homePage.HomePage(
+                                    title: "Acceuil")),
+                          );
+                        },
                         child: const Text(
                           'Connexion',
                           style: TextStyle(
@@ -100,6 +108,6 @@ class _ConnexionPageState extends State<ConnexionPage> {
               ),
             ]
         ),
-        widget);
+        widget,context);
   }
 }
