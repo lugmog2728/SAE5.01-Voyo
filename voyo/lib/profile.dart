@@ -32,17 +32,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Center(
-              child: FloatingActionButton(
-                backgroundColor: AppGlobal.secondaryColor,
-                onPressed: null, 
-                child: const Text('Modifier')
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Center(
+                child: FloatingActionButton(
+                  backgroundColor: AppGlobal.secondaryColor,
+                  onPressed: null,
+                  child: const Text('Modifier')
+                  ),
                 ),
               ),
+            ],
             ),
-          ],),
 
           Row (children: [
             Padding(
@@ -58,7 +59,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ]
           ),
         ]
-      ), widget,context
+      ), widget, context
     );
   }
 }
