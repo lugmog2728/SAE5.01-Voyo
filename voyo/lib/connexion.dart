@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
 import 'home.dart' as homePage;
+import 'newaccount.dart' as newAccountPage;
 
 class ConnexionPage extends StatefulWidget {
   const ConnexionPage({super.key, required this.title});
@@ -90,7 +91,14 @@ class _ConnexionPageState extends State<ConnexionPage> {
                           primary: Colors.yellow,
                           onPrimary: Colors.white,
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const newAccountPage.newAccountPage(
+                                    title: "Créer un compte")),
+                          );
+                        },
                         child: const Text(
                           'Créer un compte',
                           style: TextStyle(

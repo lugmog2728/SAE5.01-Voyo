@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
 
-class ConnexionPage extends StatefulWidget {
-  const ConnexionPage({super.key, required this.title});
+class newAccountPage extends StatefulWidget {
+  const newAccountPage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<ConnexionPage> createState() => _ConnexionPageState();
+  State<newAccountPage> createState() => _newAccountPageState();
 }
 
-class _ConnexionPageState extends State<ConnexionPage> {
+class _newAccountPageState extends State<newAccountPage> {
   @override
   Widget build(BuildContext context) {
     return AppGlobal.Menu(
