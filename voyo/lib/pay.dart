@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
+import 'newaccount.dart' as newAccountPage;
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({Key? key, required this.title}) : super(key: key);
@@ -47,7 +48,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     fillColor: AppGlobal.buttonback,
                   ),
                   onSaved: (String? value) {
-                    debugPrint('Card number saved as $value');
+                    debugPrint('Card umber saved as $value');
                   },
                 ),
               ),
@@ -65,7 +66,7 @@ class _PaymentPageState extends State<PaymentPage> {
                           fillColor: AppGlobal.buttonback,
                         ),
                         onSaved: (String? value) {
-                          debugPrint('Expiration_date saved as $value');
+                          debugPrint('Expiration date saved as $value');
                         },
                       ),
                     ),

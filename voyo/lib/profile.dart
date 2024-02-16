@@ -43,9 +43,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ],
-            ),
-
-          Row (children: [
+          ),
+          Row(children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Container (
@@ -103,7 +102,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                   ),
-                
+
                 Container (
                     alignment: Alignment.centerLeft,
                     width: 150,
@@ -148,7 +147,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
               )
-              
+
             ],
           )
         ]
