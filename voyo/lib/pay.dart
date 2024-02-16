@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
+import 'newaccount.dart' as newAccountPage;
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({Key? key, required this.title}) : super(key: key);
