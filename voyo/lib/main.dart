@@ -14,14 +14,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Voyo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-          scaffoldBackgroundColor: AppGlobal.backgroundColor
-      ),
-
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+          scaffoldBackgroundColor: AppGlobal.backgroundColor),
       home: const connexionPage.ConnexionPage(title: 'Connexion'),
     );
   }
 }
-
-
