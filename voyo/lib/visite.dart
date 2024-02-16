@@ -18,31 +18,36 @@ class _VisitePageState extends State<VisitePage> {
     return AppGlobal.Menu(
         Column(
           children: [
-            Visitor("thomas","thomas","lyon","13","26"),
-            Row(
-              children : [Expanded(
-                  child :  Padding(padding: EdgeInsets.only(left: 8,right: 8),
-                    child:FloatingActionButton(
-                    backgroundColor: AppGlobal.secondaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    onPressed: null,
-                    child: Expanded( child : const Text("Voir profil",style: TextStyle(color: Colors.black),))
-                    ),
-                    ),
+            Visitor("thomas", "thomas", "lyon", "13", "26"),
+            Row(children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 8),
+                  child: FloatingActionButton(
+                      backgroundColor: AppGlobal.secondaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      onPressed: null,
+                      child: const Expanded(
+                          child: Text(
+                        "Voir profil",
+                        style: TextStyle(color: Colors.black),
+                      ))),
+                ),
               ),
-              ]),
-            Row(
-                children : [Expanded(
-                  child :  Padding(padding: EdgeInsets.only(left: 8,right: 8),
+            ]),
+            Row(children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8,right: 8),
                     child:FloatingActionButton(
                         backgroundColor: AppGlobal.secondaryColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                         onPressed: null,
-                        child: Expanded( child : const Text("Valider et payer",style: TextStyle(color: Colors.black),))
+                        child: const Expanded( child : Text("Valider et payer",style: TextStyle(color: Colors.black),))
                     ),
                   ),
                 ),
@@ -87,10 +92,10 @@ Padding Visitor(name,surname,city,rate,cost) {
                 child: Wrap(
                   direction: Axis.vertical,
                   children: [
-                    Text(name,style: TextStyle(color: Colors.black,),),
-                    Text(surname,style: TextStyle(color: Colors.black,),),
-                    Text(city,style: TextStyle(color: Colors.black,),),
-                    Text(rate+"€/h",style: TextStyle(color: Colors.black,),),
+                    Text(name,style: const TextStyle(color: Colors.black,),),
+                    Text(surname,style: const TextStyle(color: Colors.black,),),
+                    Text(city,style: const TextStyle(color: Colors.black,),),
+                    Text(rate+"€/h",style: const TextStyle(color: Colors.black,),),
                     Image.asset('assets/images/etoile.png', width: 100,)
                   ],
                 ),
@@ -101,14 +106,14 @@ Padding Visitor(name,surname,city,rate,cost) {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                  child: Text(
-                      cost+"€",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.black,)
-                  ),
                   alignment: Alignment.center,
                   height: 100,
                   width: 100,
+                  child: Text(
+                      cost+"€",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.black,)
+                  ),
                 ),
               ),
             ),
