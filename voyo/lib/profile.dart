@@ -126,13 +126,13 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ]
           ),
+          
           Row(
             children: [
               Expanded(
                 flex: 2,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Expanded (
                     child: FloatingActionButton (
                       backgroundColor: AppGlobal.secondaryColor,
                       onPressed: null,
@@ -144,7 +144,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         )
                         )
                     ),
-                  ),
                 ),
               )
 
