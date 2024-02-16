@@ -89,7 +89,7 @@ class _ConnexionPageState extends State<ConnexionPage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            const newAccountPage.newAccountPage(
+                            const newAccountPage.NewAccountPage(
                                 title: "Créer un compte")),
                   );
                 },
