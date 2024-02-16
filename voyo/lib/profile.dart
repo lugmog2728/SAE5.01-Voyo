@@ -19,7 +19,7 @@ class _ProfilePageState extends State<ProfilePage> {
           Row (
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-            const Expanded(
+            const Expanded (
               child: Padding (
               padding: EdgeInsets.all(16.0),
               child: Text(
@@ -56,8 +56,101 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: const Text("Photo"),
                 ),
               ),
+
+              Container (
+                alignment: Alignment.center,
+                height: 180,
+                child : Column (
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      width: 150,
+                      decoration: BoxDecoration (
+                        border: Border (
+                          bottom: BorderSide (
+                            color: AppGlobal.secondaryColor,
+                            width: 3,
+                          )
+                        )
+                      ),
+                      child: const Text (
+                        'Alex',
+                        style: TextStyle (
+                          fontSize: 20,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+
+                  Container (
+                    alignment: Alignment.centerLeft,
+                    width: 150,
+                    decoration: BoxDecoration (
+                      border: Border (
+                        bottom: BorderSide (
+                          color: AppGlobal.secondaryColor,
+                          width: 3,
+                          )
+                        )
+                      ),
+                    child: const Text (
+                      'Micoulet',
+                      style: TextStyle (
+                        fontSize: 20,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                
+                Container (
+                    alignment: Alignment.centerLeft,
+                    width: 150,
+                    decoration: BoxDecoration (
+                      border: Border (
+                        bottom: BorderSide (
+                          color: AppGlobal.secondaryColor,
+                          width: 3,
+                          )
+                        )
+                      ),
+                    child: const Text (
+                      'Valence',
+                      style: TextStyle (
+                        fontSize: 20,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ]),
+              ),
             ]
           ),
+          Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Expanded (
+                    child: FloatingActionButton (
+                      backgroundColor: AppGlobal.secondaryColor,
+                      onPressed: null,
+                      child: const Text(
+                        'Devenir Visiteur',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.black,
+                        )
+                        )
+                    ),
+                  ),
+                ),
+              )
+              
+            ],
+          )
         ]
       ), widget, context
     );
