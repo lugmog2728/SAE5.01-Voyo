@@ -48,7 +48,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     fillColor: AppGlobal.buttonback,
                   ),
                   onSaved: (String? value) {
-                    debugPrint('Card number saved as $value');
+                    debugPrint('Card umber saved as $value');
                   },
                 ),
               ),

@@ -94,7 +94,7 @@ class _ConnexionPageState extends State<ConnexionPage> {
                   );
                 },
                 child: const Text(
-                  'Créer un compte',
+                  'Créer votre compte',
                   style: TextStyle(
                     color: Colors.black,
                   ),
