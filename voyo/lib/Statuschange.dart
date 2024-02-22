@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'globals.dart' as AppGlobal;
 
 class ChangementStatutPage extends StatefulWidget {
   const ChangementStatutPage({Key? key, required this.title}) : super(key: key);
@@ -44,127 +43,132 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AppGlobal.Menu(
-      SingleChildScrollView(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: telephoneController,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: "Numéro de téléphone",
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: ribController,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: "RIB/iBAN",
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: tarifController,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: "Tarif horaire",
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Sélectionner un jour',
-                  ),
-                  value: selectedJour,
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedJour = newValue;
-                    });
-                  },
-                  items: jours.map((jour) {
-                    return DropdownMenuItem(
-                      value: jour,
-                      child: Text(jour),
-                    );
-                  }).toList(),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: debutController,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: "Horaire de début",
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: finController,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: "Horaire de fin",
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: _ajouterHoraire,
-                  child: Text('Ajouter horaire'),
-                ),
-              ),
-              for (final horaire in horaires)
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Card(
-                    child: ListTile(
-                      title: Text(
-                        '${horaire['jour']} - Début: ${horaire['debut']}, Fin: ${horaire['fin']}',
+              // Informations
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Informations',
+                        style: TextStyle(fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
-                    ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: telephoneController,
+                        decoration: InputDecoration(
+                          labelText: "Numéro de téléphone",
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: ribController,
+                        decoration: InputDecoration(
+                          labelText: "RIB/iBAN",
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: tarifController,
+                        decoration: InputDecoration(
+                          labelText: "Tarif horaire",
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: _confirmer,
-                  child: Text('Confirmer'),
+              ),
+              SizedBox(height: 20),
+              // Horaires
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Horaires',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        value: selectedJour,
+                        onChanged: (newValue) {
+                          setState(() {
+                            selectedJour = newValue;
+                          });
+                        },
+                        items: jours.map((jour) {
+                          return DropdownMenuItem(
+                            value: jour,
+                            child: Text(jour),
+                          );
+                        }).toList(),
+                      ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: debutController,
+                        decoration: InputDecoration(
+                          labelText: "Horaire de début",
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: finController,
+                        decoration: InputDecoration(
+                          labelText: "Horaire de fin",
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: _ajouterHoraire,
+                        child: Text('Ajouter horaire'),
+                      ),
+                      SizedBox(height: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          for (final horaire in horaires)
+                            Card(
+                              child: ListTile(
+                                title: Text(
+                                  '${horaire['jour']} - Début: ${horaire['debut']}, Fin: ${horaire['fin']}',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: LinearProgressIndicator(
-                  value: _progressValue,
-                ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _confirmer,
+                child: Text('Confirmer'),
+              ),
+              SizedBox(height: 20),
+              LinearProgressIndicator(
+                value: _progressValue,
               ),
             ],
           ),
         ),
       ),
-      widget,
-      context,
     );
   }
 
@@ -177,4 +181,10 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
     tarifController.dispose();
     super.dispose();
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: ChangementStatutPage(title: 'Changement de statut'),
+  ));
 }
