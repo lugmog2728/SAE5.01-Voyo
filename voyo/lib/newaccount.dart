@@ -89,13 +89,10 @@ class _NewAccountPageState extends State<NewAccountPage> {
                         suffixIcon: Icon(Icons.calendar_today),
                       ),
                       onSaved: (String? value) {
-                        debugPrint(
-                            'Value for Date de naissance saved as $value');
+                        debugPrint('Value for Date de naissance saved as $value');
                       },
                       controller: TextEditingController(
-                          text: _selectedDate != null
-                              ? _selectedDate!.toString().substring(0, 10)
-                              : ''),
+                          text: _selectedDate != null ? _selectedDate!.toString().substring(0, 10) : ''),
                     ),
                   ),
                 ),

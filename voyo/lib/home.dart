@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
-import 'visite.dart' as visitePage;
+import 'choose_visitor.dart' as visitePage;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
