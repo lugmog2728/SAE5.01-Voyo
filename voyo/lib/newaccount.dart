@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
 
-class PaymentPage extends StatefulWidget {
-  const PaymentPage({Key? key, required this.title}) : super(key: key);
+class NewAccountPage extends StatefulWidget {
+  const NewAccountPage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
   @override
-  State<PaymentPage> createState() => _PaymentPageState();
+  State<NewAccountPage> createState() => _NewAccountPageState();
 }
 
-class _PaymentPageState extends State<PaymentPage> {
+class _NewAccountPageState extends State<NewAccountPage> {
   DateTime? _selectedDate;
 
   Future<void> _selectDate(BuildContext context) async {
@@ -36,19 +36,65 @@ class _PaymentPageState extends State<PaymentPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Nom",
+                          filled: true,
+                          fillColor: AppGlobal.buttonback,
+                        ),
+                        onSaved: (String? value) {
+                          debugPrint('Value for Nom saved as $value');
+                        },
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Prénom",
+                          filled: true,
+                          fillColor: AppGlobal.buttonback,
+                        ),
+                        onSaved: (String? value) {
+                          debugPrint('Value for Prénom saved as $value');
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: "Numéro de carte",
-                    filled: true,
-                    fillColor: AppGlobal.buttonback,
+                child: GestureDetector(
+                  onTap: () => _selectDate(context),
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                        hintText: "Date de naissance",
+                        filled: true,
+                        fillColor: AppGlobal.buttonback,
+                        border: InputBorder.none,
+                        suffixIcon: Icon(Icons.calendar_today),
+                      ),
+                      onSaved: (String? value) {
+                        debugPrint('Value for Date de naissance saved as $value');
+                      },
+                      controller: TextEditingController(
+                          text: _selectedDate != null ? _selectedDate!.toString().substring(0, 10) : ''),
+                    ),
                   ),
-                  onSaved: (String? value) {
-                    debugPrint('Card number saved as $value');
-                  },
                 ),
               ),
               Row(
@@ -60,12 +106,12 @@ class _PaymentPageState extends State<PaymentPage> {
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
                           border: InputBorder.none,
-                          hintText: "Date d'expiration",
+                          hintText: "Ville",
                           filled: true,
                           fillColor: AppGlobal.buttonback,
                         ),
                         onSaved: (String? value) {
-                          debugPrint('Expiration_date saved as $value');
+                          debugPrint('Value for Ville saved as $value');
                         },
                       ),
                     ),
@@ -77,12 +123,12 @@ class _PaymentPageState extends State<PaymentPage> {
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
                           border: InputBorder.none,
-                          hintText: "Code de sécurité",
+                          hintText: "Code postal",
                           filled: true,
                           fillColor: AppGlobal.buttonback,
                         ),
                         onSaved: (String? value) {
-                          debugPrint('Security code saved as $value');
+                          debugPrint('Value for Code postal saved as $value');
                         },
                       ),
                     ),
@@ -91,16 +137,92 @@ class _PaymentPageState extends State<PaymentPage> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: "Adresse postal",
+                    filled: true,
+                    fillColor: AppGlobal.buttonback,
+                  ),
+                  onSaved: (String? value) {
+                    debugPrint('Value for Adresse postal saved as $value');
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: "Adresse mail",
+                    filled: true,
+                    fillColor: AppGlobal.buttonback,
+                  ),
+                  onSaved: (String? value) {
+                    debugPrint('Value for Adresse mail saved as $value');
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: "Mot de passe",
+                    filled: true,
+                    fillColor: AppGlobal.buttonback,
+                  ),
+                  onSaved: (String? value) {
+                    debugPrint('Value for Mot de passe saved as $value');
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Photo",
+                          filled: true,
+                          fillColor: AppGlobal.buttonback,
+                        ),
+                        onSaved: (String? value) {
+                          debugPrint('Value for Photo saved as $value');
+                        },
+                      ),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.yellow,
+                        onPrimary: Colors.white,
+                      ),
+                      onPressed: () {},
+                      child: const Text(
+                        'Parcourir',
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     primary: Colors.yellow,
                     onPrimary: Colors.white,
                   ),
-                  onPressed: () {
-                    // Ajouter la logique de paiement ici
-                  },
+                  onPressed: () {},
                   child: const Text(
-                    'Payer',
+                    'Valider',
                     style: TextStyle(color: Colors.black),
                   ),
                 ),
