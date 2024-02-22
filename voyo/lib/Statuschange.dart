@@ -49,61 +49,75 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Informations
               Card(
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  side: BorderSide(color: Colors.yellow, width: 2),
+                ),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(20.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
                         'Informations',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 20.0),
                       TextFormField(
                         controller: telephoneController,
                         decoration: InputDecoration(
                           labelText: "Numéro de téléphone",
+                          filled: true,
+                          fillColor: Colors.blue[50], // Couleur de fond du champ de texte
                         ),
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 20.0),
                       TextFormField(
                         controller: ribController,
                         decoration: InputDecoration(
                           labelText: "RIB/iBAN",
+                          filled: true,
+                          fillColor: Colors.blue[50], // Couleur de fond du champ de texte
                         ),
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 20.0),
                       TextFormField(
                         controller: tarifController,
                         decoration: InputDecoration(
                           labelText: "Tarif horaire",
+                          filled: true,
+                          fillColor: Colors.blue[50], // Couleur de fond du champ de texte
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              // Horaires
+              SizedBox(height: 20.0),
               Card(
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  side: BorderSide(color: Colors.yellow, width: 2),
+                ),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(20.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
                         'Horaires',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 20.0),
                       DropdownButtonFormField<String>(
                         value: selectedJour,
                         onChanged: (newValue) {
@@ -118,26 +132,33 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
                           );
                         }).toList(),
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 20.0),
                       TextFormField(
                         controller: debutController,
                         decoration: InputDecoration(
                           labelText: "Horaire de début",
+                          filled: true,
+                          fillColor: Colors.blue[50], // Couleur de fond du champ de texte
                         ),
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 20.0),
                       TextFormField(
                         controller: finController,
                         decoration: InputDecoration(
                           labelText: "Horaire de fin",
+                          filled: true,
+                          fillColor: Colors.blue[50], // Couleur de fond du champ de texte
                         ),
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 20.0),
                       ElevatedButton(
                         onPressed: _ajouterHoraire,
                         child: Text('Ajouter horaire'),
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.yellow, // Couleur de fond du bouton
+                        ),
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 20.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -156,14 +177,19 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: _confirmer,
                 child: Text('Confirmer'),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.yellow, // Couleur de fond du bouton
+                ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 20.0),
               LinearProgressIndicator(
                 value: _progressValue,
+                backgroundColor: Colors.blue[50], // Couleur de fond de la barre de progression
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.yellow), // Couleur de remplissage de la barre de progression
               ),
             ],
           ),
@@ -181,10 +207,4 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
     tarifController.dispose();
     super.dispose();
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: ChangementStatutPage(title: 'Changement de statut'),
-  ));
 }
