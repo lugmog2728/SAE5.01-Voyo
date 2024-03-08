@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
 import 'connexion.dart' as connexionPage;
-
+import 'Statuschange.dart' as statChange;
 void main() {
   runApp(const MyApp());
 }
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
           scaffoldBackgroundColor: AppGlobal.backgroundColor),
-      home: const connexionPage.ConnexionPage(title: 'Connexion'),
+      home: const statChange.ChangementStatutPage(title: 'status'),
     );
   }
 }

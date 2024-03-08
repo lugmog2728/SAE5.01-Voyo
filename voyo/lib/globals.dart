@@ -146,3 +146,27 @@ Scaffold Menu(content, widget, context) {
     ),
   );
 }
+
+Row etoile(nbetoile, w, h) {
+  List<Widget> list = [];
+  for (var i = 0; i < nbetoile; i++) {
+    list.add(Image.asset(
+      'assets/images/etoilePleine.png',
+      width: w,
+      height: h,
+    ));
+  }
+  for (var i = 0; i < 5-nbetoile; i++) {
+    list.add(Image.asset(
+      'assets/images/etoileVide.png',
+      width: w,
+      height: h,
+    ));
+  }
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      for (var img in list) img,
+    ],
+  );
+} 

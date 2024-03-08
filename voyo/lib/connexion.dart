@@ -11,7 +11,7 @@ class ConnexionPage extends StatefulWidget {
   @override
   State<ConnexionPage> createState() => _ConnexionPageState();
 }
-
+//Obscuretext
 class _ConnexionPageState extends State<ConnexionPage> {
   @override
   Widget build(BuildContext context) {
@@ -45,8 +45,10 @@ class _ConnexionPageState extends State<ConnexionPage> {
                 child: Expanded(
                   child: TextFormField(
                     textAlign: TextAlign.center,
+                    obscureText: true,
                     decoration: InputDecoration(
                       hintText: "Mot de passe",
+
                       filled: true,
                       fillColor: AppGlobal.buttonback,
                       border: InputBorder.none,
@@ -94,7 +96,7 @@ class _ConnexionPageState extends State<ConnexionPage> {
                   );
                 },
                 child: const Text(
-                  'Créer un compte',
+                  'Créer votre compte',
                   style: TextStyle(
                     color: Colors.black,
                   ),
