@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Ajout de cette ligne pour importer FilteringTextInputFormatter
+import 'package:flutter/services.dart'; // Importation de cette ligne pour FilteringTextInputFormatter
 import 'globals.dart' as AppGlobal;
 
 class ChangementStatutPage extends StatefulWidget {
@@ -15,24 +15,62 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
   final List<String> jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
   String? selectedJour;
   final List<Map<String, String>> horaires = [];
-  final TextEditingController debutController = TextEditingController();
-  final TextEditingController finController = TextEditingController();
+  final TextEditingController debutHourController = TextEditingController();
+  final TextEditingController debutMinuteController = TextEditingController();
+  final TextEditingController finHourController = TextEditingController();
+  final TextEditingController finMinuteController = TextEditingController();
   final TextEditingController telephoneController = TextEditingController();
   final TextEditingController ribController = TextEditingController();
   final TextEditingController tarifController = TextEditingController();
   double _progressValue = 0.0;
 
+  // Fonction pour vérifier si une heure ou minute est valide (0 à 24 pour heures et 0 à 60 pour minutes)
+  bool _isHoraireValide(String value) {
+    try {
+      int intValue = int.parse(value);
+      if (intValue < 0 || intValue > 24) {
+        return false;
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   void _ajouterHoraire() {
-    if (selectedJour != null && debutController.text.isNotEmpty && finController.text.isNotEmpty) {
+    bool debutHourValide = _isHoraireValide(debutHourController.text);
+    bool debutMinuteValide = _isHoraireValide(debutMinuteController.text);
+    bool finHourValide = _isHoraireValide(finHourController.text);
+    bool finMinuteValide = _isHoraireValide(finMinuteController.text);
+
+    if (selectedJour != null &&
+        debutHourValide &&
+        debutMinuteValide &&
+        finHourValide &&
+        finMinuteValide) {
       setState(() {
         horaires.add({
           'jour': selectedJour!,
-          'debut': debutController.text,
-          'fin': finController.text,
+          'debut': '${debutHourController.text}:${debutMinuteController.text}',
+          'fin': '${finHourController.text}:${finMinuteController.text}',
         });
-        debutController.clear();
-        finController.clear();
+        debutHourController.clear();
+        debutMinuteController.clear();
+        finHourController.clear();
+        finMinuteController.clear();
       });
+    } else {
+      String errorMessage = 'Veuillez entrer un horaire valide';
+      if (!debutHourValide || !debutMinuteValide) {
+        debutHourController.clear();
+        debutMinuteController.clear();
+        debutHourController.text = errorMessage;
+      }
+      if (!finHourValide || !finMinuteValide) {
+        finHourController.clear();
+        finMinuteController.clear();
+        finHourController.text = errorMessage;
+      }
     }
   }
 
@@ -41,28 +79,6 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
       _progressValue = 0.0; // Réinitialiser la barre de progression
     });
     // Action de confirmation à implémenter ici
-  }
-
-  TextFormField buildHourInput(TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
-      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9:]'))],
-      decoration: InputDecoration(
-        labelText: "Horaire",
-        suffixText: 'heure',
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Veuillez saisir une heure valide';
-        }
-        // Vérifier le format de l'heure ici
-        final validFormat = RegExp(r'^[0-2]?[0-9]:[0-5][0-9]$').hasMatch(value);
-        if (!validFormat) {
-          return 'Format d\'heure invalide. Utilisez HH:MM';
-        }
-        return null;
-      },
-    );
   }
 
   @override
@@ -137,9 +153,71 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
                       }).toList(),
                     ),
                     SizedBox(height: 20.0),
-                    buildHourInput(debutController),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: debutHourController,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(2),
+                            ],
+                            decoration: InputDecoration(
+                              labelText: "Heure de début",
+                              errorText: debutHourController.text == 'Veuillez entrer un horaire valide' ? 'Veuillez entrer un horaire valide' : null,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 20.0),
+                        Expanded(
+                          child: TextFormField(
+                            controller: debutMinuteController,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(2),
+                            ],
+                            decoration: InputDecoration(
+                              labelText: "Minute de début",
+                              errorText: debutMinuteController.text == 'Veuillez entrer un horaire valide' ? 'Veuillez entrer un horaire valide' : null,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     SizedBox(height: 20.0),
-                    buildHourInput(finController),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: finHourController,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(2),
+                            ],
+                            decoration: InputDecoration(
+                              labelText: "Heure de fin",
+                              errorText: finHourController.text == 'Veuillez entrer un horaire valide' ? 'Veuillez entrer un horaire valide' : null,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 20.0),
+                        Expanded(
+                          child: TextFormField(
+                            controller: finMinuteController,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(2),
+                            ],
+                            decoration: InputDecoration(
+                              labelText: "Minute de fin",
+                              errorText: finMinuteController.text == 'Veuillez entrer un horaire valide' ? 'Veuillez entrer un horaire valide' : null,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     SizedBox(height: 20.0),
                     ElevatedButton(
                       onPressed: _ajouterHoraire,
@@ -153,20 +231,10 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         for (final horaire in horaires)
-                          Card(
-                            child: ListTile(
-                              title: Text(
-                                '${horaire['jour']} - Début: ${horaire['debut']} heure, Fin: ${horaire['fin']} heure',
-                                textAlign: TextAlign.center,
-                              ),
-                              trailing: IconButton(
-                                icon: Icon(Icons.delete),
-                                onPressed: () {
-                                  setState(() {
-                                    horaires.remove(horaire);
-                                  });
-                                },
-                              ),
+                          ListTile(
+                            title: Text(
+                              '${horaire['jour']} - Début: ${horaire['debut']}, Fin: ${horaire['fin']}',
+                              textAlign: TextAlign.center,
                             ),
                           ),
                       ],
