@@ -12,6 +12,7 @@ class RdvClosePage extends StatefulWidget {
 
 class _RdvClosePageState extends State<RdvClosePage> {
   List<bool> _isOpen = [false, false, false]; // State for whether each point is open
+  int _rating = 0; // State for the selected rating
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +27,76 @@ class _RdvClosePageState extends State<RdvClosePage> {
               _buildPointRectangle('Point 1', 0),
               _buildPointRectangle('Point 2', 1),
               _buildPointRectangle('Point 3', 2),
+              // Bouton Télécharger en PDF
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Action lorsque le bouton Télécharger en PDF est pressé
+                  },
+                  child: Text('Télécharger en PDF'),
+                ),
+              ),
+              // Rectangle pour les notes
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  color: Colors.grey[300],
+                  padding: EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Text('Note:'),
+                      SizedBox(width: 8),
+                      // Ajouter les étoiles ici
+                      Row(
+                        children: List.generate(5, (index) {
+                          return IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _rating = index + 1;
+                              });
+                            },
+                            icon: Icon(
+                              index < _rating ? Icons.star : Icons.star_border,
+                              color: Colors.yellow,
+                            ),
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Rectangle pour les commentaires
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  color: Colors.grey[300],
+                  padding: EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text('Commentaire:'),
+                      SizedBox(height: 8),
+                      TextField(
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          // Action lorsque le commentaire est modifié
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               // Bouton Valider
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    // Action lorsque le bouton de validation est pressé
+                    // Action lorsque le bouton Valider est pressé
                   },
                   child: Text('Valider'),
                 ),
