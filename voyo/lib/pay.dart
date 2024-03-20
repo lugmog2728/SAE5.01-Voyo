@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
-import 'newaccount.dart' as newAccountPage;
+import 'home.dart' as HomePage; // Importer la page d'accueil
 
-class PaymentPage extends StatefulWidget {
-  const PaymentPage({Key? key, required this.title}) : super(key: key);
+class PayPage extends StatefulWidget {
+  const PayPage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
   @override
-  State<PaymentPage> createState() => _PaymentPageState();
+  State<PayPage> createState() => _PayPageState();
 }
 
-class _PaymentPageState extends State<PaymentPage> {
+class _PayPageState extends State<PayPage> {
   DateTime? _selectedDate;
 
   Future<void> _selectDate(BuildContext context) async {
@@ -48,7 +48,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     fillColor: AppGlobal.buttonback,
                   ),
                   onSaved: (String? value) {
-                    debugPrint('Card umber saved as $value');
+                    debugPrint('Card number saved as $value');
                   },
                 ),
               ),
@@ -98,7 +98,11 @@ class _PaymentPageState extends State<PaymentPage> {
                     onPrimary: Colors.white,
                   ),
                   onPressed: () {
-                    // Ajouter la logique de paiement ici
+                    // Add payment logic here
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage.HomePage(title: 'Home')), // Remplace la page actuelle par la page d'accueil
+                    );
                   },
                   child: const Text(
                     'Payer',
