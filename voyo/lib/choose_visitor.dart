@@ -1,11 +1,8 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'globals.dart' as AppGlobal;
 
 class VisitePage extends StatefulWidget {
-  const VisitePage({super.key, required this.title});
-
+  const VisitePage({Key? key, required this.title}) : super(key: key);
   final String title;
 
   @override
@@ -14,176 +11,208 @@ class VisitePage extends StatefulWidget {
 
 class _VisitePageState extends State<VisitePage> {
   String? _selectedOption = "";
-
   var items = ['T1', "T2", "Villa"];
+  final List<String> pointToCheck = ["toto", "tete"];
+  List<Widget> extraFields = [];
 
   @override
   Widget build(BuildContext context) {
     return AppGlobal.Menu(
-        SingleChildScrollView(
-          child: Column(
-            children: [
-              Form(
+      SingleChildScrollView(
+        child: Column(
+          children: [
+            Form(
               autovalidateMode: AutovalidateMode.always,
               onChanged: () {
                 Form.of(primaryFocus!.context!).save();
               },
-                child: Wrap(
-                  children: [
-                    Padding(padding: const EdgeInsets.all(8.0),
-                      child:DropdownButtonFormField(
-                        decoration: InputDecoration(
-                          hintText: 'Type de logement',
-                          filled: true,
-                          fillColor: AppGlobal.buttonback,
-                        ),
-                        dropdownColor: Colors.amber,
-                        items: items.map((items){
-                          return DropdownMenuItem(value : items, child: Text(items));
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            _selectedOption = newValue;
-                          });
-                        }
+              child: Wrap(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: DropdownButtonFormField(
+                      decoration: InputDecoration(
+                        hintText: 'Type de logement',
+                        filled: true,
+                        fillColor: AppGlobal.buttonback,
                       ),
+                      dropdownColor: Colors.amber,
+                      items: items.map((item) {
+                        return DropdownMenuItem(value: item, child: Text(item));
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedOption = newValue;
+                        });
+                      },
                     ),
-                    Row(
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            textAlign: TextAlign.left,
+                            decoration: InputDecoration(
+                              hintText: "Ville",
+                              filled: true,
+                              fillColor: AppGlobal.buttonback,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            textAlign: TextAlign.left,
+                            decoration: InputDecoration(
+                              hintText: "Rue",
+                              filled: true,
+                              fillColor: AppGlobal.buttonback,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            textAlign: TextAlign.left,
+                            decoration: InputDecoration(
+                              hintText: "code postale",
+                              filled: true,
+                              fillColor: AppGlobal.buttonback,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Visitor("thomas", "thomas", "lyon", "13", "26"),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: extraFields.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index < extraFields.length) {
+                        return Row(
+                          children: [
+                            Expanded(child: extraFields[index]),
+                            IconButton(
+                              icon: Icon(Icons.remove),
+                              onPressed: () {
+                                setState(() {
+                                  extraFields.removeAt(index);
+                                });
+                              },
+                            ),
+                          ],
+                        );
+                      } else {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            textAlign: TextAlign.left,
+                            decoration: InputDecoration(
+                              hintText: "ex: WC séparé",
+                              filled: true,
+                              fillColor: AppGlobal.buttonback,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0), // ajustez le padding selon vos besoins
-                            child: TextFormField(
-                              textAlign: TextAlign.left,
-                              decoration: InputDecoration(
-                                hintText: "Ville",
-                                filled: true,
-                                fillColor: AppGlobal.buttonback,
-                              ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8, right: 8),
+                          child: FloatingActionButton(
+                            backgroundColor: AppGlobal.secondaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
                             ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0), // ajustez le padding selon vos besoins
-                            child: TextFormField(
-                              textAlign: TextAlign.left,
-                              decoration: InputDecoration(
-                                hintText: "Rue",
-                                filled: true,
-                                fillColor: AppGlobal.buttonback,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0), // ajustez le padding selon vos besoins
-                            child: TextFormField(
-                              textAlign: TextAlign.left,
-                              decoration: InputDecoration(
-                                hintText: "code postale",
-                                filled: true,
-                                fillColor: AppGlobal.buttonback,
+                            onPressed: () {
+                              bool allFieldsFilled = true;
+                              extraFields.forEach((field) {
+                                if (field is TextFormField) {
+                                  if (field.controller!.text.isEmpty) {
+                                    allFieldsFilled = false;
+                                  }
+                                }
+                              });
+                              if (allFieldsFilled) {
+                                setState(() {
+                                  extraFields.add(
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: TextFormField(
+                                        textAlign: TextAlign.left,
+                                        decoration: InputDecoration(
+                                          hintText: "ex: WC séparé",
+                                          filled: true,
+                                          fillColor: AppGlobal.buttonback,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                });
+                              }
+                            },
+                            child: const Text(
+                              "+",
+                              style: TextStyle(
+                                fontSize: 25.0,
+                                color: Colors.black,
                               ),
                             ),
                           ),
                         ),
                       ],
                     ),
-                    Visitor("thomas", "thomas", "lyon", "13", "26"),
-                    Row(children: [
+                  ),
+
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16.0),
+                  child: Row(
+                    children: [
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.only(left: 8, right: 8),
                           child: FloatingActionButton(
-                              backgroundColor: AppGlobal.secondaryColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                              onPressed: null,
-                              child: const Expanded(
-                                  child: Text(
-                                    "Voir profil",
-                                    style: TextStyle(color: Colors.black),
-                                  ))),
-                        ),
-                      ),
-                    ]),
-
-                    const Padding(padding: EdgeInsets.all(10.0),
-                      child: Text(
-                        'Point à vérifier:',
-                        style: TextStyle(
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
-                          textAlign: TextAlign.left,
-                          decoration: InputDecoration(
-                            hintText: "ex: WC séparé",
-                            filled: true,
-                            fillColor: AppGlobal.buttonback,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    Center(
-                      child:
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8,bottom: 8),
-                          child:FloatingActionButton(
-                            backgroundColor: AppGlobal.primaryColor,
+                            backgroundColor: AppGlobal.secondaryColor,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                             onPressed: null,
-                            child:
-                            const Expanded(
-                              child : Text(
-                                '+',
-                                style: TextStyle(
-                                  fontSize: 25.0,
-                                  color: Colors.black
-                                ),
-                              )
-                            )
-                          ),
-                        ),
-                      ),
-
-                    Row(children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 8,right: 8),
-                          child:FloatingActionButton(
-                              backgroundColor: AppGlobal.secondaryColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
+                            child: const Expanded(
+                              child: Text(
+                                "Valider et payer",
+                                style: TextStyle(color: Colors.black),
                               ),
-                              onPressed: null,
-                              child: const Expanded( child : Text("Valider et payer",style: TextStyle(color: Colors.black),))
+                            ),
                           ),
                         ),
                       ),
-                    ]),
-                  ]),
+                    ],
+                  ),
+                )
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        widget,
-    context);
+      ),
+      widget,
+      context,
+    );
   }
 }
+
 Padding Visitor(name,surname,city,rate,cost) {
   return Padding(
     padding: const EdgeInsets.all(8.0),
