@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
+import 'home.dart' as HomePage; // Importer la page d'accueil
 
 class PayPage extends StatefulWidget {
   const PayPage({Key? key, required this.title}) : super(key: key);
@@ -98,6 +99,10 @@ class _PayPageState extends State<PayPage> {
                   ),
                   onPressed: () {
                     // Add payment logic here
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage.HomePage(title: 'Home')), // Remplace la page actuelle par la page d'accueil
+                    );
                   },
                   child: const Text(
                     'Payer',
