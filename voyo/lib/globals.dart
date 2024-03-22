@@ -1,9 +1,12 @@
 library my_prj.globals;
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'home.dart' as homePage;
 import 'chat.dart' as chatPage;
 import 'profile.dart' as profilPage;
+import 'package:http/http.dart' as http;
 
 Color primaryColor = const Color(0xFFFE881C);
 Color secondaryColor = const Color(0xFFFEC534);
@@ -169,4 +172,24 @@ Row etoile(nbetoile, w, h) {
       for (var img in list) img,
     ],
   );
-} 
+}
+
+
+Future<List<dynamic>?> fetchData(String urlString) async {
+  var url = Uri.parse(urlString);
+
+  try {
+    var response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = json.decode(response.body);
+      return jsonData;
+    } else {
+      print('Erreur de requête : ${response.statusCode}');
+      return null;
+    }
+  } catch (e) {
+    print('Erreur de connexion : $e');
+    return null;
+  }
+}
