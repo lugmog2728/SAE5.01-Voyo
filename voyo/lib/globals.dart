@@ -194,3 +194,22 @@ Future<List<dynamic>?> fetchData(String urlString) async {
     return null;
   }
 }
+
+Future<Map<String, dynamic>?> fetchDataMap(String urlString) async {
+  var url = Uri.parse(urlString);
+
+  try {
+    var response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonData = json.decode(response.body);
+      return jsonData;
+    } else {
+      print('Erreur de requête : ${response.statusCode}');
+      return null;
+    }
+  } catch (e) {
+    print('Erreur de connexion : $e');
+    return null;
+  }
+}
