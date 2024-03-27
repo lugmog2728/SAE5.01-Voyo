@@ -11,150 +11,159 @@ class RdvPage extends StatefulWidget {
 }
 
 class _RdvPageState extends State<RdvPage> {
-  final TextEditingController typeLogementController = TextEditingController();
-  final TextEditingController villeController = TextEditingController();
-  final TextEditingController rueController = TextEditingController();
-  final TextEditingController codePostalController = TextEditingController();
-  final TextEditingController nomUtilisateurController = TextEditingController();
-  final TextEditingController imageController = TextEditingController();
+  DateTime? _selectedDate;
+  List<String> _points = [];
+  TextEditingController _newPointController = TextEditingController();
 
-  final List<String> points = [];
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (pickedDate != null && pickedDate != _selectedDate) {
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    }
+  }
+
+  void _addPoint(String point) {
+    setState(() {
+      _points.add(point);
+      _newPointController.clear(); // Clear the text field after adding the point
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: SingleChildScrollView(
+    return AppGlobal.Menu(
+      SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextFormField(
-                          controller: typeLogementController,
-                          decoration: InputDecoration(labelText: "Type de logement"),
-                        ),
-                        SizedBox(height: 20.0),
-                        TextFormField(
-                          controller: villeController,
-                          decoration: InputDecoration(labelText: "Ville"),
-                        ),
-                        SizedBox(height: 20.0),
-                        TextFormField(
-                          controller: rueController,
-                          decoration: InputDecoration(labelText: "Rue"),
-                        ),
-                        SizedBox(height: 20.0),
-                        TextFormField(
-                          controller: codePostalController,
-                          decoration: InputDecoration(labelText: "Code Postal"),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 20.0),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Text('Utilisateur'),
-                        SizedBox(height: 10),
-                        Container(
-                          width: 100,
-                          height: 100,
-                          color: Colors.grey, // Placeholder for user image
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Photo', // Placeholder for user image
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Action when view profile button is pressed
-                          },
-                          child: Text('Voir Profil'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              // Logo
+              Container(
+                alignment: Alignment.center,
+                child: Text('Logo'),
               ),
-              SizedBox(height: 20.0),
-              Text(
-                'Points',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 20.0),
-              Column(
-                children: [
-                  for (var i = 0; i < points.length; i++)
-                    ListTile(
-                      title: Text(points[i]),
-                      trailing: IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () {
-                          setState(() {
-                            points.removeAt(i);
-                          });
-                        },
+              // Infos
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Type de logement:'),
+                          SizedBox(height: 4),
+                          Text('Ville:'),
+                          SizedBox(height: 4),
+                          Text('Rue:'),
+                          SizedBox(height: 4),
+                          Text('Code Postal:'),
+                        ],
                       ),
                     ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        points.add('Nouveau point');
-                      });
-                    },
-                    child: Text('Ajouter Point'),
-                    style: ElevatedButton.styleFrom(
-                      primary: AppGlobal.primaryColor,
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        color: Colors.grey[200],
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Nom d\'utilisateur:', style: TextStyle(fontWeight: FontWeight.bold)),
+                            SizedBox(height: 8),
+                            Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.black),
+                              ),
+                              child: Center(
+                                child: Text('Photo'),
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Action when view profile button is pressed
+                              },
+                              child: Text('Voir Profil'),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              SizedBox(height: 20.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      // Action when cancel button is pressed
-                    },
-                    child: Text('Annuler RDV'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Action when start visit button is pressed
-                    },
-                    child: Text('Démarrer la visite'),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20.0),
-              Image.asset(
-                'assets/images/voyo_logo.png', // Path to Voyo logo image
-                width: 200,
-              ),
-              SizedBox(height: 20.0),
-              Container(
-                color: AppGlobal.primaryColor,
-                padding: EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              // Liste de Points
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '© 2024 Voyo. Tous droits réservés.',
-                      style: TextStyle(color: Colors.white),
+                    Text('Liste de Points:', style: TextStyle(fontWeight: FontWeight.bold)),
+                    for (String point in _points)
+                      ListTile(
+                        title: Text(point),
+                      ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _newPointController,
+                            decoration: InputDecoration(
+                              labelText: 'Nouveau point',
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            String newPoint = _newPointController.text.trim();
+                            if (newPoint.isNotEmpty) {
+                              _addPoint(newPoint);
+                            }
+                          },
+                          child: Text('Ajouter'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              // Boutons Annuler RDV et Débuter la visite
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        // Action when cancel button is pressed
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.red,
+                        onPrimary: Colors.white,
+                      ),
+                      child: Text('Annuler RDV'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Action when start visit button is pressed
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.green,
+                        onPrimary: Colors.white,
+                      ),
+                      child: Text('Débuter la visite'),
                     ),
                   ],
                 ),
@@ -163,6 +172,8 @@ class _RdvPageState extends State<RdvPage> {
           ),
         ),
       ),
+      widget,
+      context,
     );
   }
 }
