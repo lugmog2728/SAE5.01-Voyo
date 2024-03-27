@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'globals.dart' as AppGlobal;
+import 'globals.dart' as app_global;
+import 'Statuschange.dart' as status_change;
+import 'availibility.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, required this.title});
@@ -9,41 +10,6 @@ class ProfilePage extends StatefulWidget {
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
-}
-
-class Availibility {
-  late String day;
-  late TimeOfDay startTime;
-  late TimeOfDay endTime;
-
-  Availibility(this.day, int hStart, int mStart, int hEnd, int mEnd) {
-    startTime = TimeOfDay(hour: hStart, minute: mStart);
-    endTime = TimeOfDay(hour: hEnd, minute: mEnd);
-  }
-  
-  TimeOfDay getTime(bool isTimeEnd) {
-    if (isTimeEnd) {
-      return endTime;
-    }
-    return startTime;
-  }
-
-  void updateAvailibility(Availibility availibility) {
-    day = availibility.day;
-    startTime = availibility.startTime;
-    endTime = availibility.endTime;
-  }
-
-  bool compare(Availibility availibility) {
-    if (daysMap[day] == daysMap[availibility.day]) {
-      return startTime.hour < availibility.startTime.hour;
-    }
-    return daysMap[day]! < daysMap[availibility.day]!;
-  }
-
-  Availibility copy() {
-    return Availibility(day, startTime.hour, startTime.minute, endTime.hour, endTime.minute);
-  }
 }
 
 class Comment {
@@ -58,7 +24,7 @@ class Comment {
 
 /*Réutilisation de Widget*/
 ButtonStyle buttonStyle = ElevatedButton.styleFrom(
-  backgroundColor: AppGlobal.primaryColor,
+  backgroundColor: app_global.primaryColor,
   foregroundColor: Colors.black
 );
 /*Fin*/
@@ -66,13 +32,12 @@ ButtonStyle buttonStyle = ElevatedButton.styleFrom(
 bool isVisitor = true;
 String statut = "";
 bool isEdit = false;
+bool isError = false;
+int maxAvailibility = 10;
 
-/*List<String> days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];*/
-Map<String, int> daysMap = {"Lundi":1, "Mardi":2, "Mercredi":3, "Jeudi":4,"Vendredi":5, "Samedi":6, "Dimanche":7};
-Image placeholder = Image.asset("assets/images/profilePicture.jpg", width: 140, height: 180,);
+Image placeholder = Image.asset("assets/images/placeholder.webp", width: 140, height: 180,);
 
 class _ProfilePageState extends State<ProfilePage> {
-
   double heightLabel = 180;
 
   Border borderInformation = const Border ();
@@ -84,8 +49,8 @@ class _ProfilePageState extends State<ProfilePage> {
   String imageUrl = "imageProfil.png";
   int rating = 2;
   List<Availibility> availibilities = [Availibility("Lundi", 16, 0, 18, 0), Availibility("Vendredi", 14, 0, 16, 0), Availibility("Mardi", 9, 20, 15, 0)];
-  List<Comment> comments = [Comment('Utilisateur aléatoire', 'assets/images/profilePicture.jpg', 4, 'Voici un commentaire des plus pertinenant sur un visiteur très charismatique', '12/10/2023'),
-    Comment('Utilisateur aléatoire', 'assets/images/profilePicture.jpg', 2, 'NUL à chier mais 2 étoiles parce que j''ai pas race', '02/02/2024')];
+  List<Comment> comments = [Comment('Utilisateur aléatoire', 'imageProl.png', 4, 'Voici un commentaire des plus pertinenant sur un visiteur très charismatique', '12/10/2023'),
+    Comment('Utilisateur aléatoire', 'imageProfil.png', 2, "NUL à chier mais 2 étoiles parce que j'ai pas race", '02/02/2024')];
   int selectedComments = 0;
 
   TextEditingController nameController = TextEditingController();
@@ -93,6 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController cityController = TextEditingController();
   TextEditingController hourlyRateController = TextEditingController();
   List<Availibility> availibilitiesController = [];
+  List<int> availibilitiesError = [];
 
   Widget nameWidget = Container();
   Widget firstNameWidget = Container();
@@ -104,7 +70,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    shortAvailibilities();
+    availibilities = shortAvailibilities(availibilities);
     initAvailibilitiesController();
   }
 
@@ -115,21 +81,22 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void shortAvailibilities() {
-    List<Availibility> shortAvailibilities = [];
-    for (Availibility old in availibilities) {
-      int i = 0;
-      bool find = false;
-      
-      while (!find && i != shortAvailibilities.length) {
-        find = old.compare(shortAvailibilities[i]);
-        if (!find) {
-          i++;
+  bool checkAvailibilities() {
+    bool error = false;
+    for (int i = 0; i < availibilitiesController.length; i++) {
+      if (availibilitiesController[i].getMinutePeriod() < 60) {
+        error = true;
+        availibilitiesError.add(i);
+      } else {
+        for (int j = i+1; j < availibilitiesController.length; j++) {
+          if (availibilitiesController[i].isInclude(availibilitiesController[j])) {
+            error = true;
+            availibilitiesError.add(j);
+          }
         }
       }
-      shortAvailibilities.insert(i, old);
-    } 
-    availibilities = shortAvailibilities;
+    }
+    return error;
   }
 
   void viewingMode() {
@@ -137,7 +104,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     borderInformation = Border (
       bottom: BorderSide (
-        color: AppGlobal.secondaryColor,
+        color: app_global.secondaryColor,
         width: 3,
       )
     );
@@ -148,6 +115,7 @@ class _ProfilePageState extends State<ProfilePage> {
     hourlyRateWidget = editProfileText("$hourlyRate€");
 
     editAppBar = AppBar(toolbarHeight: 0.0);
+    availibilitiesError.clear();
   }
 
   void editprofile() {
@@ -155,7 +123,6 @@ class _ProfilePageState extends State<ProfilePage> {
       isEdit = !isEdit;
     });
   }
-
   void editMode() {
     heightLabel = 300;
     borderInformation = const Border();
@@ -179,50 +146,82 @@ class _ProfilePageState extends State<ProfilePage> {
     );
 
     editAppBar = AppBar(
-      backgroundColor: AppGlobal.backgroundColor,
+      backgroundColor: app_global.backgroundColor,
       shadowColor: Colors.black,
       shape: Border(
         bottom: BorderSide(
-          color: AppGlobal.secondaryColor,
-          width: 2.0,
+          color: app_global.secondaryColor,
+          width: 1.0,
         ),
       ),
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          ElevatedButton(
-            onPressed: () => updateData(),
-            style: buttonStyle,
-            child: const Icon(Icons.task_outlined)
+      toolbarHeight: 80,
+      title: Column (
+        children: [Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton(
+                onPressed: () => updateData(),
+                style: buttonStyle,
+                child: const Icon(Icons.task_outlined)
+              ),
+              ElevatedButton(
+                onPressed: () => cancelUpdate(),
+                style: buttonStyle,
+                child: const Icon(Icons.cancel_outlined)
+              ),
+            ]
           ),
-          ElevatedButton(
-            onPressed: () => cancelUpdate(),
-            style: buttonStyle,
-            child: const Icon(Icons.cancel_outlined)
-          )
-        ]
-      )
+          Visibility (
+            visible: isError,
+            child: const Text(
+              "Erreur ! Des horaires sont invalide. La mise à jour ne peut s'effectuer",
+              style: TextStyle(
+                color: Colors.red,
+                fontStyle: FontStyle.italic,
+                fontSize: 12,
+              ),
+            ),
+          ),
+          ],
+        )
     );
   }
 
   void cancelUpdate() {
-    for (int i = 0; i < availibilities.length; i++) {
-      availibilitiesController[i].updateAvailibility(availibilities[i]);
-    }
+    setState(() {
+      isError = false;
+    });
+    initAvailibilitiesController();
     editprofile();
   }
 
   void updateData() {
-    name = nameController.text;
-    firstName = firstNameController.text;
-    city = cityController.text;
-    hourlyRate = hourlyRateController.text;
-    for (int i = 0; i < availibilities.length; i++) {
-      availibilities[i].updateAvailibility(availibilitiesController[i]);
+    setState(() {
+      isError = checkAvailibilities();
+      availibilitiesController;
+    });
+    if (!isError) {
+      name = nameController.text;
+      firstName = firstNameController.text;
+      city = cityController.text;
+      hourlyRate = hourlyRateController.text;
+      int index = 0;
+      for (Availibility availibility in availibilitiesController) {
+        if (index < availibilities.length) {
+          availibilities[index].updateAvailibility(availibilitiesController[index]);
+        } else {
+          availibilities.add(availibility);
+        }
+        index++;
+      }
+      while (index < availibilities.length) {
+        availibilities.removeAt(index);
+      }
+
+      availibilities = shortAvailibilities(availibilities);
+      initAvailibilitiesController();
+      editprofile();
     }
-    shortAvailibilities();
-    initAvailibilitiesController();
-    editprofile();
   }
 
   @override
@@ -234,7 +233,7 @@ class _ProfilePageState extends State<ProfilePage> {
     } else {viewingMode();}
 
 
-    return AppGlobal.Menu(
+    return app_global.Menu(
       Scaffold(
         appBar: editAppBar,
         body: SingleChildScrollView(
@@ -274,11 +273,11 @@ class _ProfilePageState extends State<ProfilePage> {
               Row(children: [ 
                 Padding (
                   padding: const EdgeInsets.only(left: 16, right: 16),
-                  child: Image.network('${AppGlobal.UrlServer}/image/$imageUrl', 
+                  child: Image.network('${app_global.UrlServer}/image/$imageUrl', 
                     width: 140,
                     height: 180, 
                     errorBuilder: (context, error, stackTrace) => placeholder,
-                    loadingBuilder: (context, child, loadingProgress) => placeholder,
+                    frameBuilder: (context, child, frame, wasSynchronouslyLoaded) => placeholder,
                     ),
                 ),
 
@@ -298,6 +297,23 @@ class _ProfilePageState extends State<ProfilePage> {
                 ]
               ),
 
+              Visibility(
+                visible: !isVisitor,
+                child: Center (
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const status_change.ChangementStatutPage(title: "Changement de statut")),
+                      );
+                    },
+                    style: buttonStyle,
+                    child: const Text("Devenir visiteur"),
+                  ),
+                ),
+              ),
 
               Visibility (
                 visible: isVisitor && !isEdit,
@@ -305,7 +321,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   alignment: Alignment.centerLeft,
                   width: 150,
                   padding: const EdgeInsets.only(left: 16),
-                  child: AppGlobal.etoile(rating, 20.0, 50.0)
+                  child: app_global.etoile(rating, 20.0, 50.0)
                 ),
               ), 
 
@@ -324,9 +340,28 @@ class _ProfilePageState extends State<ProfilePage> {
                           fontWeight: FontWeight.bold,
                         )
                       ),
-                      for (var i = 0; i < availibilities.length; i++) 
-                        if (isEdit) hourlyInput(availibilitiesController[i]) 
-                        else hourlyLabel(availibilities[i])
+                      for (var i = 0; i < availibilitiesController.length; i++) 
+                        if (isEdit) hourlyInput(availibilitiesController[i], i) 
+                        else hourlyLabel(availibilities[i]),
+                      Visibility(
+                        visible: isEdit && availibilitiesController.length < maxAvailibility,
+                        child: Center(
+                          child: ElevatedButton (
+                            onPressed: () => addAvailibility(),
+                            style: buttonStyle,
+                            child: const Icon(Icons.add),
+                          )
+                        )
+                      ),
+                      Visibility(
+                        visible: isEdit,
+                        child: Center(
+                          child: Text(
+                            '${availibilitiesController.length} sur $maxAvailibility',
+                            style: const TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                        )
+                      ),
                     ],
                   ),
                 ),
@@ -390,6 +425,12 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
+  void addAvailibility() {
+    setState(() {
+      availibilitiesController.add(Availibility("Lundi", 24, 0, 24, 0));
+    });
+  }
+
   Container profileInformation(Widget informationWidget) {
     return Container(
       alignment: Alignment.centerLeft,
@@ -430,32 +471,48 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Row hourlyInput(Availibility availibility) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        DropdownButton<String>(
-          value: availibility.day,
-          focusColor: AppGlobal.secondaryColor,
-          items: daysMap.keys.toList().map((d) {
-            return DropdownMenuItem(
-              value: d,
-              child: Text(d),
-            );
-          }).toList(),
-          onChanged: (value) {
-            setState(() {
-              availibility.day = value!;
-            });
-          }
-        ),
-        timeButton(availibility, false),
-        timeButton(availibility, true),
-      ],
+  Container hourlyInput(Availibility availibility, int index) {
+    BoxDecoration errorBorder = const BoxDecoration();
+    if (availibilitiesError.contains(index)) {
+      errorBorder = BoxDecoration(border:Border.all(color: Colors.red));
+    }
+    return Container(
+      decoration: errorBorder,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          DropdownButton<String>(
+            value: availibility.day,
+            focusColor: app_global.secondaryColor,
+            items: daysMap.keys.toList().map((d) {
+              return DropdownMenuItem(
+                value: d,
+                child: Text(d),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                availibility.day = value!;
+              });
+            }
+          ),
+          timeButton(context, availibility, false),
+          timeButton(context, availibility, true),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                availibilitiesController.removeAt(index);
+              });
+            }, 
+            style: buttonStyle,
+            child: const Icon(Icons.delete)
+            )
+        ],
+      ),
     );
   }
 
-  ElevatedButton timeButton(Availibility availibility, bool isTimeEnd) {
+  ElevatedButton timeButton(BuildContext context, Availibility availibility, bool isTimeEnd) {
     return ElevatedButton(
       onPressed: () async { final TimeOfDay? time = await showTimePicker(
         context: context,
@@ -482,22 +539,11 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  String translateTime(TimeOfDay time) {
-    int h = time.hourOfPeriod;
-    int m = time.minute;
-    if (time.period == DayPeriod.pm) {h = (12 + h) % 24;}
-    String hSTR = h.toString();
-    String mSTR = m.toString();
-    if (h<10) {hSTR = "0$h";}
-    if (m<10) {mSTR = "0$mSTR";}
-    return "${hSTR}h$mSTR";
-  }
-
   Container commentWidget(Comment comment) {
     return Container(
       alignment: Alignment.center,
       margin: const EdgeInsets.only(bottom: 10),
-      color: AppGlobal.primaryColor,
+      color: app_global.primaryColor,
       child: Column (
         children: [
           Row (
@@ -508,18 +554,16 @@ class _ProfilePageState extends State<ProfilePage> {
                 width: 25,
                 height: 25,
                 decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(comment.img),
-                    fit: BoxFit.cover,
-                  ),
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(100),
-                  border: const Border(
-                    bottom: BorderSide(color: Colors.black),
-                    top: BorderSide(color: Colors.black),
-                    right: BorderSide(color: Colors.black),
-                    left: BorderSide(color: Colors.black),
-                  )
+                  border: Border.all(color: Colors.black),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(100),
+                  child: Image.network('${app_global.UrlServer}/image/${comment.img}', 
+                    errorBuilder: (context, error, stackTrace) => placeholder,
+                    frameBuilder: (context, child, frame, wasSynchronouslyLoaded) => placeholder,
+                  ),
                 ),
               ),
 
@@ -536,7 +580,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       )
                     ),
 
-                    AppGlobal.etoile(comment.rating,10.0,15.0)
+                    app_global.etoile(comment.rating,10.0,15.0)
                   ],
                 )
               ),
