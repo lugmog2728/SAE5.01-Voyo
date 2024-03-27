@@ -4,9 +4,10 @@ import 'Statuschange.dart' as status_change;
 import 'availibility.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key, required this.title});
+  const ProfilePage({super.key, required this.title, required this.idUser});
 
   final String title;
+  final int idUser;
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -49,7 +50,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String imageUrl = "imageProfil.png";
   int rating = 2;
   List<Availibility> availibilities = [Availibility("Lundi", 16, 0, 18, 0), Availibility("Vendredi", 14, 0, 16, 0), Availibility("Mardi", 9, 20, 15, 0)];
-  List<Comment> comments = [Comment('Utilisateur aléatoire', 'imageProl.png', 4, 'Voici un commentaire des plus pertinenant sur un visiteur très charismatique', '12/10/2023'),
+  List<Comment> comments = [Comment('Utilisateur aléatoire', 'imageProfil.png', 4, 'Voici un commentaire des plus pertinenant sur un visiteur très charismatique', '12/10/2023'),
     Comment('Utilisateur aléatoire', 'imageProfil.png', 2, "NUL à chier mais 2 étoiles parce que j'ai pas race", '02/02/2024')];
   int selectedComments = 0;
 
@@ -72,6 +73,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     availibilities = shortAvailibilities(availibilities);
     initAvailibilitiesController();
+    app_global.fetchData("");
   }
 
   void initAvailibilitiesController() {
@@ -79,24 +81,6 @@ class _ProfilePageState extends State<ProfilePage> {
     for (Availibility availibility in availibilities) {
       availibilitiesController.add(availibility.copy());
     }
-  }
-
-  bool checkAvailibilities() {
-    bool error = false;
-    for (int i = 0; i < availibilitiesController.length; i++) {
-      if (availibilitiesController[i].getMinutePeriod() < 60) {
-        error = true;
-        availibilitiesError.add(i);
-      } else {
-        for (int j = i+1; j < availibilitiesController.length; j++) {
-          if (availibilitiesController[i].isInclude(availibilitiesController[j])) {
-            error = true;
-            availibilitiesError.add(j);
-          }
-        }
-      }
-    }
-    return error;
   }
 
   void viewingMode() {
@@ -197,7 +181,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void updateData() {
     setState(() {
-      isError = checkAvailibilities();
+      availibilitiesError = checkAvailibilities(availibilitiesController);
+      isError = (availibilitiesError.isNotEmpty);
       availibilitiesController;
     });
     if (!isError) {
@@ -277,7 +262,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     width: 140,
                     height: 180, 
                     errorBuilder: (context, error, stackTrace) => placeholder,
-                    frameBuilder: (context, child, frame, wasSynchronouslyLoaded) => placeholder,
                     ),
                 ),
 
@@ -562,7 +546,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   borderRadius: BorderRadius.circular(100),
                   child: Image.network('${app_global.UrlServer}/image/${comment.img}', 
                     errorBuilder: (context, error, stackTrace) => placeholder,
-                    frameBuilder: (context, child, frame, wasSynchronouslyLoaded) => placeholder,
                   ),
                 ),
               ),

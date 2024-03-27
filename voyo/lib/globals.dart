@@ -14,7 +14,8 @@ Color backgroundColor = const Color(0xFFFCFAD3);
 Color inputColor = const Color(0xFFFEE486);
 Color subInputColor = const Color(0xFFE4CC76);
 Color buttonback = const Color(0xFFFFFEE8);
-String UrlServer = "http://172.26.240.10:1080/";
+String UrlServer = "http://172.26.213.3/";
+int idUser = 1;
 
 BoxDecoration TitleDecoration() {
   return BoxDecoration(
@@ -61,7 +62,7 @@ Scaffold Menu(content, widget, context) {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            const profilPage.ProfilePage(title: "Profile")),
+                          profilPage.ProfilePage(title: "Profile", idUser: idUser,)),
                   );
                 },
                 tooltip: 'Account',
@@ -150,7 +151,7 @@ Scaffold Menu(content, widget, context) {
   );
 }
 
-Row etoile(nbetoile, w, h) {
+Row etoile(int nbetoile, double w, double h) {
   List<Widget> list = [];
   for (var i = 0; i < nbetoile; i++) {
     list.add(Image.asset(
