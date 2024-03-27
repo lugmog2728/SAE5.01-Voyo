@@ -61,6 +61,22 @@ String translateTime(TimeOfDay time) {
   return "${hSTR}h$mSTR";
 }
 
+List<int> checkAvailibilities(List<Availibility> availibilities) {
+    List<int> errorList = [];
+    for (int i = 0; i < availibilities.length; i++) {
+      if (availibilities[i].getMinutePeriod() < 60) {
+        errorList.add(i);
+      } else {
+        for (int j = i+1; j < availibilities.length; j++) {
+          if (availibilities[i].isInclude(availibilities[j])) {
+            errorList.add(j);
+          }
+        }
+      }
+    }
+    return errorList;
+  }
+
 List<Availibility> shortAvailibilities(List<Availibility> availibilities) {
   List<Availibility> shortAvailibilities = [];
   for (Availibility old in availibilities) {
