@@ -13,11 +13,12 @@ class _VisitePageState extends State<VisitePage> {
   List<String> items = [];
   final List<String> pointToCheck = ["toto", "tete"];
   List<Widget> extraFields = [];
+  
 
   @override
   void initState() {
     super.initState();
-    AppGlobal.fetchData('http://172.26.240.10:1080/House/GetTypeHouse').then((List<dynamic>? jsonData) {
+    AppGlobal.fetchData('http://172.26.213.7:1080/House/GetTypeHouse').then((List<dynamic>? jsonData) {
       if (jsonData != null) {
         List<String> stringArray = jsonData.cast<String>();
         setState(() {
