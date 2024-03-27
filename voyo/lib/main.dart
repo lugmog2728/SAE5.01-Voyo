@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
           scaffoldBackgroundColor: AppGlobal.backgroundColor),
-      home: const statChange.ChangementStatutPage(title: 'status'),
+      home: const connexionPage.ConnexionPage(title: 'connexion')
     );
   }
 }

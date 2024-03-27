@@ -5,9 +5,22 @@ import 'profile.dart'; // Import de la page profile.dart
 import 'pay.dart'; // Import de la page pay.dart
 
 class VisitePage extends StatefulWidget {
-  const VisitePage({super.key, required this.title});
+  const VisitePage({
+    Key? key,
+    required this.title,
+    required this.name,
+    required this.surname,
+    required this.city,
+    required this.rate,
+    required this.cost,
+  }) : super(key: key);
 
   final String title;
+  final String name;
+  final String surname;
+  final String city;
+  final String rate;
+  final String cost;
 
   @override
   State<VisitePage> createState() => _VisitePageState();
@@ -17,62 +30,70 @@ class _VisitePageState extends State<VisitePage> {
   @override
   Widget build(BuildContext context) {
     return AppGlobal.Menu(
-      Column(
-        children: [
-          Visitor("thomas", "thomas", "lyon", "13", "26"),
-          Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 8, right: 8),
-                  child: FloatingActionButton(
-                    backgroundColor: AppGlobal.secondaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    onPressed: () {
-                      // Redirection vers la page du profil
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ProfilePage(title: 'Profile')), // Provide the title parameter
-                      );
-                    },
-                    child: const Text(
-                      "Voir profil",
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 8, right: 8),
-                  child: FloatingActionButton(
-                    backgroundColor: AppGlobal.secondaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    onPressed: () {
-                      // Redirection vers la page de paiement
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => PayPage(title: 'Pay')), // Provide the title parameter
-                      );
-                    },
-                    child: const Text(
-                      "Valider et payer",
-                      style: TextStyle(color: Colors.black),
+      SingleChildScrollView(
+        child: Column(
+          children: [
+            Visitor(
+              widget.name,
+              widget.surname,
+              widget.city,
+              widget.rate,
+              widget.cost,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 8, right: 8),
+                    child: FloatingActionButton(
+                      backgroundColor: AppGlobal.secondaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      onPressed: () {
+                        // Redirection vers la page du profil
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ProfilePage(title: 'Profile')), // Provide the title parameter
+                        );
+                      },
+                      child: const Text(
+                        "Voir profil",
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 8, right: 8),
+                    child: FloatingActionButton(
+                      backgroundColor: AppGlobal.secondaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      onPressed: () {
+                        // Redirection vers la page de paiement
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => PayPage(title: 'Pay')), // Provide the title parameter
+                        );
+                      },
+                      child: const Text(
+                        "Valider et payer",
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
       widget,
       context,

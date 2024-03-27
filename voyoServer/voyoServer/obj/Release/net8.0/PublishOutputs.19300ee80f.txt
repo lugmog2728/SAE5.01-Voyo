@@ -1,0 +1,12 @@
+C:\Users\boula\Source\Repos\voyo\voyoServer\voyoServer\obj\Release\net8.0\PubTmp\Out\voyoServer.exe
+C:\Users\boula\Source\Repos\voyo\voyoServer\voyoServer\obj\Release\net8.0\PubTmp\Out\appsettings.Development.json
+C:\Users\boula\Source\Repos\voyo\voyoServer\voyoServer\obj\Release\net8.0\PubTmp\Out\appsettings.json
+C:\Users\boula\Source\Repos\voyo\voyoServer\voyoServer\obj\Release\net8.0\PubTmp\Out\Build\appsettings.Development.json
+C:\Users\boula\Source\Repos\voyo\voyoServer\voyoServer\obj\Release\net8.0\PubTmp\Out\Build\appsettings.json
+C:\Users\boula\Source\Repos\voyo\voyoServer\voyoServer\obj\Release\net8.0\PubTmp\Out\Build\voyoServer.deps.json
+C:\Users\boula\Source\Repos\voyo\voyoServer\voyoServer\obj\Release\net8.0\PubTmp\Out\Build\voyoServer.runtimeconfig.json
+C:\Users\boula\Source\Repos\voyo\voyoServer\voyoServer\obj\Release\net8.0\PubTmp\Out\voyoServer.dll
+C:\Users\boula\Source\Repos\voyo\voyoServer\voyoServer\obj\Release\net8.0\PubTmp\Out\voyoServer.deps.json
+C:\Users\boula\Source\Repos\voyo\voyoServer\voyoServer\obj\Release\net8.0\PubTmp\Out\voyoServer.runtimeconfig.json
+C:\Users\boula\Source\Repos\voyo\voyoServer\voyoServer\obj\Release\net8.0\PubTmp\Out\voyoServer.pdb
+C:\Users\boula\Source\Repos\voyo\voyoServer\voyoServer\obj\Release\net8.0\PubTmp\Out\Npgsql.dll
