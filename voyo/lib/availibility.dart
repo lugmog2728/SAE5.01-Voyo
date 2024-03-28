@@ -50,6 +50,13 @@ class Availibility {
   }
 }
 
+int translateStringHour(String hour) {
+  int result = int.parse(hour);
+  if (result == 0) {result = 12;}
+  else if (result == 12) {result = 0;}
+  return result;
+}
+
 String translateTime(TimeOfDay time) {
   int h = time.hourOfPeriod;
   int m = time.minute;
@@ -94,4 +101,4 @@ List<Availibility> shortAvailibilities(List<Availibility> availibilities) {
   return shortAvailibilities;
 }
 
-Map<String, int> daysMap = {"Lundi":1, "Mardi":2, "Mercredi":3, "Jeudi":4,"Vendredi":5, "Samedi":6, "Dimanche":7};
+Map<String, int> daysMap = {"lundi":1, "mardi":2, "mercredi":3, "jeudi":4,"vendredi":5, "samedi":6, "dimanche":7};

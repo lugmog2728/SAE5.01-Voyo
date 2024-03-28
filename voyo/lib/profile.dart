@@ -30,7 +30,7 @@ ButtonStyle buttonStyle = ElevatedButton.styleFrom(
 );
 /*Fin*/
 
-bool isVisitor = true;
+bool isVisitor = false;
 String statut = "";
 bool isEdit = false;
 bool isError = false;
@@ -43,13 +43,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Border borderInformation = const Border ();
 
-  String name = "Thomas";
-  String firstName = "Thomas";
-  String city = "Saint-Poutier-Sur-Rhône";
-  String hourlyRate = "50";
+  String name = "";
+  String firstName = "";
+  String city = "";
+  String hourlyRate = "";
   String imageUrl = "imageProfil.png";
-  int rating = 2;
-  List<Availibility> availibilities = [Availibility("Lundi", 16, 0, 18, 0), Availibility("Vendredi", 14, 0, 16, 0), Availibility("Mardi", 9, 20, 15, 0)];
+  int rating = 0;
+  /*List<Availibility> availibilities = [Availibility("Lundi", 16, 0, 18, 0), Availibility("Vendredi", 14, 0, 16, 0), Availibility("Mardi", 9, 20, 15, 0)];*/
+  List<Availibility> availibilities = [];
   List<Comment> comments = [Comment('Utilisateur aléatoire', 'imageProfil.png', 4, 'Voici un commentaire des plus pertinenant sur un visiteur très charismatique', '12/10/2023'),
     Comment('Utilisateur aléatoire', 'imageProfil.png', 2, "NUL à chier mais 2 étoiles parce que j'ai pas race", '02/02/2024')];
   int selectedComments = 0;
@@ -71,9 +72,50 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    availibilities = shortAvailibilities(availibilities);
-    initAvailibilitiesController();
-    app_global.fetchData("");
+    app_global.fetchDataMap("${app_global.UrlServer}User/GetUserByID?id=${widget.idUser}").then((Map<String, dynamic>? jsonData) {
+      if (jsonData != null) {
+        if (jsonData["User"] == null) {
+        }
+          isVisitor = jsonData["User"] != null;
+          if (isVisitor) {
+
+            setState(() {
+              name = jsonData["User"]["Name"];
+              firstName = jsonData["User"]["FirstName"];
+              city = jsonData["User"]["City"];
+              hourlyRate = jsonData["HourlyRate"].toString();
+              rating = jsonData["Rating"];
+            });
+            app_global.fetchData("${app_global.UrlServer}Availibility/GetAvailibiltyByVisitor?id=${jsonData["Id"]}").then((List<dynamic>? jsonData) {
+              if (jsonData != null) {
+                for (dynamic availibility in jsonData) {
+                  List<String> lstStart = availibility["Start"].toString().split(":");
+                  List<String> lstEnd = availibility["End"].toString().split(":");
+                  
+                  Availibility av = Availibility(availibility["day"], translateStringHour(lstStart[0]), int.parse(lstStart[1]), translateStringHour(lstEnd[0]), int.parse(lstEnd[1]));
+
+                  availibilities.add(av);
+                }
+                setState(() {
+                  availibilities = shortAvailibilities(availibilities);
+                });
+                initAvailibilitiesController();
+              }
+              }).catchError((error) {
+                isVisitor = false;
+                print('\nUne erreur est survenue lors de la récupération des données : $error');
+            });
+
+          }else {
+            name = jsonData["Name"];
+            firstName = jsonData["FirstName"];
+            city = jsonData["City"];
+          }
+      }
+      }).catchError((error) {
+        isVisitor = false;
+        print('\nUne erreur est survenue lors de la récupération des données : $error');
+    });
   }
 
   void initAvailibilitiesController() {
@@ -110,7 +152,6 @@ class _ProfilePageState extends State<ProfilePage> {
   void editMode() {
     heightLabel = 300;
     borderInformation = const Border();
-
     nameController.text = name;
     firstNameController.text = firstName;
     cityController.text = city;
@@ -182,6 +223,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void updateData() {
     setState(() {
       availibilitiesError = checkAvailibilities(availibilitiesController);
+      print(availibilitiesError);
       isError = (availibilitiesError.isNotEmpty);
       availibilitiesController;
     });
@@ -275,7 +317,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       profileInformation(nameWidget),
                       profileInformation(firstNameWidget),
                       profileInformation(cityWidget),
-                      profileInformation(hourlyRateWidget),
+                      Visibility(
+                        visible: isVisitor,
+                        child: profileInformation(hourlyRateWidget),
+                        )
                     ]),
                   ),
                 ]
@@ -324,9 +369,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           fontWeight: FontWeight.bold,
                         )
                       ),
-                      for (var i = 0; i < availibilitiesController.length; i++) 
-                        if (isEdit) hourlyInput(availibilitiesController[i], i) 
-                        else hourlyLabel(availibilities[i]),
+                      if (isEdit) for (var i = 0; i < availibilitiesController.length; i++) hourlyInput(availibilitiesController[i], i)
+                      else for (var i = 0; i < availibilities.length; i++) hourlyLabel(availibilities[i]),
                       Visibility(
                         visible: isEdit && availibilitiesController.length < maxAvailibility,
                         child: Center(
