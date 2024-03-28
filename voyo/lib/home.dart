@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
 import 'visite.dart' as visitePage;
@@ -18,7 +16,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   var listHouseType = [""];
   var houseType = "";
-  var listVisitor;
+  var listVisitor = [];
   var city = "";
   var date = "";
 
