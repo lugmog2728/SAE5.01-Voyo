@@ -54,7 +54,7 @@ class _VisitePageState extends State<VisitePage> {
                         // Redirection vers la page du profil
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => ProfilePage(title: 'Profile')), // Provide the title parameter
+                          MaterialPageRoute(builder: (context) => ProfilePage(title: 'Profile', idUser: 1,)), // Provide the title parameter
                         );
                       },
                       child: const Text(
