@@ -3,8 +3,6 @@ import 'globals.dart' as AppGlobal;
 import 'package:dio/dio.dart';
 import 'dart:convert';
 
-
-
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key, required this.title});
 
@@ -14,23 +12,25 @@ class ChatPage extends StatefulWidget {
   State<ChatPage> createState() => _ChatPageState();
 }
 
-
 class _ChatPageState extends State<ChatPage> {
   var userId = 2;
+  var indexList = 0;
   var listMessengers = [""];
   var messenger = "";
   var listMessage = [];
+
   @override
   void initState() {
     super.initState();
     getMessengers();
     getMessages();
+
   }
 
   void getMessengers() async {
     try {
-      var response =
-      await Dio().get('${AppGlobal.UrlServer}Message/GetMessagers?id=${userId}');
+      var response = await Dio()
+          .get('${AppGlobal.UrlServer}Message/GetMessagers?id=${userId}');
       if (response.statusCode == 200) {
         setState(() {
           listMessengers = json.decode(response.data).cast<String>().toList();
@@ -46,8 +46,8 @@ class _ChatPageState extends State<ChatPage> {
 
   void getMessages() async {
     try {
-      var response =
-      await Dio().get('${AppGlobal.UrlServer}Message/RecieveMessage?useridsend=1&useridrecieve=${userId}');
+      var response = await Dio().get(
+          '${AppGlobal.UrlServer}Message/RecieveMessage?useridsend=${userIdOther}&useridrecieve=${userId}');
       if (response.statusCode == 200) {
         setState(() {
           listMessage = json.decode(response.data) as List;
@@ -98,6 +98,7 @@ class _ChatPageState extends State<ChatPage> {
                             height: 0,
                           ),
                           onChanged: (String? value) {
+                            getUserId();
                             // This is called when the user selects an item.
                             setState(() {
                               messenger = value!;
@@ -127,13 +128,13 @@ class _ChatPageState extends State<ChatPage> {
           Expanded(
               flex: 8,
               child: Column(children: [
+                Text(userIdOther.toString()),
                 for (var message in listMessage)
                   if (message['UserIdRecieve'] == userId)
                     messageIn(message['Body'])
-                else
+                  else
                     messageOut(message['Body'])
-
-                ])),
+              ])),
           Positioned(
               height: 80,
               child: Container(
