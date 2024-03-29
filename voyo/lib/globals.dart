@@ -14,7 +14,7 @@ Color backgroundColor = const Color(0xFFFCFAD3);
 Color inputColor = const Color(0xFFFEE486);
 Color subInputColor = const Color(0xFFE4CC76);
 Color buttonback = const Color(0xFFFFFEE8);
-String UrlServer = "http://172.26.213.3/";
+String UrlServer = "http://172.26.213.5/";
 int idUser = 1;
 
 BoxDecoration TitleDecoration() {
@@ -211,5 +211,15 @@ Future<Map<String, dynamic>?> fetchDataMap(String urlString) async {
   } catch (e) {
     print('Erreur de connexion : $e');
     return null;
+  }
+}
+
+Future<bool> sendData(String urlString) async {
+  var url = Uri.parse(urlString);
+  try {
+    await http.get(url);
+    return true;
+  } catch (e) {
+    return false;
   }
 }
