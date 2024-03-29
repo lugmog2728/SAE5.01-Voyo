@@ -3,17 +3,20 @@ import 'package:flutter/material.dart';
 class Availibility {
   late String day;
   late TimeOfDay startTime;
-  late TimeOfDay endTime;
-
+  late TimeOfDay endTime; 
+  late int startMinute;
+  late int endMinute;
+  
   Availibility(this.day, int hStart, int mStart, int hEnd, int mEnd) {
-    startTime = TimeOfDay(hour: hStart, minute: mStart);
-    endTime = TimeOfDay(hour: hEnd, minute: mEnd);
+    startTime = TimeOfDay(hour: translateStringHour(hStart), minute: mStart);
+    endTime = TimeOfDay(hour: translateStringHour(hEnd), minute: mEnd);
+    startMinute = hStart*60 + mStart;
+    endMinute = hEnd*60 + mEnd;
+    print("$hEnd, $mEnd");
   }
 
   int getMinutePeriod() {
-    int sMinute = startTime.hour * 60 + startTime.minute;
-    int eMinute = endTime.hour * 60 + endTime.minute;
-    return eMinute - sMinute;
+    return endMinute - startMinute;
   }
   
   TimeOfDay getTime(bool isTimeEnd) {
@@ -27,37 +30,40 @@ class Availibility {
     day = availibility.day;
     startTime = availibility.startTime;
     endTime = availibility.endTime;
+    startMinute = availibility.startMinute;
+    endMinute = availibility.endMinute;
   }
 
   bool compare(Availibility availibility) { 
     if (daysMap[day] == daysMap[availibility.day]) {
-      return startTime.hour < availibility.startTime.hour;
+      return startMinute < availibility.startMinute;
     }
     return daysMap[day]! < daysMap[availibility.day]!;
   }
 
   bool isInclude(Availibility availibility) {
-    if (day != availibility.day) {
+    if (daysMap[day] != daysMap[availibility.day]) {
       return false;
     }
-    bool startBool = startTime.hour >= availibility.startTime.hour && startTime.hour <= availibility.endTime.hour;
-    bool endBool = endTime.hour >= availibility.startTime.hour && endTime.hour <= availibility.endTime.hour;
+    bool startBool =  availibility.startMinute >= startMinute && availibility.startMinute <= endMinute;
+    bool endBool =  availibility.endMinute >= startMinute && availibility.endMinute <= endMinute;
     return startBool || endBool;
   }
 
   Availibility copy() {
-    return Availibility(day, startTime.hour, startTime.minute, endTime.hour, endTime.minute);
+    int hStart = startMinute ~/ 60;
+    int hEnd = endMinute ~/ 60;
+    return Availibility(day, hStart, startTime.minute, hEnd, endTime.minute);
   }
 }
 
-int translateStringHour(String hour) {
-  int result = int.parse(hour);
-  if (result == 0) {result = 12;}
-  else if (result == 12) {result = 0;}
-  return result;
+int translateStringHour(int hour) {
+  if (hour == 0) {return 12;}
+  else if (hour == 12) {return 0;}
+  return hour;
 }
 
-String translateTime(TimeOfDay time) {
+String translateTime(TimeOfDay time, String separator) {
   int h = time.hourOfPeriod;
   int m = time.minute;
   if (time.period == DayPeriod.pm) {h = (12 + h) % 24;}
@@ -65,17 +71,19 @@ String translateTime(TimeOfDay time) {
   String mSTR = m.toString();
   if (h<10) {hSTR = "0$h";}
   if (m<10) {mSTR = "0$mSTR";}
-  return "${hSTR}h$mSTR";
+  return "$hSTR$separator$mSTR";
 }
 
 List<int> checkAvailibilities(List<Availibility> availibilities) {
     List<int> errorList = [];
     for (int i = 0; i < availibilities.length; i++) {
       if (availibilities[i].getMinutePeriod() < 60) {
+        print("${availibilities[i].endMinute}, ${availibilities[i].startMinute}");
         errorList.add(i);
       } else {
-        for (int j = i+1; j < availibilities.length; j++) {
-          if (availibilities[i].isInclude(availibilities[j])) {
+        for (int j = 0; j < availibilities.length; j++) {
+          if (i != j && availibilities[i].isInclude(availibilities[j])) {
+            errorList.add(i);
             errorList.add(j);
           }
         }

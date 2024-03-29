@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'globals.dart' as AppGlobal;
-import 'profile.dart'; // Import de la page profile.dart
-import 'pay.dart'; // Import de la page pay.dart
+import 'profile.dart';
+import 'pay.dart';
 
 class VisitePage extends StatefulWidget {
   const VisitePage({
@@ -27,6 +28,29 @@ class VisitePage extends StatefulWidget {
 }
 
 class _VisitePageState extends State<VisitePage> {
+  late int userId = -1;
+
+  @override
+  void initState() {
+    super.initState();
+    // Appeler la fonction pour récupérer l'ID de l'utilisateur au chargement de la page
+    getUserIdByName();
+  }
+
+  Future<void> getUserIdByName() async {
+    final response = await http.get(Uri.parse('${AppGlobal.UrlServer}User/GetUsersByName?name=${widget.name}'));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data.isNotEmpty) {
+        // Récupérer l'ID du premier utilisateur de la liste
+        userId = data[0]['Id'];
+      }
+    } else {
+      throw Exception('Failed to load user ID');
+    }
+    setState(() {}); // Rafraîchir l'interface pour afficher l'ID
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppGlobal.Menu(
@@ -40,6 +64,7 @@ class _VisitePageState extends State<VisitePage> {
               widget.rate,
               widget.cost,
             ),
+            Text('User ID: $userId'), // Afficher l'ID de l'utilisateur
             Row(
               children: [
                 Expanded(
@@ -51,10 +76,10 @@ class _VisitePageState extends State<VisitePage> {
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       onPressed: () {
-                        // Redirection vers la page du profil
+                        // Redirection vers la page du profil avec l'ID de l'utilisateur
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => ProfilePage(title: 'Profile', idUser: 1,)), // Provide the title parameter
+                          MaterialPageRoute(builder: (context) => ProfilePage(title: 'Profile', idUser: userId)), // Utilisez userId pour transmettre l'ID de l'utilisateur
                         );
                       },
                       child: const Text(
