@@ -6,12 +6,13 @@ class Availibility {
   late TimeOfDay endTime; 
   late int startMinute;
   late int endMinute;
-
+  
   Availibility(this.day, int hStart, int mStart, int hEnd, int mEnd) {
     startTime = TimeOfDay(hour: translateStringHour(hStart), minute: mStart);
     endTime = TimeOfDay(hour: translateStringHour(hEnd), minute: mEnd);
     startMinute = hStart*60 + mStart;
     endMinute = hEnd*60 + mEnd;
+    print("$hEnd, $mEnd");
   }
 
   int getMinutePeriod() {
@@ -62,8 +63,7 @@ int translateStringHour(int hour) {
   return hour;
 }
 
-String translateTime(TimeOfDay time) {
-  
+String translateTime(TimeOfDay time, String separator) {
   int h = time.hourOfPeriod;
   int m = time.minute;
   if (time.period == DayPeriod.pm) {h = (12 + h) % 24;}
@@ -71,13 +71,14 @@ String translateTime(TimeOfDay time) {
   String mSTR = m.toString();
   if (h<10) {hSTR = "0$h";}
   if (m<10) {mSTR = "0$mSTR";}
-  return "${hSTR}h$mSTR";
+  return "$hSTR$separator$mSTR";
 }
 
 List<int> checkAvailibilities(List<Availibility> availibilities) {
     List<int> errorList = [];
     for (int i = 0; i < availibilities.length; i++) {
       if (availibilities[i].getMinutePeriod() < 60) {
+        print("${availibilities[i].endMinute}, ${availibilities[i].startMinute}");
         errorList.add(i);
       } else {
         for (int j = 0; j < availibilities.length; j++) {

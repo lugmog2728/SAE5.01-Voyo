@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'globals.dart' as app_global;
 import 'Statuschange.dart' as status_change;
@@ -43,6 +44,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Border borderInformation = const Border ();
 
+  int idVisitor = -1; 
   String name = "";
   String firstName = "";
   String city = "";
@@ -78,6 +80,7 @@ class _ProfilePageState extends State<ProfilePage> {
           if (isVisitor) {
 
             setState(() {
+              idVisitor = jsonData["Id"];
               name = jsonData["User"]["Name"];
               firstName = jsonData["User"]["FirstName"];
               city = jsonData["User"]["City"];
@@ -102,10 +105,8 @@ class _ProfilePageState extends State<ProfilePage> {
               }).catchError((error) {
                 print('\nUne erreur est survenue lors de la récupération des données : $error');
             });
-            print("TESTE");
             app_global.fetchData("${app_global.UrlServer}Visit/GetComment?idvisitor=${jsonData["Id"]}").then((List<dynamic>? jsonDataCom) {
               if (jsonDataCom != null) {
-                print(jsonDataCom);
                 for (dynamic com in jsonDataCom) {
                   List<String> dateSplit = com["DateVisit"].toString().split("T")[0].split("-");
                   Comment comment = Comment(com["NameUser"], "imageProfil.png", com["Rating"], com["Content"], "${dateSplit[2]}/${dateSplit[1]}/${dateSplit[0]}");
@@ -132,7 +133,7 @@ class _ProfilePageState extends State<ProfilePage> {
         print('\nUne erreur est survenue lors de la récupération des données : $error');
     });
   }
-
+  
   void initAvailibilitiesController() {
     availibilitiesController = [];
     for (Availibility availibility in availibilities) {
@@ -236,32 +237,62 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void updateData() {
+    
     setState(() {
       availibilitiesError = checkAvailibilities(availibilitiesController);
       isError = (availibilitiesError.isNotEmpty);
       availibilitiesController;
     });
     if (!isError) {
-      name = nameController.text;
-      firstName = firstNameController.text;
-      city = cityController.text;
-      hourlyRate = hourlyRateController.text;
-      int index = 0;
-      for (Availibility availibility in availibilitiesController) {
-        if (index < availibilities.length) {
-          availibilities[index].updateAvailibility(availibilitiesController[index]);
-        } else {
-          availibilities.add(availibility);
-        }
-        index++;
-      }
-      while (index < availibilities.length) {
-        availibilities.removeAt(index);
-      }
+      app_global.sendData("${app_global.UrlServer}User/ModifyUser?id=${widget.idUser}&name=${nameController.text}&firstName=${firstNameController.text}&city=${cityController.text}").then((value) {
+        setState(() {
+          name = nameController.text;
+          firstName = firstNameController.text;
+          city = cityController.text;
+        });
+      });
+      if (isVisitor) {
+        app_global.sendData("${app_global.UrlServer}Visitor/ModifyVisitor?id=$idVisitor&hourlyRate=${hourlyRateController.text}").then((value) {
+          setState(() {
+            hourlyRate = hourlyRateController.text;
+          });
+        });
+        app_global.sendData("${app_global.UrlServer}Availibility/DeleteAvailibilty?id=$idVisitor").then((value) {
+          availibilities.clear();
+          for (Availibility availibility in availibilitiesController) {
+            String start = translateTime(availibility.startTime, ":");
+            String end = translateTime(availibility.endTime, ":");
 
-      availibilities = shortAvailibilities(availibilities);
-      initAvailibilitiesController();
-      editprofile();
+            app_global.sendData("${app_global.UrlServer}Availibility/SetAvailibilty?id=$idVisitor&day=${availibility.day}&start=$start&end=$end").then((value) {
+              if (!value) {
+                setState(() {
+                  availibilities.remove(availibility);
+                });
+                initAvailibilitiesController();
+              }
+            });
+            availibilities.add(availibility);
+          }
+          setState(() {
+            availibilities = shortAvailibilities(availibilities);
+          });
+          initAvailibilitiesController();
+        });
+
+        /*int index = 0;
+        for (Availibility availibility in availibilitiesController) {
+          if (index < availibilities.length) {
+            availibilities[index].updateAvailibility(availibilitiesController[index]);
+          } else {
+            availibilities.add(availibility);
+          }
+          index++;
+        }
+        while (index < availibilities.length) {
+          availibilities.removeAt(index);
+        }*/
+        editprofile();
+      }
     }
   }
 
@@ -505,7 +536,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Text hourlyLabel(Availibility availibility) {
     return Text (
-      '${availibility.day} : ${translateTime(availibility.startTime)} à ${translateTime(availibility.endTime)}',
+      '${availibility.day} : ${translateTime(availibility.startTime, "h")} à ${translateTime(availibility.endTime, "h")}',
       style: const TextStyle(
         fontSize: 16,
         fontStyle: FontStyle.italic
@@ -569,16 +600,17 @@ class _ProfilePageState extends State<ProfilePage> {
           if (time != null) {
             if (isTimeEnd) {
               availibility.endTime = TimeOfDay(hour: time.hour, minute: time.minute);
-              availibility.endMinute = time.hour*60 + time.minute;
+              availibility.endMinute = translateStringHour(time.hour)*60 + time.minute;
+
             } else {
               availibility.startTime = TimeOfDay(hour: time.hour, minute: time.minute);
-              availibility.startMinute = time.hour*60 + time.minute;
+              availibility.startMinute = translateStringHour(time.hour)*60 + time.minute;
             }
           }
         });
       }, 
       style: buttonStyle,
-      child: Text(translateTime(availibility.getTime(isTimeEnd)))
+      child: Text(translateTime(availibility.getTime(isTimeEnd), "h"))
     );
   }
 
