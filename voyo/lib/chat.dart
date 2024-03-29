@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
-
-const List<String> list = <String>['PHILIPE DUPUIS', 'THOMAS THOMAS'];
-String dropdownValue = list.first;
+import 'package:dio/dio.dart';
+import 'dart:convert';
+import 'dart:async';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key, required this.title});
@@ -14,6 +14,85 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  var userId = 2;
+  var userIdOther = 0;
+  var listMessengers = [];
+  var messenger = "";
+  var listMessage = [];
+  var listMessengersString = [""];
+  var message = TextEditingController();
+  ScrollController _scrollController = ScrollController();
+  Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+    getMessengers();
+    getMessages();
+    getMessages();
+    timer = Timer.periodic(Duration(seconds: 5), (Timer t) => getMessages());
+  }
+
+  void getMessengers() async {
+    try {
+      var response = await Dio()
+          .get('${AppGlobal.UrlServer}Message/GetMessagers?id=${userId}');
+      if (response.statusCode == 200) {
+        setState(() {
+          listMessengers = json.decode(response.data) as List;
+          messenger = listMessengers.first['Value'];
+          userIdOther = listMessengers.first['Key'];
+          listMessengersString.removeAt(0);
+          for (var messenger in listMessengers)
+            listMessengersString.add(messenger['Value']);
+        });
+      } else {
+        print(response.statusCode);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void SendMessage() async {
+    try {
+      debugPrint(
+          '${AppGlobal.UrlServer}message/SendMessage?message=${message.text}&dateCreate=${DateTime.now().toString().substring(0, 19)}&useridsend=${userId}&useridrecieve=${userIdOther}');
+
+      var response = await Dio().get(
+          '${AppGlobal.UrlServer}message/SendMessage?message=${message.text}&dateCreate=${DateTime.now().toString().substring(0, 19)}&useridsend=${userId}&useridrecieve=${userIdOther}');
+      if (response.statusCode == 200) {
+        print("success");
+      } else {
+        print(response.statusCode);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void getMessages() async {
+    try {
+      var response = await Dio().get(
+          '${AppGlobal.UrlServer}Message/RecieveMessage?useridsend=${userId}&useridrecieve=${userIdOther}');
+      if (response.statusCode == 200) {
+        setState(() {
+          print(
+              'Message/RecieveMessage?useridsend=${userId}&useridrecieve=${userIdOther}');
+          if (listMessage.length < (json.decode(response.data) as List).length){
+            listMessage = json.decode(response.data) as List;
+            _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+          }
+
+        });
+      } else {
+        print(response.statusCode);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppGlobal.Menu(
@@ -42,7 +121,7 @@ class _ChatPageState extends State<ChatPage> {
                             .copyWith(canvasColor: AppGlobal.subInputColor),
                         child: DropdownButton<String>(
                           isExpanded: true,
-                          value: dropdownValue,
+                          value: messenger,
                           elevation: 0,
                           icon: const Visibility(
                               visible: false,
@@ -52,12 +131,16 @@ class _ChatPageState extends State<ChatPage> {
                             height: 0,
                           ),
                           onChanged: (String? value) {
+                            for (var messenger in listMessengers)
+                              if (messenger['Value'] == value)
+                                userIdOther = messenger['Key'];
+                            getMessages();
                             // This is called when the user selects an item.
                             setState(() {
-                              dropdownValue = value!;
+                              messenger = value!;
                             });
                           },
-                          items: list
+                          items: listMessengersString
                               .map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
@@ -79,13 +162,17 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
           Expanded(
-              flex: 8,
-              child: Column(children: [
-                messageIn(
-                    "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest"),
-                messageOut(
-                    "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest"),
-              ])),
+            flex: 8,
+            child: SingleChildScrollView(
+                controller: _scrollController,
+                child: Column(children: [
+                  for (var message in listMessage)
+                    if (message['UserIdRecieve'] == userId)
+                      messageIn(message['Body'])
+                    else
+                      messageOut(message['Body'])
+                ])),
+          ),
           Positioned(
               height: 80,
               child: Container(
@@ -94,7 +181,7 @@ class _ChatPageState extends State<ChatPage> {
                     padding: const EdgeInsets.only(
                         left: 8, right: 8, bottom: 4, top: 4),
                     child: Row(children: [
-                      ElevatedButton(
+                      /*ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppGlobal.subInputColor,
                           shape: RoundedRectangleBorder(
@@ -107,7 +194,7 @@ class _ChatPageState extends State<ChatPage> {
                           Icons.add,
                           size: 40,
                         ),
-                      ),
+                      ),*/
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.only(
@@ -123,6 +210,7 @@ class _ChatPageState extends State<ChatPage> {
                                 child: Row(children: [
                                   Expanded(
                                     child: TextFormField(
+                                      controller: message,
                                       decoration: const InputDecoration(
                                         hintText: "Message",
                                         border: InputBorder.none,
@@ -137,7 +225,13 @@ class _ChatPageState extends State<ChatPage> {
                                         backgroundColor:
                                             AppGlobal.subInputColor,
                                       ),
-                                      onPressed: null,
+                                      onPressed: () {
+                                        if (message.text != "") {
+                                          SendMessage();
+                                          getMessages();
+                                          message.text = "";
+                                        }
+                                      },
                                       child: const Icon(Icons.send)),
                                 ]),
                               ),

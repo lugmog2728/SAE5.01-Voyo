@@ -61,8 +61,10 @@ Scaffold Menu(content, widget, context) {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                          profilPage.ProfilePage(title: "Profile", idUser: idUser,)),
+                        builder: (context) => profilPage.ProfilePage(
+                              title: "Profile",
+                              idUser: idUser,
+                            )),
                   );
                 },
                 tooltip: 'Account',
