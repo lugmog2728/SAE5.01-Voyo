@@ -49,10 +49,8 @@ class _ProfilePageState extends State<ProfilePage> {
   String hourlyRate = "";
   String imageUrl = "imageProfil.png";
   int rating = 0;
-  /*List<Availibility> availibilities = [Availibility("Lundi", 16, 0, 18, 0), Availibility("Vendredi", 14, 0, 16, 0), Availibility("Mardi", 9, 20, 15, 0)];*/
   List<Availibility> availibilities = [];
-  List<Comment> comments = [Comment('Utilisateur aléatoire', 'imageProfil.png', 4, 'Voici un commentaire des plus pertinenant sur un visiteur très charismatique', '12/10/2023'),
-    Comment('Utilisateur aléatoire', 'imageProfil.png', 2, "NUL à chier mais 2 étoiles parce que j'ai pas race", '02/02/2024')];
+  List<Comment> comments = [];
   int selectedComments = 0;
 
   TextEditingController nameController = TextEditingController();
@@ -86,13 +84,13 @@ class _ProfilePageState extends State<ProfilePage> {
               hourlyRate = jsonData["HourlyRate"].toString();
               rating = jsonData["Rating"];
             });
-            app_global.fetchData("${app_global.UrlServer}Availibility/GetAvailibiltyByVisitor?id=${jsonData["Id"]}").then((List<dynamic>? jsonData) {
-              if (jsonData != null) {
-                for (dynamic availibility in jsonData) {
+
+            app_global.fetchData("${app_global.UrlServer}Availibility/GetAvailibiltyByVisitor?id=${jsonData["Id"]}").then((List<dynamic>? jsonDataAv) {
+              if (jsonDataAv != null) {
+                for (dynamic availibility in jsonDataAv) {
                   List<String> lstStart = availibility["Start"].toString().split(":");
                   List<String> lstEnd = availibility["End"].toString().split(":");
-                  
-                  Availibility av = Availibility(availibility["day"], translateStringHour(lstStart[0]), int.parse(lstStart[1]), translateStringHour(lstEnd[0]), int.parse(lstEnd[1]));
+                  Availibility av = Availibility(availibility["day"], int.parse(lstStart[0]), int.parse(lstStart[1]), int.parse(lstEnd[0]), int.parse(lstEnd[1]));
 
                   availibilities.add(av);
                 }
@@ -102,14 +100,31 @@ class _ProfilePageState extends State<ProfilePage> {
                 initAvailibilitiesController();
               }
               }).catchError((error) {
-                isVisitor = false;
                 print('\nUne erreur est survenue lors de la récupération des données : $error');
+            });
+            print("TESTE");
+            app_global.fetchData("${app_global.UrlServer}Visit/GetComment?idvisitor=${jsonData["Id"]}").then((List<dynamic>? jsonDataCom) {
+              if (jsonDataCom != null) {
+                print(jsonDataCom);
+                for (dynamic com in jsonDataCom) {
+                  List<String> dateSplit = com["DateVisit"].toString().split("T")[0].split("-");
+                  Comment comment = Comment(com["NameUser"], "imageProfil.png", com["Rating"], com["Content"], "${dateSplit[2]}/${dateSplit[1]}/${dateSplit[0]}");
+                  comments.add(comment);
+                }
+                setState(() {
+                  comments;
+                });
+              }
+            }).catchError((error) {
+              print('\nUne erreur est survenue lors de la récupération des données : $error');
             });
 
           }else {
-            name = jsonData["Name"];
-            firstName = jsonData["FirstName"];
-            city = jsonData["City"];
+            setState(() {
+              name = jsonData["Name"];
+              firstName = jsonData["FirstName"];
+              city = jsonData["City"];
+            });
           }
       }
       }).catchError((error) {
@@ -223,7 +238,6 @@ class _ProfilePageState extends State<ProfilePage> {
   void updateData() {
     setState(() {
       availibilitiesError = checkAvailibilities(availibilitiesController);
-      print(availibilitiesError);
       isError = (availibilitiesError.isNotEmpty);
       availibilitiesController;
     });
@@ -396,7 +410,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
 
               Visibility(
-                visible: isVisitor && !isEdit,
+                visible: isVisitor && !isEdit && comments.isNotEmpty,
                 child: Container (
                   alignment: Alignment.center,
                   margin: const EdgeInsets.all(16),
@@ -410,7 +424,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           fontWeight: FontWeight.bold,
                         )
                       ),
-                      commentWidget(comments[selectedComments]),
+                      if (comments.isNotEmpty) commentWidget(comments[selectedComments]),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -455,7 +469,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void addAvailibility() {
     setState(() {
-      availibilitiesController.add(Availibility("Lundi", 24, 0, 24, 0));
+      availibilitiesController.add(Availibility("lundi", 0, 0, 0, 0));
     });
   }
 
@@ -545,7 +559,6 @@ class _ProfilePageState extends State<ProfilePage> {
       onPressed: () async { final TimeOfDay? time = await showTimePicker(
         context: context,
         initialTime: availibility.getTime(isTimeEnd),
-        initialEntryMode: TimePickerEntryMode.input,
         helpText: "Choissiez une heure",
         hourLabelText: "Heure",
         minuteLabelText: "Minute",
@@ -555,9 +568,11 @@ class _ProfilePageState extends State<ProfilePage> {
         setState(() {
           if (time != null) {
             if (isTimeEnd) {
-              availibility.endTime = time;
+              availibility.endTime = TimeOfDay(hour: time.hour, minute: time.minute);
+              availibility.endMinute = time.hour*60 + time.minute;
             } else {
-              availibility.startTime = time;
+              availibility.startTime = TimeOfDay(hour: time.hour, minute: time.minute);
+              availibility.startMinute = time.hour*60 + time.minute;
             }
           }
         });
@@ -627,11 +642,10 @@ class _ProfilePageState extends State<ProfilePage> {
               )
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(right:5, left: 5, top:3),
-            child: Text(
-              comment.txt,
-            ),
+          Container (
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.only(right:5, left: 20, top:3, bottom: 5),
+            child: Text(comment.txt,),
           ),
         ],
       ),
