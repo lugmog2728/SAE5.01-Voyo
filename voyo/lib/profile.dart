@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
 import 'globals.dart' as app_global;
 import 'Statuschange.dart' as status_change;
 import 'availibility.dart';
@@ -49,7 +51,9 @@ class _ProfilePageState extends State<ProfilePage> {
   String firstName = "";
   String city = "";
   String hourlyRate = "";
-  String imageUrl = "imageProfil.png";
+  String imageUrl = "";
+  XFile? imagePick;
+
   int rating = 0;
   List<Availibility> availibilities = [];
   List<Comment> comments = [];
@@ -78,13 +82,13 @@ class _ProfilePageState extends State<ProfilePage> {
         }
           isVisitor = jsonData["User"] != null;
           if (isVisitor) {
-
             setState(() {
               idVisitor = jsonData["Id"];
               name = jsonData["User"]["Name"];
               firstName = jsonData["User"]["FirstName"];
               city = jsonData["User"]["City"];
               hourlyRate = jsonData["HourlyRate"].toString();
+              imageUrl = jsonData["User"]["ProfilPicture"];
               rating = jsonData["Rating"];
             });
 
@@ -125,6 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
               name = jsonData["Name"];
               firstName = jsonData["FirstName"];
               city = jsonData["City"];
+              imageUrl = jsonData["ProfilPicture"];
             });
           }
       }
@@ -155,7 +160,6 @@ class _ProfilePageState extends State<ProfilePage> {
     firstNameWidget = editProfileText(firstName);
     cityWidget = editProfileText(city);
     hourlyRateWidget = editProfileText("$hourlyRate€");
-
     editAppBar = AppBar(toolbarHeight: 0.0);
     availibilitiesError.clear();
   }
@@ -278,19 +282,6 @@ class _ProfilePageState extends State<ProfilePage> {
           });
           initAvailibilitiesController();
         });
-
-        /*int index = 0;
-        for (Availibility availibility in availibilitiesController) {
-          if (index < availibilities.length) {
-            availibilities[index].updateAvailibility(availibilitiesController[index]);
-          } else {
-            availibilities.add(availibility);
-          }
-          index++;
-        }
-        while (index < availibilities.length) {
-          availibilities.removeAt(index);
-        }*/
         editprofile();
       }
     }
@@ -303,7 +294,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (isEdit) {editMode();
     } else {viewingMode();}
-
 
     return app_global.Menu(
       Scaffold(
@@ -343,13 +333,28 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               Row(children: [ 
-                Padding (
-                  padding: const EdgeInsets.only(left: 16, right: 16),
-                  child: Image.network('${app_global.UrlServer}/image/$imageUrl', 
-                    width: 140,
-                    height: 180, 
-                    errorBuilder: (context, error, stackTrace) => placeholder,
+                Stack(
+                  children: [
+                    Padding (
+                      padding: const EdgeInsets.only(left: 16, right: 16),
+                      child: Image.network('${app_global.UrlServer}/image/$imageUrl', 
+                        width: 140,
+                        height: 180, 
+                        errorBuilder: (context, error, stackTrace) => placeholder,
+                        ),
                     ),
+                    Positioned(
+                      left: 0,
+                      bottom: 0,
+                      child: ElevatedButton(
+                        onPressed: () async { final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                          imagePick = image;
+                        }, 
+                        style: buttonStyle,
+                        child: const Icon(Icons.photo_size_select_actual_outlined)
+                      ),
+                    )
+                  ],
                 ),
 
                 Container (
@@ -379,8 +384,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                const status_change.ChangementStatutPage(title: "Changement de statut")),
+                          builder: (context) =>
+                            const status_change.ChangementStatutPage(title: "Changement de statut")
+                        ),
                       );
                     },
                     style: buttonStyle,
@@ -388,6 +394,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
               ),
+              
 
               Visibility (
                 visible: isVisitor && !isEdit,

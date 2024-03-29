@@ -12,7 +12,6 @@ class Availibility {
     endTime = TimeOfDay(hour: translateStringHour(hEnd), minute: mEnd);
     startMinute = hStart*60 + mStart;
     endMinute = hEnd*60 + mEnd;
-    print("$hEnd, $mEnd");
   }
 
   int getMinutePeriod() {
@@ -78,7 +77,6 @@ List<int> checkAvailibilities(List<Availibility> availibilities) {
     List<int> errorList = [];
     for (int i = 0; i < availibilities.length; i++) {
       if (availibilities[i].getMinutePeriod() < 60) {
-        print("${availibilities[i].endMinute}, ${availibilities[i].startMinute}");
         errorList.add(i);
       } else {
         for (int j = 0; j < availibilities.length; j++) {
