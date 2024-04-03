@@ -17,6 +17,11 @@ Color buttonback = const Color(0xFFFFFEE8);
 String UrlServer = "http://172.26.240.10:1080/voyo/";
 int idUser = 1;
 
+ButtonStyle buttonStyle = ElevatedButton.styleFrom(
+  backgroundColor: primaryColor,
+  foregroundColor: Colors.black
+);
+
 BoxDecoration TitleDecoration() {
   return BoxDecoration(
     border: Border(
