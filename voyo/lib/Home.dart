@@ -27,8 +27,8 @@ class _HomePageState extends State<HomePage> {
 
   void getDataVisitor() async {
     try {
-      var response = await Dio()
-          .get('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=$id');
+      var response =
+          await Dio().get('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=$id');
       if (response.statusCode == 200) {
         setState(() {
           listVisit = json.decode(response.data) as List;
@@ -39,6 +39,37 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       print(e);
     }
+  }
+
+  Future<String> GetNameUser(visit) async {
+    try {
+      if (visit['VisitorId'] != id) {
+        var response = await Dio().get(
+            '${AppGlobal.UrlServer}ser/GetVisitorByID?id=${visit['VisitorId']}');
+        if (response.statusCode == 200) {
+          return json.decode(response.data)['User']['Name'];
+          setState(() {
+            listVisit = json.decode(response.data) as List;
+          });
+        } else {
+          print(response.statusCode);
+        }
+      } else {
+        var response = await Dio()
+            .get('${AppGlobal.UrlServer}ser/GetUserByID?id=${visit['UserId']}');
+        if (response.statusCode == 200) {
+          return json.decode(response.data)['User']['Name'];
+          setState(() {
+            listVisit = json.decode(response.data) as List;
+          });
+        } else {
+          print(response.statusCode);
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+    return "error";
   }
 
   @override
@@ -76,13 +107,19 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                for (var visitor in listVisit)
+                for (var visit in listVisit)
                   Visit(
-                    name: visitor['statut'],
-                    surname: visitor['statut'],
-                    city: visitor['statut'],
-                    rate: visitor['statut'],
-                    cost: visitor['statut'],
+                    name: "name",
+                    surname: visit['statut'],
+                    city: visit['Street'] +
+                        " " +
+                        visit['City'] +
+                        " " +
+                        visit['PostalCode'],
+                    rate: visit['statut'],
+                    cost: "10",
+                    typeHouse: visit['statut'],
+                    user: visit['statut'],
                     context: context,
                   ),
               ],
@@ -92,22 +129,26 @@ class _HomePageState extends State<HomePage> {
             bottom: 10,
             right: 10,
             child: IconButton(
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: AppGlobal.secondaryColor,
-                  ) ,
-                  icon: const Icon(Icons.add, color: Colors.black,size: 50,),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const listVisitor.listVisitor(
-                          title: "Demande de visite",
-                        ),
-                      ),
-                    );
-                  },
-                ),
+              style: OutlinedButton.styleFrom(
+                backgroundColor: AppGlobal.secondaryColor,
               ),
+              icon: const Icon(
+                Icons.add,
+                color: Colors.black,
+                size: 50,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const listVisitor.listVisitor(
+                      title: "Demande de visite",
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
       widget,
@@ -117,8 +158,11 @@ class _HomePageState extends State<HomePage> {
 }
 
 Padding Visit({
-  required String ,
+  required String typeHouse,
   required String city,
+  required String name,
+  required String surname,
+  required String rate,
   required String user,
   required String cost,
   required BuildContext context,
@@ -159,13 +203,7 @@ Padding Visit({
                   direction: Axis.vertical,
                   children: [
                     Text(
-                      name,
-                      style: const TextStyle(
-                        color: Colors.black,
-                      ),
-                    ),
-                    Text(
-                      surname,
+                      typeHouse,
                       style: const TextStyle(
                         color: Colors.black,
                       ),
@@ -177,11 +215,24 @@ Padding Visit({
                       ),
                     ),
                     Text(
-                      rate + "€/h",
+                      city,
                       style: const TextStyle(
                         color: Colors.black,
                       ),
-                    )
+                    ),
+                    Text(
+                      user,
+                      style: const TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text(
+                      cost + "€",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -194,13 +245,6 @@ Padding Visit({
                   alignment: Alignment.center,
                   height: 100,
                   width: 100,
-                  child: Text(
-                    cost + "€",
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.black,
-                    ),
-                  ),
                 ),
               ),
             ),
