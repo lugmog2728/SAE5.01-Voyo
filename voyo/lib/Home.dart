@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
 import 'visite.dart' as visitePage;
+import 'listVisitor.dart' as listVisitor;
 import 'package:dio/dio.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,9 +15,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  var listVisitor = [];
+  var listVisit = [];
   var city = "";
-  var id = 1;
+  var id = 5;
 
   @override
   void initState() {
@@ -27,10 +28,10 @@ class _HomePageState extends State<HomePage> {
   void getDataVisitor() async {
     try {
       var response = await Dio()
-          .get('${AppGlobal.UrlServer}visitor/GetVisitor?city=$city');
+          .get('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=$id');
       if (response.statusCode == 200) {
         setState(() {
-          listVisitor = json.decode(response.data) as List;
+          listVisit = json.decode(response.data) as List;
         });
       } else {
         print(response.statusCode);
@@ -75,13 +76,13 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                for (var visitor in listVisitor)
-                  Visitor(
-                    name: visitor['User']['Name'],
-                    surname: visitor['User']['FirstName'],
-                    city: visitor['User']['City'],
-                    rate: visitor['HourlyRate'].toString(),
-                    cost: visitor['Price'].toString(),
+                for (var visitor in listVisit)
+                  Visit(
+                    name: visitor['statut'],
+                    surname: visitor['statut'],
+                    city: visitor['statut'],
+                    rate: visitor['statut'],
+                    cost: visitor['statut'],
                     context: context,
                   ),
               ],
@@ -95,7 +96,16 @@ class _HomePageState extends State<HomePage> {
                     backgroundColor: AppGlobal.secondaryColor,
                   ) ,
                   icon: const Icon(Icons.add, color: Colors.black,size: 50,),
-                  onPressed: null,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const listVisitor.listVisitor(
+                          title: "Demande de visite",
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
         ],
@@ -106,11 +116,10 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-Padding Visitor({
-  required String name,
-  required String surname,
+Padding Visit({
+  required String ,
   required String city,
-  required String rate,
+  required String user,
   required String cost,
   required BuildContext context,
 }) {
@@ -172,10 +181,6 @@ Padding Visitor({
                       style: const TextStyle(
                         color: Colors.black,
                       ),
-                    ),
-                    Image.asset(
-                      'assets/images/etoile.png',
-                      width: 100,
                     )
                   ],
                 ),

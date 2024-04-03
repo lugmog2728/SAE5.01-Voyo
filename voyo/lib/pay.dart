@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
-import 'listVisitor.dart' as HomePage; // Importer la page d'accueil
+import 'Home.dart' as HomePage; // Importer la page d'accueil
 
 class PayPage extends StatefulWidget {
   const PayPage({Key? key, required this.title}) : super(key: key);
