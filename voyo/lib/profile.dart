@@ -1,10 +1,15 @@
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 import 'globals.dart' as app_global;
-import 'Statuschange.dart' as status_change;
+import 'statuschange.dart' as status_change;
 import 'availibility.dart';
+
+//####__CONSTANTS__####\\
+
+Image placeholder = Image.asset("assets/images/placeholder.webp", width: 140, height: 180,);
+
+//####__PROFIL_PAGE__#####\\
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, required this.title, required this.idUser});
@@ -16,62 +21,262 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class Comment {
-  String uti;
-  String img;
-  int rating;
-  String txt;
-  String date;
-  
-  Comment(this.uti, this.img, this.rating, this.txt, this.date);
-}
-
-/*Réutilisation de Widget*/
-ButtonStyle buttonStyle = ElevatedButton.styleFrom(
-  backgroundColor: app_global.primaryColor,
-  foregroundColor: Colors.black
-);
-/*Fin*/
-
-bool isVisitor = false;
-String statut = "";
-bool isEdit = false;
-bool isError = false;
-int maxAvailibility = 10;
-
-Image placeholder = Image.asset("assets/images/placeholder.webp", width: 140, height: 180,);
-
 class _ProfilePageState extends State<ProfilePage> {
+  
+  //####__SUPPORTS_VAR__####\\
+  
+  XFile? imagePick;
+  ///Image height depending on edit
   double heightLabel = 180;
+  ///Index of the comment displayed
+  int selectedComments = 0;
+  bool isEdit = false;
+  ///Defined if the update is feasible
+  bool isError = false;
+  ///List of index for availibities not valid (isEdit = true)
+  List<int> availibilitiesError = [];
 
-  Border borderInformation = const Border ();
+  //####__DATA_VAR__####\\
 
+  bool isVisitor = false;
   int idVisitor = -1; 
+  String statut = "";
   String name = "";
   String firstName = "";
   String city = "";
   String hourlyRate = "";
   String imageUrl = "";
-  XFile? imagePick;
-
   int rating = 0;
   List<Availibility> availibilities = [];
   List<Comment> comments = [];
-  int selectedComments = 0;
+
+  //####__CONTROLLERS__####\\
 
   TextEditingController nameController = TextEditingController();
   TextEditingController firstNameController = TextEditingController();
   TextEditingController cityController = TextEditingController();
   TextEditingController hourlyRateController = TextEditingController();
   List<Availibility> availibilitiesController = [];
-  List<int> availibilitiesError = [];
+
+  //####__WIDGET__####\\
 
   Widget nameWidget = Container();
   Widget firstNameWidget = Container();
   Widget cityWidget = Container();
   Widget hourlyRateWidget = Container();
-
+  ///Yellow underline for information label
+  Border borderInformation = const Border ();
   AppBar editAppBar = AppBar(toolbarHeight: 0.0);
+
+  //#####__BUILD_OF_THE_PAGE__####\\
+
+  @override
+  Widget build(BuildContext context) {
+    if (isVisitor) {statut = "Visiteur";
+    } else {statut = "Utilisateur";}
+
+    if (isEdit) {editMode();
+    } else {viewingMode();}
+
+    return app_global.Menu(
+      Scaffold(
+        appBar: editAppBar,
+        body: SingleChildScrollView(
+          controller: ScrollController(),
+          child: Column (
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Visibility(
+                visible: !isEdit,
+                child: Row (
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Padding (
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    "Statut : $statut",
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Center(
+                      child: ElevatedButton(
+                        style: app_global.buttonStyle,
+                        child: const Icon(Icons.edit_sharp),
+                        onPressed: () => editprofile(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Row(children: [ 
+                Stack(
+                  children: [
+                    Padding (
+                      padding: const EdgeInsets.only(left: 16, right: 16),
+                      child: Image.network('${app_global.UrlServer}/image/$imageUrl', 
+                        width: 140,
+                        height: 180, 
+                        errorBuilder: (context, error, stackTrace) => placeholder,
+                        ),
+                    ),
+                    Positioned(
+                      left: 0,
+                      bottom: 0,
+                      child: ElevatedButton(
+                        onPressed: () async { final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                          imagePick = image;
+                        }, 
+                        style: app_global.buttonStyle,
+                        child: const Icon(Icons.photo_size_select_actual_outlined)
+                      ),
+                    )
+                  ],
+                ),
+
+                Container (
+                  alignment: Alignment.center,
+                  height: heightLabel,
+                  child : Column (
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      profileInformation(nameWidget),
+                      profileInformation(firstNameWidget),
+                      profileInformation(cityWidget),
+                      Visibility(
+                        visible: isVisitor,
+                        child: profileInformation(hourlyRateWidget),
+                        )
+                    ]),
+                  ),
+                ]
+              ),
+
+              Visibility(
+                visible: !isVisitor,
+                child: Center (
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                            const status_change.ChangementStatutPage(title: "Changement de statut")
+                        ),
+                      );
+                    },
+                    style: app_global.buttonStyle,
+                    child: const Text("Devenir visiteur"),
+                  ),
+                ),
+              ),
+              
+
+              Visibility (
+                visible: isVisitor && !isEdit,
+                child: Container (
+                  alignment: Alignment.centerLeft,
+                  width: 150,
+                  padding: const EdgeInsets.only(left: 16),
+                  child: app_global.etoile(rating, 20.0, 50.0)
+                ),
+              ), 
+
+              Visibility(
+                visible: isVisitor,
+                child: Container(
+                  alignment: Alignment.centerLeft,
+                  margin: const EdgeInsets.only(left: 16),
+                  child: Column ( 
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text (
+                        'Horaires',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        )
+                      ),
+                      if (isEdit) for (var i = 0; i < availibilitiesController.length; i++) hourlyInput(availibilitiesController[i], i)
+                      else for (var i = 0; i < availibilities.length; i++) hourlyLabel(availibilities[i]),
+                      Visibility(
+                        visible: isEdit && availibilitiesController.length < maxAvailibility,
+                        child: Center(
+                          child: ElevatedButton (
+                            onPressed: () => addAvailibility(),
+                            style: app_global.buttonStyle,
+                            child: const Icon(Icons.add),
+                          )
+                        )
+                      ),
+                      Visibility(
+                        visible: isEdit,
+                        child: Center(
+                          child: Text(
+                            '${availibilitiesController.length} sur $maxAvailibility',
+                            style: const TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                        )
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              Visibility(
+                visible: isVisitor && !isEdit && comments.isNotEmpty,
+                child: Container (
+                  alignment: Alignment.center,
+                  margin: const EdgeInsets.all(16),
+                  child: Column (
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text (
+                        'Commentaire',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        )
+                      ),
+                      if (comments.isNotEmpty) commentWidget(comments[selectedComments]),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => updateComment(-1), 
+                            style: app_global.buttonStyle,
+                            child: const Icon(Icons.keyboard_arrow_left)
+                          ),
+                          Text(
+                            '${selectedComments+1} sur ${comments.length}',
+                            style: const TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                          ElevatedButton(
+                            onPressed: () => updateComment(1), 
+                            style: app_global.buttonStyle,
+                            child: const Icon(Icons.keyboard_arrow_right)
+                          )
+                        ],
+                      )
+                    ]
+                  ),
+                )
+              ),
+            ]
+          ),
+        ),
+      ), widget, context
+    );
+  }
+
+  //####__LOADING DATA__#####\\
 
   @override
   void initState() {
@@ -138,14 +343,10 @@ class _ProfilePageState extends State<ProfilePage> {
         print('\nUne erreur est survenue lors de la récupération des données : $error');
     });
   }
-  
-  void initAvailibilitiesController() {
-    availibilitiesController = [];
-    for (Availibility availibility in availibilities) {
-      availibilitiesController.add(availibility.copy());
-    }
-  }
 
+  //####__DISPLAY_MODE__####\\
+
+  ///Change the display in the viewing mode
   void viewingMode() {
     heightLabel = 180;
 
@@ -163,12 +364,7 @@ class _ProfilePageState extends State<ProfilePage> {
     editAppBar = AppBar(toolbarHeight: 0.0);
     availibilitiesError.clear();
   }
-
-  void editprofile() {
-    setState(() {
-      isEdit = !isEdit;
-    });
-  }
+  ///Change the display in the edit mode
   void editMode() {
     heightLabel = 300;
     borderInformation = const Border();
@@ -206,12 +402,12 @@ class _ProfilePageState extends State<ProfilePage> {
             children: [
               ElevatedButton(
                 onPressed: () => updateData(),
-                style: buttonStyle,
+                style: app_global.buttonStyle,
                 child: const Icon(Icons.task_outlined)
               ),
               ElevatedButton(
                 onPressed: () => cancelUpdate(),
-                style: buttonStyle,
+                style: app_global.buttonStyle,
                 child: const Icon(Icons.cancel_outlined)
               ),
             ]
@@ -232,6 +428,15 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  //####__UPDATE_DATA_FONCTION___####\\
+
+  ///Change the mode to diplay
+  void editprofile() {
+    setState(() {
+      isEdit = !isEdit;
+    });
+  }
+  ///Cancel the edit mode
   void cancelUpdate() {
     setState(() {
       isError = false;
@@ -239,9 +444,8 @@ class _ProfilePageState extends State<ProfilePage> {
     initAvailibilitiesController();
     editprofile();
   }
-
+  ///Check is data's valid and, if good, updates the user in API and in display
   void updateData() {
-    
     setState(() {
       availibilitiesError = checkAvailibilities(availibilitiesController);
       isError = (availibilitiesError.isNotEmpty);
@@ -287,230 +491,9 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    if (isVisitor) {statut = "Visiteur";
-    } else {statut = "Utilisateur";}
+  //####__INFORMATION_LABEL_MANAGEMENT####\\
 
-    if (isEdit) {editMode();
-    } else {viewingMode();}
-
-    return app_global.Menu(
-      Scaffold(
-        appBar: editAppBar,
-        body: SingleChildScrollView(
-          controller: ScrollController(),
-          child: Column (
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Visibility(
-                visible: !isEdit,
-                child: Row (
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding (
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    "Statut : $statut",
-                    textAlign: TextAlign.right,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Center(
-                      child: ElevatedButton(
-                        style: buttonStyle,
-                        child: const Icon(Icons.edit_sharp),
-                        onPressed: () => editprofile(),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Row(children: [ 
-                Stack(
-                  children: [
-                    Padding (
-                      padding: const EdgeInsets.only(left: 16, right: 16),
-                      child: Image.network('${app_global.UrlServer}/image/$imageUrl', 
-                        width: 140,
-                        height: 180, 
-                        errorBuilder: (context, error, stackTrace) => placeholder,
-                        ),
-                    ),
-                    Positioned(
-                      left: 0,
-                      bottom: 0,
-                      child: ElevatedButton(
-                        onPressed: () async { final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
-                          imagePick = image;
-                        }, 
-                        style: buttonStyle,
-                        child: const Icon(Icons.photo_size_select_actual_outlined)
-                      ),
-                    )
-                  ],
-                ),
-
-                Container (
-                  alignment: Alignment.center,
-                  height: heightLabel,
-                  child : Column (
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      profileInformation(nameWidget),
-                      profileInformation(firstNameWidget),
-                      profileInformation(cityWidget),
-                      Visibility(
-                        visible: isVisitor,
-                        child: profileInformation(hourlyRateWidget),
-                        )
-                    ]),
-                  ),
-                ]
-              ),
-
-              Visibility(
-                visible: !isVisitor,
-                child: Center (
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                            const status_change.ChangementStatutPage(title: "Changement de statut")
-                        ),
-                      );
-                    },
-                    style: buttonStyle,
-                    child: const Text("Devenir visiteur"),
-                  ),
-                ),
-              ),
-              
-
-              Visibility (
-                visible: isVisitor && !isEdit,
-                child: Container (
-                  alignment: Alignment.centerLeft,
-                  width: 150,
-                  padding: const EdgeInsets.only(left: 16),
-                  child: app_global.etoile(rating, 20.0, 50.0)
-                ),
-              ), 
-
-              Visibility(
-                visible: isVisitor,
-                child: Container(
-                  alignment: Alignment.centerLeft,
-                  margin: const EdgeInsets.only(left: 16),
-                  child: Column ( 
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text (
-                        'Horaires',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        )
-                      ),
-                      if (isEdit) for (var i = 0; i < availibilitiesController.length; i++) hourlyInput(availibilitiesController[i], i)
-                      else for (var i = 0; i < availibilities.length; i++) hourlyLabel(availibilities[i]),
-                      Visibility(
-                        visible: isEdit && availibilitiesController.length < maxAvailibility,
-                        child: Center(
-                          child: ElevatedButton (
-                            onPressed: () => addAvailibility(),
-                            style: buttonStyle,
-                            child: const Icon(Icons.add),
-                          )
-                        )
-                      ),
-                      Visibility(
-                        visible: isEdit,
-                        child: Center(
-                          child: Text(
-                            '${availibilitiesController.length} sur $maxAvailibility',
-                            style: const TextStyle(fontStyle: FontStyle.italic),
-                            ),
-                        )
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              Visibility(
-                visible: isVisitor && !isEdit && comments.isNotEmpty,
-                child: Container (
-                  alignment: Alignment.center,
-                  margin: const EdgeInsets.all(16),
-                  child: Column (
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text (
-                        'Commentaire',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        )
-                      ),
-                      if (comments.isNotEmpty) commentWidget(comments[selectedComments]),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () => updateComment(-1), 
-                            style: buttonStyle,
-                            child: const Icon(Icons.keyboard_arrow_left)
-                          ),
-                          Text(
-                            '${selectedComments+1} sur ${comments.length}',
-                            style: const TextStyle(fontStyle: FontStyle.italic),
-                            ),
-                          ElevatedButton(
-                            onPressed: () => updateComment(1), 
-                            style: buttonStyle,
-                            child: const Icon(Icons.keyboard_arrow_right)
-                          )
-                        ],
-                      )
-                    ]
-                  ),
-                )
-              ),
-            ]
-          ),
-        ),
-      ), widget, context
-    );
-  }
-
-  void updateComment(int add) {
-    setState(() {
-      selectedComments += add;
-      if (selectedComments < 0) {
-        selectedComments = comments.length - 1;
-      }
-      else if (selectedComments >= comments.length) {
-        selectedComments = 0;
-      }
-    });
-  }
-
-  void addAvailibility() {
-    setState(() {
-      availibilitiesController.add(Availibility("lundi", 0, 0, 0, 0));
-    });
-  }
-
+  ///Create a container for a information label. Is a Text or TextFormField according to the edit mode
   Container profileInformation(Widget informationWidget) {
     return Container(
       alignment: Alignment.centerLeft,
@@ -521,7 +504,7 @@ class _ProfilePageState extends State<ProfilePage> {
       child: informationWidget,
     );
   }
-
+  ///Create a information label (String Data) for the viewing mode
   Text editProfileText(String value) {
     return Text(
       value, 
@@ -531,7 +514,7 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
+  ///Create a input information (String Data) for the edit mode
   TextFormField inputProfileEdit(TextEditingController textController, String label) {
     return TextFormField(
       controller: textController,
@@ -541,16 +524,23 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Text hourlyLabel(Availibility availibility) {
-    return Text (
-      '${availibility.day} : ${translateTime(availibility.startTime, "h")} à ${translateTime(availibility.endTime, "h")}',
-      style: const TextStyle(
-        fontSize: 16,
-        fontStyle: FontStyle.italic
-      ),
-    );
-  }
+  //####__AVAILIBILITY_MANAGEMENT__####\\
 
+  ///Copy the availibilities data in the availibilitiesController
+  void initAvailibilitiesController() {
+    availibilitiesController = [];
+    for (Availibility availibility in availibilities) {
+      availibilitiesController.add(availibility.copy());
+    }
+  }
+  ///Add a empty availibility in the availibilitiesController
+  void addAvailibility() {
+    setState(() {
+      availibilitiesController.add(Availibility("lundi", 0, 0, 0, 0));
+    });
+  }
+  
+  ///Create a container allow to modifiy a availibility in edit mode
   Container hourlyInput(Availibility availibility, int index) {
     BoxDecoration errorBorder = const BoxDecoration();
     if (availibilitiesError.contains(index)) {
@@ -584,14 +574,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 availibilitiesController.removeAt(index);
               });
             }, 
-            style: buttonStyle,
+            style: app_global.buttonStyle,
             child: const Icon(Icons.delete)
             )
         ],
       ),
     );
   }
-
+  ///Create a TimePicker button for a modifiy a availibility
   ElevatedButton timeButton(BuildContext context, Availibility availibility, bool isTimeEnd) {
     return ElevatedButton(
       onPressed: () async { final TimeOfDay? time = await showTimePicker(
@@ -616,11 +606,14 @@ class _ProfilePageState extends State<ProfilePage> {
           }
         });
       }, 
-      style: buttonStyle,
+      style: app_global.buttonStyle,
       child: Text(translateTime(availibility.getTime(isTimeEnd), "h"))
     );
   }
 
+  //####__COMMENT_MANAGEMENT__####\\
+
+  ///Create a widget comment with a Comment Object
   Container commentWidget(Comment comment) {
     return Container(
       alignment: Alignment.center,
@@ -690,5 +683,29 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+  ///Change the selected comment (1 or -1). Overflows are resolved.
+  void updateComment(int add) {
+    setState(() {
+      selectedComments += add;
+      if (selectedComments < 0) {
+        selectedComments = comments.length - 1;
+      }
+      else if (selectedComments >= comments.length) {
+        selectedComments = 0;
+      }
+    });
+  }
+  
+  //####//
 }
 
+///Object comments
+class Comment {
+  String uti;
+  String img;
+  int rating;
+  String txt;
+  String date;
+  
+  Comment(this.uti, this.img, this.rating, this.txt, this.date);
+}

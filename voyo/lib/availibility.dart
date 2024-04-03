@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
 class Availibility {
+  ///The name day of week of the availibility
   late String day;
   late TimeOfDay startTime;
   late TimeOfDay endTime; 
+  ///Total minutes of the start time
   late int startMinute;
+  ///Total minutes of the end time
   late int endMinute;
   
   Availibility(this.day, int hStart, int mStart, int hEnd, int mEnd) {
@@ -13,11 +16,11 @@ class Availibility {
     startMinute = hStart*60 + mStart;
     endMinute = hEnd*60 + mEnd;
   }
-
+  ///Get the total minutes between the start and the end time
   int getMinutePeriod() {
     return endMinute - startMinute;
   }
-  
+  ///Get a default start time. isTimeEnd allow to get the time end. 
   TimeOfDay getTime(bool isTimeEnd) {
     if (isTimeEnd) {
       return endTime;
@@ -107,4 +110,16 @@ List<Availibility> shortAvailibilities(List<Availibility> availibilities) {
   return shortAvailibilities;
 }
 
+///Create a hourly label for a display a availibility in viewing mode
+  Text hourlyLabel(Availibility availibility) {
+    return Text (
+      '${availibility.day} : ${translateTime(availibility.startTime, "h")} à ${translateTime(availibility.endTime, "h")}',
+      style: const TextStyle(
+        fontSize: 16,
+        fontStyle: FontStyle.italic
+      ),
+    );
+  }
+
 Map<String, int> daysMap = {"lundi":1, "mardi":2, "mercredi":3, "jeudi":4,"vendredi":5, "samedi":6, "dimanche":7};
+const int maxAvailibility = 10;
