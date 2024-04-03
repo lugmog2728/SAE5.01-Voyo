@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
-import 'home.dart' as homePage;
+import 'listVisitor.dart' as homePage;
 import 'newaccount.dart' as newAccountPage;
 
 class ConnexionPage extends StatefulWidget {
