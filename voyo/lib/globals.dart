@@ -3,7 +3,7 @@ library my_prj.globals;
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'Home.dart' as homePage;
+import 'home.dart' as homePage;
 import 'chat.dart' as chatPage;
 import 'profile.dart' as profilPage;
 import 'package:http/http.dart' as http;
