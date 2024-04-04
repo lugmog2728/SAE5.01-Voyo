@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
 import 'listVisitor.dart' as listVisitor;
 import 'package:dio/dio.dart';
-
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title});
 
@@ -28,7 +27,8 @@ class _HomePageState extends State<HomePage> {
 
   void getDataVisitor() async {
     try {
-      listName = [""];
+      listName = [];
+      listHouseType = [];
       var response =
           await Dio().get('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=$id');
       if (response.statusCode == 200) {
@@ -40,6 +40,7 @@ class _HomePageState extends State<HomePage> {
           listName.add(await GetNameUser(visit));
           listHouseType.add(await GetHouseTypeName(visit['HousingTypeId']));
         }
+
       } else {
         print(response.statusCode);
       }
@@ -53,7 +54,7 @@ class _HomePageState extends State<HomePage> {
         var response = await Dio().get(
             '${AppGlobal.UrlServer}House/GetTypeHouseById?id=${id}');
         if (response.statusCode == 200) {
-          return json.decode(response.data)[0];
+          return json.decode(response.data);
         } else {
           print(response.statusCode);
         }
@@ -135,7 +136,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
 
-                for(int index = 0; index < listVisit.length; index++)
+                for(int index = 0; index < listVisit.length  ; index++)
                   Visit(
                     name: listName[index].toString(),
                     surname: listVisit[index]['statut'].toString(),
@@ -146,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                         listVisit[index]['PostalCode'].toString(),
                     rate: listVisit[index]['statut'].toString(),
                     cost: "10",
-                    typeHouse: listHouseType[index],
+                    typeHouse: "listHouseType[index]",
                     user: listVisit[index]['statut'].toString(),
                     context: context,
                   ),
