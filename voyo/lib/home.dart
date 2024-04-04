@@ -14,6 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var listVisit = [];
+  var listVisitTemp = [];
   var listName = [""];
   var listHouseType = [""];
   var city = "";
@@ -32,14 +33,17 @@ class _HomePageState extends State<HomePage> {
       var response =
           await Dio().get('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=$id');
       if (response.statusCode == 200) {
-        setState(() {
-          listVisit = json.decode(response.data) as List;
-        });
-        for (var visit in listVisit){
+        listVisitTemp = json.decode(response.data) as List;
+        for (var visit in listVisitTemp){
 
           listName.add(await GetNameUser(visit));
           listHouseType.add(await GetHouseTypeName(visit['HousingTypeId']));
         }
+    setState(() {
+      listName = listName;
+      listHouseType = listHouseType;
+      listVisit = listVisitTemp;
+    });
 
       } else {
         print(response.statusCode);
@@ -136,7 +140,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
 
-                for(int index = 0; index < listVisit.length  ; index++)
+                for(int index = 0; index < listVisit.length ; index++)
                   Visit(
                     name: listName[index].toString(),
                     surname: listVisit[index]['statut'].toString(),
@@ -147,8 +151,8 @@ class _HomePageState extends State<HomePage> {
                         listVisit[index]['PostalCode'].toString(),
                     rate: listVisit[index]['statut'].toString(),
                     cost: "10",
-                    typeHouse: "listHouseType[index]",
-                    user: listVisit[index]['statut'].toString(),
+                    typeHouse: listHouseType[index],
+                    user: listName[index].toString(),
                     context: context,
                   ),
               ],
