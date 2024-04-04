@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
-import 'Home.dart' as homePage;
+import 'home.dart' as homePage;
 import 'newaccount.dart' as newAccountPage;
 import 'package:http/http.dart' as http;
 import 'dart:convert';

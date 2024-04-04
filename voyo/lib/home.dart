@@ -17,6 +17,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   var listVisit = [];
   var listName = [""];
+  var listHouseType = [""];
   var city = "";
   var id = 6;
 
@@ -36,7 +37,9 @@ class _HomePageState extends State<HomePage> {
           listVisit = json.decode(response.data) as List;
         });
         for (var visit in listVisit){
-          listName.add(await GetNameUser(visit['Id'].toString()));
+
+          listName.add(await GetNameUser(visit));
+          listHouseType.add(await GetHouseTypeName(visit['HousingTypeId']));
         }
       } else {
         print(response.statusCode);
@@ -46,31 +49,15 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<String> GetNameUser(visit) async {
+  Future<String> GetHouseTypeName(id) async {
     try {
-      if (visit['VisitorId'] != id) {
         var response = await Dio().get(
-            '${AppGlobal.UrlServer}ser/GetVisitorByID?id=${visit['VisitorId']}');
+            '${AppGlobal.UrlServer}House/GetTypeHouseById?id=${id}');
         if (response.statusCode == 200) {
-          return json.decode(response.data)['User']['Name'];
-          setState(() {
-            listVisit = json.decode(response.data) as List;
-          });
+          return json.decode(response.data)[0];
         } else {
           print(response.statusCode);
         }
-      } else {
-        var response = await Dio()
-            .get('${AppGlobal.UrlServer}ser/GetUserByID?id=${visit['UserId']}');
-        if (response.statusCode == 200) {
-          return json.decode(response.data)['User']['Name'];
-          setState(() {
-            listVisit = json.decode(response.data) as List;
-          });
-        } else {
-          print(response.statusCode);
-        }
-      }
     } catch (e) {
       print(e);
     }
@@ -79,9 +66,11 @@ class _HomePageState extends State<HomePage> {
 
   Future<String> GetNameUser(visit) async {
     try {
+
       if (visit['VisitorId'] != id) {
+
         var response = await Dio().get(
-            '${AppGlobal.UrlServer}ser/GetVisitorByID?id=${visit['VisitorId']}');
+            '${AppGlobal.UrlServer}Visitor/GetVisitorByID?id=${visit['VisitorId'].toString()}');
         if (response.statusCode == 200) {
           return json.decode(response.data)['User']['Name'];
           setState(() {
@@ -92,7 +81,7 @@ class _HomePageState extends State<HomePage> {
         }
       } else {
         var response = await Dio()
-            .get('${AppGlobal.UrlServer}ser/GetUserByID?id=${visit['UserId']}');
+            .get('${AppGlobal.UrlServer}User/GetUserByID?id=${visit['UserId'].toString()}');
         if (response.statusCode == 200) {
           return json.decode(response.data)['User']['Name'];
           setState(() {
@@ -103,6 +92,7 @@ class _HomePageState extends State<HomePage> {
         }
       }
     } catch (e) {
+      debugPrint( visit['UserId'].toString());
       print(e);
     }
     return "error";
@@ -157,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                         listVisit[index]['PostalCode'].toString(),
                     rate: listVisit[index]['statut'].toString(),
                     cost: "10",
-                    typeHouse: listVisit[index]['statut'].toString(),
+                    typeHouse: listHouseType[index],
                     user: listVisit[index]['statut'].toString(),
                     context: context,
                   ),
