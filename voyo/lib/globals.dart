@@ -3,7 +3,7 @@ library my_prj.globals;
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'home.dart' as homePage;
+import 'Home.dart' as homePage;
 import 'chat.dart' as chatPage;
 import 'profile.dart' as profilPage;
 import 'package:http/http.dart' as http;
@@ -16,6 +16,11 @@ Color subInputColor = const Color(0xFFE4CC76);
 Color buttonback = const Color(0xFFFFFEE8);
 String UrlServer = "http://172.26.240.10:1080/voyo/";
 int idUser = 1;
+
+ButtonStyle buttonStyle = ElevatedButton.styleFrom(
+  backgroundColor: primaryColor,
+  foregroundColor: Colors.black
+);
 
 BoxDecoration TitleDecoration() {
   return BoxDecoration(
@@ -61,8 +66,10 @@ Scaffold Menu(content, widget, context) {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                          profilPage.ProfilePage(title: "Profile", idUser: idUser,)),
+                        builder: (context) => profilPage.ProfilePage(
+                              title: "Profile",
+                              idUser: idUser,
+                            )),
                   );
                 },
                 tooltip: 'Account',

@@ -1,8 +1,19 @@
-
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
 import 'globals.dart' as app_global;
-import 'Statuschange.dart' as status_change;
+import 'statuschange.dart' as status_change;
 import 'availibility.dart';
+
+//####__CONSTANTS__####\\
+
+Image placeholder = Image.asset("assets/images/placeholder.webp", width: 140, height: 180,);
+TextStyle sectionStyle = const TextStyle(
+  fontSize: 20,
+  fontWeight: FontWeight.bold,
+);
+
+//####__PROFIL_PAGE__#####\\
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, required this.title, required this.idUser});
@@ -14,287 +25,67 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class Comment {
-  String uti;
-  String img;
-  int rating;
-  String txt;
-  String date;
-  
-  Comment(this.uti, this.img, this.rating, this.txt, this.date);
-}
-
-/*Réutilisation de Widget*/
-ButtonStyle buttonStyle = ElevatedButton.styleFrom(
-  backgroundColor: app_global.primaryColor,
-  foregroundColor: Colors.black
-);
-/*Fin*/
-
-bool isVisitor = false;
-String statut = "";
-bool isEdit = false;
-bool isError = false;
-int maxAvailibility = 10;
-
-Image placeholder = Image.asset("assets/images/placeholder.webp", width: 140, height: 180,);
-
 class _ProfilePageState extends State<ProfilePage> {
+  
+  //####__SUPPORTS_VAR__####\\
+  XFile? imagePick;
+  ///Image height depending on edit
   double heightLabel = 180;
+  ///Index of the comment displayed
+  int selectedComments = 0;
+  bool isEdit = false;
+  ///Defined if the update is feasible
+  bool isError = false;
+  ///List of index for availibities not valid (isEdit = true)
+  List<int> availibilitiesError = [];
 
-  Border borderInformation = const Border ();
+  //####__DATA_VAR__####\\
 
+  bool isVisitor = false;
+  ///Defined if the visitor has been validated by an administrator
+  bool isValid = true;
   int idVisitor = -1; 
+  String statut = "";
   String name = "";
   String firstName = "";
   String city = "";
   String hourlyRate = "";
-  String imageUrl = "imageProfil.png";
+  String imageUrl = "";
   int rating = 0;
+  String street = "";
+  String zipCode = "";
+  String phone = "";
+  String rib = "";
   List<Availibility> availibilities = [];
   List<Comment> comments = [];
-  int selectedComments = 0;
+
+  //####__CONTROLLERS__####\\
 
   TextEditingController nameController = TextEditingController();
   TextEditingController firstNameController = TextEditingController();
   TextEditingController cityController = TextEditingController();
   TextEditingController hourlyRateController = TextEditingController();
+  TextEditingController streetController = TextEditingController();
+  TextEditingController zipCodeController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController ribController = TextEditingController();
   List<Availibility> availibilitiesController = [];
-  List<int> availibilitiesError = [];
+
+  //####__WIDGET__####\\
 
   Widget nameWidget = Container();
   Widget firstNameWidget = Container();
   Widget cityWidget = Container();
   Widget hourlyRateWidget = Container();
-
+  Widget streetWidget = Container();
+  Widget zipCodeWidget = Container();
+  Widget phoneWidget = Container();
+  Widget ribWidget = Container();
+  ///Yellow underline for information label
+  Border borderInformation = const Border ();
   AppBar editAppBar = AppBar(toolbarHeight: 0.0);
 
-  @override
-  void initState() {
-    super.initState();
-    app_global.fetchDataMap("${app_global.UrlServer}User/GetUserByID?id=${widget.idUser}").then((Map<String, dynamic>? jsonData) {
-      if (jsonData != null) {
-        if (jsonData["User"] == null) {
-        }
-          isVisitor = jsonData["User"] != null;
-          if (isVisitor) {
-
-            setState(() {
-              idVisitor = jsonData["Id"];
-              name = jsonData["User"]["Name"];
-              firstName = jsonData["User"]["FirstName"];
-              city = jsonData["User"]["City"];
-              hourlyRate = jsonData["HourlyRate"].toString();
-              rating = jsonData["Rating"];
-            });
-
-            app_global.fetchData("${app_global.UrlServer}Availibility/GetAvailibiltyByVisitor?id=${jsonData["Id"]}").then((List<dynamic>? jsonDataAv) {
-              if (jsonDataAv != null) {
-                for (dynamic availibility in jsonDataAv) {
-                  List<String> lstStart = availibility["Start"].toString().split(":");
-                  List<String> lstEnd = availibility["End"].toString().split(":");
-                  Availibility av = Availibility(availibility["day"], int.parse(lstStart[0]), int.parse(lstStart[1]), int.parse(lstEnd[0]), int.parse(lstEnd[1]));
-
-                  availibilities.add(av);
-                }
-                setState(() {
-                  availibilities = shortAvailibilities(availibilities);
-                });
-                initAvailibilitiesController();
-              }
-              }).catchError((error) {
-                print('\nUne erreur est survenue lors de la récupération des données : $error');
-            });
-            app_global.fetchData("${app_global.UrlServer}Visit/GetComment?idvisitor=${jsonData["Id"]}").then((List<dynamic>? jsonDataCom) {
-              if (jsonDataCom != null) {
-                for (dynamic com in jsonDataCom) {
-                  List<String> dateSplit = com["DateVisit"].toString().split("T")[0].split("-");
-                  Comment comment = Comment(com["NameUser"], "imageProfil.png", com["Rating"], com["Content"], "${dateSplit[2]}/${dateSplit[1]}/${dateSplit[0]}");
-                  comments.add(comment);
-                }
-                setState(() {
-                  comments;
-                });
-              }
-            }).catchError((error) {
-              print('\nUne erreur est survenue lors de la récupération des données : $error');
-            });
-
-          }else {
-            setState(() {
-              name = jsonData["Name"];
-              firstName = jsonData["FirstName"];
-              city = jsonData["City"];
-            });
-          }
-      }
-      }).catchError((error) {
-        isVisitor = false;
-        print('\nUne erreur est survenue lors de la récupération des données : $error');
-    });
-  }
-  
-  void initAvailibilitiesController() {
-    availibilitiesController = [];
-    for (Availibility availibility in availibilities) {
-      availibilitiesController.add(availibility.copy());
-    }
-  }
-
-  void viewingMode() {
-    heightLabel = 180;
-
-    borderInformation = Border (
-      bottom: BorderSide (
-        color: app_global.secondaryColor,
-        width: 3,
-      )
-    );
-
-    nameWidget = editProfileText(name);
-    firstNameWidget = editProfileText(firstName);
-    cityWidget = editProfileText(city);
-    hourlyRateWidget = editProfileText("$hourlyRate€");
-
-    editAppBar = AppBar(toolbarHeight: 0.0);
-    availibilitiesError.clear();
-  }
-
-  void editprofile() {
-    setState(() {
-      isEdit = !isEdit;
-    });
-  }
-  void editMode() {
-    heightLabel = 300;
-    borderInformation = const Border();
-    nameController.text = name;
-    firstNameController.text = firstName;
-    cityController.text = city;
-    hourlyRateController.text = hourlyRate;
-
-    nameWidget = inputProfileEdit(nameController, "Prénom");
-    firstNameWidget = inputProfileEdit(firstNameController, "Nom");
-    cityWidget = inputProfileEdit(cityController, "Ville");
-    
-    hourlyRateWidget = TextFormField(
-      controller: hourlyRateController,
-      decoration: const InputDecoration(
-        labelText: "Tarif Horaire",
-      ),
-      keyboardType: TextInputType.number,
-      maxLength: 5,
-    );
-
-    editAppBar = AppBar(
-      backgroundColor: app_global.backgroundColor,
-      shadowColor: Colors.black,
-      shape: Border(
-        bottom: BorderSide(
-          color: app_global.secondaryColor,
-          width: 1.0,
-        ),
-      ),
-      toolbarHeight: 80,
-      title: Column (
-        children: [Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              ElevatedButton(
-                onPressed: () => updateData(),
-                style: buttonStyle,
-                child: const Icon(Icons.task_outlined)
-              ),
-              ElevatedButton(
-                onPressed: () => cancelUpdate(),
-                style: buttonStyle,
-                child: const Icon(Icons.cancel_outlined)
-              ),
-            ]
-          ),
-          Visibility (
-            visible: isError,
-            child: const Text(
-              "Erreur ! Des horaires sont invalide. La mise à jour ne peut s'effectuer",
-              style: TextStyle(
-                color: Colors.red,
-                fontStyle: FontStyle.italic,
-                fontSize: 12,
-              ),
-            ),
-          ),
-          ],
-        )
-    );
-  }
-
-  void cancelUpdate() {
-    setState(() {
-      isError = false;
-    });
-    initAvailibilitiesController();
-    editprofile();
-  }
-
-  void updateData() {
-    
-    setState(() {
-      availibilitiesError = checkAvailibilities(availibilitiesController);
-      isError = (availibilitiesError.isNotEmpty);
-      availibilitiesController;
-    });
-    if (!isError) {
-      app_global.sendData("${app_global.UrlServer}User/ModifyUser?id=${widget.idUser}&name=${nameController.text}&firstName=${firstNameController.text}&city=${cityController.text}").then((value) {
-        setState(() {
-          name = nameController.text;
-          firstName = firstNameController.text;
-          city = cityController.text;
-        });
-      });
-      if (isVisitor) {
-        app_global.sendData("${app_global.UrlServer}Visitor/ModifyVisitor?id=$idVisitor&hourlyRate=${hourlyRateController.text}").then((value) {
-          setState(() {
-            hourlyRate = hourlyRateController.text;
-          });
-        });
-        app_global.sendData("${app_global.UrlServer}Availibility/DeleteAvailibilty?id=$idVisitor").then((value) {
-          availibilities.clear();
-          for (Availibility availibility in availibilitiesController) {
-            String start = translateTime(availibility.startTime, ":");
-            String end = translateTime(availibility.endTime, ":");
-
-            app_global.sendData("${app_global.UrlServer}Availibility/SetAvailibilty?id=$idVisitor&day=${availibility.day}&start=$start&end=$end").then((value) {
-              if (!value) {
-                setState(() {
-                  availibilities.remove(availibility);
-                });
-                initAvailibilitiesController();
-              }
-            });
-            availibilities.add(availibility);
-          }
-          setState(() {
-            availibilities = shortAvailibilities(availibilities);
-          });
-          initAvailibilitiesController();
-        });
-
-        /*int index = 0;
-        for (Availibility availibility in availibilitiesController) {
-          if (index < availibilities.length) {
-            availibilities[index].updateAvailibility(availibilitiesController[index]);
-          } else {
-            availibilities.add(availibility);
-          }
-          index++;
-        }
-        while (index < availibilities.length) {
-          availibilities.removeAt(index);
-        }*/
-        editprofile();
-      }
-    }
-  }
+  //#####__BUILD_OF_THE_PAGE__####\\
 
   @override
   Widget build(BuildContext context) {
@@ -304,6 +95,10 @@ class _ProfilePageState extends State<ProfilePage> {
     if (isEdit) {editMode();
     } else {viewingMode();}
 
+    Widget image = placeholder;
+    if (imageUrl != "") {
+      image = Image.network('${app_global.UrlServer}/image/$imageUrl', width: 140,height: 180, errorBuilder: (context, error, stackTrace) => placeholder);
+    }
 
     return app_global.Menu(
       Scaffold(
@@ -313,6 +108,22 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column (
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Visibility(
+                visible: !isValid,
+                child: const Center(
+                  child: 
+                    Text(
+                    "Ce compte n'a pas encore était validé par un administrateur.",
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic
+                    ),
+                  ),
+                ),
+              ),
+              Visibility(
+                visible: widget.idUser == 0,
+                child: Container(),
+              ),
               Visibility(
                 visible: !isEdit,
                 child: Row (
@@ -329,27 +140,48 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                   ),
-                  Padding(
+                  Container (
                     padding: const EdgeInsets.all(16.0),
-                    child: Center(
-                      child: ElevatedButton(
-                        style: buttonStyle,
-                        child: const Icon(Icons.edit_sharp),
-                        onPressed: () => editprofile(),
+                    width: 130,
+                    child: Visibility(
+                      visible: widget.idUser == app_global.idUser,
+                      child: Center(
+                        child: IconButton(
+                          onPressed: () => editprofile(),
+                          style: app_global.buttonStyle,
+                          icon: const Icon(Icons.edit_sharp),
+                          ),
                         ),
                       ),
                     ),
+                  
                   ],
                 ),
               ),
               Row(children: [ 
-                Padding (
-                  padding: const EdgeInsets.only(left: 16, right: 16),
-                  child: Image.network('${app_global.UrlServer}/image/$imageUrl', 
-                    width: 140,
-                    height: 180, 
-                    errorBuilder: (context, error, stackTrace) => placeholder,
+                Stack(
+                  children: [
+                    Padding (
+                      padding: const EdgeInsets.only(left: 16, right: 16),
+                      child: image,
                     ),
+                    Visibility(
+                      visible: widget.idUser == app_global.idUser,
+                      child: Positioned(
+                        left: 10,
+                        bottom: 10,
+                        child: IconButton(
+                          onPressed: () async { final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                            imagePick = image;
+                            String? t = image?.readAsString() as String?;
+                            print(t);
+                          }, 
+                          style: app_global.buttonStyle,
+                          icon: const Icon(Icons.photo_size_select_actual_outlined)
+                        ),
+                      )
+                    ),
+                  ],
                 ),
 
                 Container (
@@ -379,15 +211,17 @@ class _ProfilePageState extends State<ProfilePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                const status_change.ChangementStatutPage(title: "Changement de statut")),
+                          builder: (context) =>
+                            status_change.ChangementStatutPage(title: "Changement de statut", idUser: widget.idUser,)
+                        ),
                       );
                     },
-                    style: buttonStyle,
+                    style: app_global.buttonStyle,
                     child: const Text("Devenir visiteur"),
                   ),
                 ),
               ),
+              
 
               Visibility (
                 visible: isVisitor && !isEdit,
@@ -407,12 +241,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Column ( 
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text (
+                      Text (
                         'Horaires',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        )
+                        style: sectionStyle
                       ),
                       if (isEdit) for (var i = 0; i < availibilitiesController.length; i++) hourlyInput(availibilitiesController[i], i)
                       else for (var i = 0; i < availibilities.length; i++) hourlyLabel(availibilities[i]),
@@ -421,7 +252,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Center(
                           child: ElevatedButton (
                             onPressed: () => addAvailibility(),
-                            style: buttonStyle,
+                            style: app_global.buttonStyle,
                             child: const Icon(Icons.add),
                           )
                         )
@@ -441,6 +272,44 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
 
               Visibility(
+                visible: isVisitor && widget.idUser == app_global.idUser,
+                child: Container (
+                  alignment: Alignment.centerLeft,
+                  margin: const EdgeInsets.only(top: 16, left: 16),
+                  child: Column (
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text (
+                        'Données privées',
+                        style: sectionStyle
+                      ),
+                      Row (
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              labelPrivateData("Adresse :"),
+                              labelPrivateData("Code Postal : "),
+                              labelPrivateData("Téléphone : "),
+                              labelPrivateData("RIB : ")
+                            ]
+                          ),
+                          Column(
+                            children: [
+                              profileInformation(streetWidget),
+                              profileInformation(zipCodeWidget), 
+                              profileInformation(phoneWidget), 
+                              profileInformation(ribWidget)
+                            ]
+                          )
+                        ],
+                      )
+                    ]
+                  ),
+                )
+              ),
+
+              Visibility(
                 visible: isVisitor && !isEdit && comments.isNotEmpty,
                 child: Container (
                   alignment: Alignment.center,
@@ -448,12 +317,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Column (
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text (
-                        'Commentaire',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        )
+                      Text (
+                        'Commentaires',
+                        style: sectionStyle
                       ),
                       if (comments.isNotEmpty) commentWidget(comments[selectedComments]),
                       Row(
@@ -461,7 +327,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           ElevatedButton(
                             onPressed: () => updateComment(-1), 
-                            style: buttonStyle,
+                            style: app_global.buttonStyle,
                             child: const Icon(Icons.keyboard_arrow_left)
                           ),
                           Text(
@@ -470,7 +336,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ElevatedButton(
                             onPressed: () => updateComment(1), 
-                            style: buttonStyle,
+                            style: app_global.buttonStyle,
                             child: const Icon(Icons.keyboard_arrow_right)
                           )
                         ],
@@ -486,24 +352,241 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void updateComment(int add) {
-    setState(() {
-      selectedComments += add;
-      if (selectedComments < 0) {
-        selectedComments = comments.length - 1;
+  //####__LOADING DATA__#####\\
+
+  @override
+  void initState() {
+    super.initState();
+    app_global.fetchDataMap("${app_global.UrlServer}User/GetUserByID?id=${widget.idUser}").then((Map<String, dynamic>? jsonData) {
+      if (jsonData != null) {
+        if (jsonData["User"] == null) {
+        }
+          isVisitor = jsonData["User"] != null;
+          switch (jsonData["State"]) {
+            case "Attente": isValid = false;
+              break;
+            case "Refuser": isVisitor = false;
+          }
+          if (isVisitor) {
+            setState(() {
+              idVisitor = jsonData["Id"];
+              name = jsonData["User"]["Name"];
+              firstName = jsonData["User"]["FirstName"];
+              city = jsonData["User"]["City"];
+              hourlyRate = jsonData["HourlyRate"].toString();
+              imageUrl = jsonData["User"]["ProfilPicture"];
+              rating = jsonData["Rating"];
+              street = jsonData["Street"];
+              zipCode = jsonData["PostalCode"].toString();
+              if (zipCode.length < 5) {
+                zipCode = "0$zipCode";
+              }
+              phone = jsonData["User"]["PhoneNumber"];
+              rib = jsonData["RIB"].toString();
+              //rib = "**** **** ${rib.substring(rib.length-5)}";
+            });
+
+            app_global.fetchData("${app_global.UrlServer}Availibility/GetAvailibiltyByVisitor?id=${jsonData["Id"]}").then((List<dynamic>? jsonDataAv) {
+              if (jsonDataAv != null) {
+                for (dynamic availibility in jsonDataAv) {
+                  List<String> lstStart = availibility["Start"].toString().split(":");
+                  List<String> lstEnd = availibility["End"].toString().split(":");
+                  Availibility av = Availibility(availibility["day"], int.parse(lstStart[0]), int.parse(lstStart[1]), int.parse(lstEnd[0]), int.parse(lstEnd[1]));
+
+                  availibilities.add(av);
+                }
+                setState(() {
+                  availibilities = shortAvailibilities(availibilities);
+                });
+                initAvailibilitiesController();
+              }
+              }).catchError((error) {
+            });
+            app_global.fetchData("${app_global.UrlServer}Visit/GetComment?idvisitor=${jsonData["Id"]}").then((List<dynamic>? jsonDataCom) {
+              if (jsonDataCom != null) {
+                for (dynamic com in jsonDataCom) {
+                  List<String> dateSplit = com["DateVisit"].toString().split("T")[0].split("-");
+                  Comment comment = Comment(com["NameUser"], "imageProfil.png", com["Rating"], com["Content"], "${dateSplit[2]}/${dateSplit[1]}/${dateSplit[0]}");
+                  comments.add(comment);
+                }
+                setState(() {
+                  comments;
+                });
+              }
+            }).catchError((error) {
+            });
+
+          }else {
+            setState(() {
+              name = jsonData["Name"];
+              firstName = jsonData["FirstName"];
+              city = jsonData["City"];
+              imageUrl = jsonData["ProfilPicture"];
+            });
+          }
       }
-      else if (selectedComments >= comments.length) {
-        selectedComments = 0;
-      }
+      }).catchError((error) {
+        isVisitor = false;
     });
+  } 
+
+  //####__DISPLAY_MODE__####\\
+
+  ///Change the display in the viewing mode
+  void viewingMode() {
+    heightLabel = 180;
+
+    borderInformation = Border (
+      bottom: BorderSide (
+        color: app_global.secondaryColor,
+        width: 3,
+      )
+    );
+
+    nameWidget = editProfileText(name);
+    firstNameWidget = editProfileText(firstName);
+    cityWidget = editProfileText(city);
+    hourlyRateWidget = editProfileText("$hourlyRate€");
+    streetWidget = editProfileText(street);
+    zipCodeWidget = editProfileText(zipCode);
+    phoneWidget = editProfileText(phone);
+    ribWidget = editProfileText(rib);
+    editAppBar = AppBar(toolbarHeight: 0.0);
+    availibilitiesError.clear();
+  }
+  ///Change the display in the edit mode
+  void editMode() {
+    heightLabel = 300;
+    borderInformation = const Border();
+    nameController.text = name;
+    firstNameController.text = firstName;
+    cityController.text = city;
+    hourlyRateController.text = hourlyRate;
+    streetController.text = street;
+    zipCodeController.text = zipCode;
+    phoneController.text = phone;
+
+    nameWidget = inputProfileEdit(nameController, "Prénom", TextInputType.text, null);
+    firstNameWidget = inputProfileEdit(firstNameController, "Nom", TextInputType.text, null);
+    cityWidget = inputProfileEdit(cityController, "Ville", TextInputType.text, null);
+    hourlyRateWidget = inputProfileEdit(hourlyRateController, "Tarif Horaire", TextInputType.number, 5);
+    streetWidget = inputProfileEdit(streetController, "Adresse", TextInputType.text, null);
+    zipCodeWidget = inputProfileEdit(zipCodeController, "Code Postal", TextInputType.number, 5);
+    phoneWidget = inputProfileEdit(phoneController, "Téléphone", TextInputType.phone, 10);
+    ribWidget = inputProfileEdit(ribController, "RIB", TextInputType.text, 34);
+
+    editAppBar = AppBar(
+      backgroundColor: app_global.backgroundColor,
+      shadowColor: Colors.black,
+      shape: Border(
+        bottom: BorderSide(
+          color: app_global.secondaryColor,
+          width: 1.0,
+        ),
+      ),
+      toolbarHeight: 80,
+      title: Column (
+        children: [Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton(
+                onPressed: () => updateData(),
+                style: app_global.buttonStyle,
+                child: const Icon(Icons.task_outlined)
+              ),
+              ElevatedButton(
+                onPressed: () => cancelUpdate(),
+                style: app_global.buttonStyle,
+                child: const Icon(Icons.cancel_outlined)
+              ),
+            ]
+          ),
+          Visibility (
+            visible: isError,
+            child: const Text(
+              "Erreur ! Des horaires sont invalide. La mise à jour ne peut s'effectuer",
+              style: TextStyle(
+                color: Colors.red,
+                fontStyle: FontStyle.italic,
+                fontSize: 12,
+              ),
+            ),
+          ),
+          ],
+        )
+    );
   }
 
-  void addAvailibility() {
+  //####__UPDATE_DATA_FONCTION___####\\
+
+  ///Change the mode to diplay
+  void editprofile() {
     setState(() {
-      availibilitiesController.add(Availibility("lundi", 0, 0, 0, 0));
+      isEdit = !isEdit;
     });
   }
+  ///Cancel the edit mode
+  void cancelUpdate() {
+    setState(() {
+      isError = false;
+    });
+    initAvailibilitiesController();
+    editprofile();
+  }
+  ///Check is data's valid and, if good, updates the user in API and in display
+  void updateData() {
+    setState(() {
+      availibilitiesError = checkAvailibilities(availibilitiesController);
+      isError = (availibilitiesError.isNotEmpty);
+      availibilitiesController;
+    });
+    if (!isError) {
+      app_global.sendData("${app_global.UrlServer}User/ModifyUser?id=${widget.idUser}&name=${nameController.text}&firstName=${firstNameController.text}&city=${cityController.text}").then((value) {
+        setState(() {
+          name = nameController.text;
+          firstName = firstNameController.text;
+          city = cityController.text;
+        });
+      });
+      if (isVisitor) {
+        print("${app_global.UrlServer}Visitor/ModifyVisitor?id=$idVisitor&street=${streetController.text}&hourlyRate=${hourlyRateController.text}&phoneNumber=${phoneController.text}&PostalCode=${zipCodeController.text}");
+        app_global.sendData("${app_global.UrlServer}Visitor/ModifyVisitor?id=$idVisitor&street=${streetController.text}&hourlyRate=${hourlyRateController.text}&phoneNumber=${phoneController.text}&PostalCode=${zipCodeController.text}").then((value) {
+          setState(() {
+            hourlyRate = hourlyRateController.text;
+            street = streetController.text;
+            zipCode = zipCodeController.text;
+            phone = phoneController.text;
+          });
+        });
+        app_global.sendData("${app_global.UrlServer}Availibility/DeleteAvailibilty?id=$idVisitor").then((value) {
+          availibilities.clear();
+          for (Availibility availibility in availibilitiesController) {
+            String start = translateTime(availibility.startTime, ":");
+            String end = translateTime(availibility.endTime, ":");
 
+            app_global.sendData("${app_global.UrlServer}Availibility/SetAvailibilty?id=$idVisitor&day=${availibility.day}&start=$start&end=$end").then((value) {
+              if (!value) {
+                setState(() {
+                  availibilities.remove(availibility);
+                });
+                initAvailibilitiesController();
+              }
+            });
+            availibilities.add(availibility);
+          }
+          setState(() {
+            availibilities = shortAvailibilities(availibilities);
+          });
+          initAvailibilitiesController();
+        });
+        editprofile();
+      }
+    }
+  }
+
+  //####__INFORMATION_LABEL_MANAGEMENT####\\
+
+  ///Create a container for a information label. Is a Text or TextFormField according to the edit mode
   Container profileInformation(Widget informationWidget) {
     return Container(
       alignment: Alignment.centerLeft,
@@ -514,7 +597,7 @@ class _ProfilePageState extends State<ProfilePage> {
       child: informationWidget,
     );
   }
-
+  ///Create a information label (String Data) for the viewing mode
   Text editProfileText(String value) {
     return Text(
       value, 
@@ -524,26 +607,45 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
-  TextFormField inputProfileEdit(TextEditingController textController, String label) {
+  ///Create a input information (String Data) for the edit mode
+  TextFormField inputProfileEdit(TextEditingController textController, String label, TextInputType keyboardType, int? maxLength) {
     return TextFormField(
       controller: textController,
+      keyboardType: keyboardType,
+      maxLength: maxLength,
       decoration: InputDecoration(
         labelText: label,
       )
     );
   }
 
-  Text hourlyLabel(Availibility availibility) {
-    return Text (
-      '${availibility.day} : ${translateTime(availibility.startTime, "h")} à ${translateTime(availibility.endTime, "h")}',
+  Text labelPrivateData(String label) {
+    return Text(
+      label, 
       style: const TextStyle(
         fontSize: 16,
-        fontStyle: FontStyle.italic
+        fontStyle: FontStyle.italic,
       ),
     );
   }
 
+  //####__AVAILIBILITY_MANAGEMENT__####\\
+
+  ///Copy the availibilities data in the availibilitiesController
+  void initAvailibilitiesController() {
+    availibilitiesController = [];
+    for (Availibility availibility in availibilities) {
+      availibilitiesController.add(availibility.copy());
+    }
+  }
+  ///Add a empty availibility in the availibilitiesController
+  void addAvailibility() {
+    setState(() {
+      availibilitiesController.add(Availibility("lundi", 0, 0, 0, 0));
+    });
+  }
+  
+  ///Create a container allow to modifiy a availibility in edit mode
   Container hourlyInput(Availibility availibility, int index) {
     BoxDecoration errorBorder = const BoxDecoration();
     if (availibilitiesError.contains(index)) {
@@ -569,51 +671,57 @@ class _ProfilePageState extends State<ProfilePage> {
               });
             }
           ),
-          timeButton(context, availibility, false),
-          timeButton(context, availibility, true),
-          ElevatedButton(
+          timeButton(availibility, false),
+          timeButton(availibility, true),
+          IconButton(
             onPressed: () {
               setState(() {
                 availibilitiesController.removeAt(index);
               });
             }, 
-            style: buttonStyle,
-            child: const Icon(Icons.delete)
+            style: app_global.buttonStyle,
+            icon: const Icon(Icons.delete)
             )
         ],
       ),
     );
   }
-
-  ElevatedButton timeButton(BuildContext context, Availibility availibility, bool isTimeEnd) {
+  ///Create a TimePicker button for a modifiy a availibility
+  ElevatedButton timeButton(Availibility availibility, bool isTimeEnd) {
     return ElevatedButton(
-      onPressed: () async { final TimeOfDay? time = await showTimePicker(
-        context: context,
-        initialTime: availibility.getTime(isTimeEnd),
-        helpText: "Choissiez une heure",
-        hourLabelText: "Heure",
-        minuteLabelText: "Minute",
-        cancelText: "Annuler",
-        errorInvalidText: "Heure invalide",
-        );
-        setState(() {
-          if (time != null) {
-            if (isTimeEnd) {
-              availibility.endTime = TimeOfDay(hour: time.hour, minute: time.minute);
-              availibility.endMinute = translateStringHour(time.hour)*60 + time.minute;
-
-            } else {
-              availibility.startTime = TimeOfDay(hour: time.hour, minute: time.minute);
-              availibility.startMinute = translateStringHour(time.hour)*60 + time.minute;
-            }
-          }
-        });
-      }, 
-      style: buttonStyle,
+      onPressed: () => timePickerFunction(availibility, isTimeEnd),
+      style: app_global.buttonStyle,
       child: Text(translateTime(availibility.getTime(isTimeEnd), "h"))
     );
   }
 
+  void timePickerFunction(Availibility availibility, bool isTimeEnd) async {
+    final TimeOfDay? time = await showTimePicker(
+      context: context,
+      initialTime: availibility.getTime(isTimeEnd),
+      helpText: "Choissiez une heure",
+      hourLabelText: "Heure",
+      minuteLabelText: "Minute",
+      cancelText: "Annuler",
+      errorInvalidText: "Heure invalide",
+    );
+    setState(() {
+      if (time != null) {
+        if (isTimeEnd) {
+          availibility.endTime = TimeOfDay(hour: time.hour, minute: time.minute);
+          availibility.endMinute = translateStringHour(time.hour)*60 + time.minute;
+
+        } else {
+          availibility.startTime = TimeOfDay(hour: time.hour, minute: time.minute);
+          availibility.startMinute = translateStringHour(time.hour)*60 + time.minute;
+        }
+      }
+    });
+  }
+
+  //####__COMMENT_MANAGEMENT__####\\
+
+  ///Create a widget comment with a Comment Object
   Container commentWidget(Comment comment) {
     return Container(
       alignment: Alignment.center,
@@ -683,5 +791,29 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+  ///Change the selected comment (1 or -1). Overflows are resolved.
+  void updateComment(int add) {
+    setState(() {
+      selectedComments += add;
+      if (selectedComments < 0) {
+        selectedComments = comments.length - 1;
+      }
+      else if (selectedComments >= comments.length) {
+        selectedComments = 0;
+      }
+    });
+  }
+  
+  //####//
 }
 
+///Object comments
+class Comment {
+  String uti;
+  String img;
+  int rating;
+  String txt;
+  String date;
+  
+  Comment(this.uti, this.img, this.rating, this.txt, this.date);
+}

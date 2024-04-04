@@ -4,16 +4,16 @@ import 'globals.dart' as AppGlobal;
 import 'choose_visitor.dart' as visitePage;
 import 'package:dio/dio.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key, required this.title});
+class listVisitor extends StatefulWidget {
+  const listVisitor({Key? key, required this.title});
 
   final String title;
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<listVisitor> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<listVisitor> {
   var listHouseType = [""];
   var houseType = "";
   var listVisitor = [];
@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
   void getDataHouseType() async {
     try {
       var response =
-      await Dio().get('${AppGlobal.UrlServer}House/GetTypeHouse');
+          await Dio().get('${AppGlobal.UrlServer}House/GetTypeHouse');
       if (response.statusCode == 200) {
         setState(() {
           listHouseType = json.decode(response.data).cast<String>().toList();
@@ -74,8 +74,8 @@ class _HomePageState extends State<HomePage> {
               child: Wrap(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(
-                        left: 4.0, right: 4.0, bottom: 2),
+                    padding:
+                        const EdgeInsets.only(left: 4.0, right: 4.0, bottom: 2),
                     child: Expanded(
                       child: TextFormField(
                         textAlign: TextAlign.center,
@@ -95,8 +95,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(
-                        left: 4.0, right: 4.0, bottom: 2),
+                    padding:
+                        const EdgeInsets.only(left: 4.0, right: 4.0, bottom: 2),
                     child: Expanded(
                       child: TextFormField(
                         textAlign: TextAlign.center,
@@ -128,7 +128,8 @@ class _HomePageState extends State<HomePage> {
                           value: houseType,
                           elevation: 0,
                           icon: const Visibility(
-                              visible: false, child: Icon(Icons.arrow_downward)),
+                              visible: false,
+                              child: Icon(Icons.arrow_downward)),
                           style: const TextStyle(color: Colors.deepPurple),
                           underline: Container(
                             height: 0,
