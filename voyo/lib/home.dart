@@ -249,21 +249,7 @@ Padding Visit({
             ),
           ],
         ),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => visitePage.VisitePage(
-                title: "Demande de visite",
-                name: name,
-                surname: surname,
-                city: city,
-                rate: rate,
-                cost: cost,
-              ),
-            ),
-          );
-        },
+        onPressed: () {},
       ),
     ),
   );
