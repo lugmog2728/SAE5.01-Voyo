@@ -68,6 +68,21 @@ class _HomePageState extends State<HomePage> {
     return "error";
   }
 
+  Future<int> GetCost(IdVisitor, typehouse) async {
+    try {
+        var response = await Dio().get(
+            '${AppGlobal.UrlServer}House/GetTypeHouseById?id=${id}');
+        if (response.statusCode == 200) {
+          return json.decode(response.data);
+        } else {
+          print(response.statusCode);
+        }
+    } catch (e) {
+      print(e);
+    }
+    return "error";
+  }
+
   Future<String> GetNameUser(visit) async {
     try {
 
