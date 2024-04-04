@@ -16,8 +16,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var listVisit = [];
+  var listName = [""];
   var city = "";
-  var id = 5;
+  var id = 6;
 
   @override
   void initState() {
@@ -27,12 +28,16 @@ class _HomePageState extends State<HomePage> {
 
   void getDataVisitor() async {
     try {
+      listName = [""];
       var response =
           await Dio().get('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=$id');
       if (response.statusCode == 200) {
         setState(() {
           listVisit = json.decode(response.data) as List;
         });
+        for (var visit in listVisit){
+          listName.add(await GetNameUser(visit['Id'].toString()));
+        }
       } else {
         print(response.statusCode);
       }
@@ -72,12 +77,45 @@ class _HomePageState extends State<HomePage> {
     return "error";
   }
 
+  Future<String> GetNameUser(visit) async {
+    try {
+      if (visit['VisitorId'] != id) {
+        var response = await Dio().get(
+            '${AppGlobal.UrlServer}ser/GetVisitorByID?id=${visit['VisitorId']}');
+        if (response.statusCode == 200) {
+          return json.decode(response.data)['User']['Name'];
+          setState(() {
+            listVisit = json.decode(response.data) as List;
+          });
+        } else {
+          print(response.statusCode);
+        }
+      } else {
+        var response = await Dio()
+            .get('${AppGlobal.UrlServer}ser/GetUserByID?id=${visit['UserId']}');
+        if (response.statusCode == 200) {
+          return json.decode(response.data)['User']['Name'];
+          setState(() {
+            listVisit = json.decode(response.data) as List;
+          });
+        } else {
+          print(response.statusCode);
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+    return "error";
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppGlobal.Menu(
-      Stack(
+      Expanded(
+        child:Stack(
         children: [
-          SingleChildScrollView(
+        Expanded(
+        child:SingleChildScrollView(
             child: Wrap(
               children: [
                 Form(
@@ -107,24 +145,26 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                for (var visit in listVisit)
+
+                for(int index = 0; index < listVisit.length; index++)
                   Visit(
-                    name: "name",
-                    surname: visit['statut'],
-                    city: visit['Street'] +
+                    name: listName[index].toString(),
+                    surname: listVisit[index]['statut'].toString(),
+                    city: listVisit[index]['Street'].toString() +
                         " " +
-                        visit['City'] +
+                        listVisit[index]['City'].toString() +
                         " " +
-                        visit['PostalCode'],
-                    rate: visit['statut'],
+                        listVisit[index]['PostalCode'].toString(),
+                    rate: listVisit[index]['statut'].toString(),
                     cost: "10",
-                    typeHouse: visit['statut'],
-                    user: visit['statut'],
+                    typeHouse: listVisit[index]['statut'].toString(),
+                    user: listVisit[index]['statut'].toString(),
                     context: context,
                   ),
               ],
             ),
           ),
+        ),
           Positioned(
             bottom: 10,
             right: 10,
@@ -150,6 +190,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ],
+      ),
       ),
       widget,
       context,
@@ -204,12 +245,6 @@ Padding Visit({
                   children: [
                     Text(
                       typeHouse,
-                      style: const TextStyle(
-                        color: Colors.black,
-                      ),
-                    ),
-                    Text(
-                      city,
                       style: const TextStyle(
                         color: Colors.black,
                       ),
