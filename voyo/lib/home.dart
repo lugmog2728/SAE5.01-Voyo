@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
-import 'visite.dart' as visitePage;
+import 'choose_visitor.dart' as visitePage;
 import 'package:dio/dio.dart';
 
 class HomePage extends StatefulWidget {
@@ -165,6 +165,8 @@ class _HomePageState extends State<HomePage> {
                 city: visitor['User']['City'],
                 rate: visitor['HourlyRate'].toString(),
                 cost: visitor['Price'].toString(),
+                id: visitor['User']['Id'],
+                houseType : houseType,
                 context: context,
               ),
           ],
@@ -182,6 +184,8 @@ Padding Visitor({
   required String city,
   required String rate,
   required String cost,
+  required int id,
+  required String houseType,
   required BuildContext context,
 }) {
   return Padding(
@@ -277,11 +281,8 @@ Padding Visitor({
             MaterialPageRoute(
               builder: (context) => visitePage.VisitePage(
                 title: "Demande de visite",
-                name: name,
-                surname: surname,
-                city: city,
-                rate: rate,
-                cost: cost,
+                idVisitor: id,
+                houseType: houseType
               ),
             ),
           );
