@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
 import 'connexion.dart' as connexionPage;
-import 'Statuschange.dart' as statChange;
 void main() {
   runApp(const MyApp());
 }

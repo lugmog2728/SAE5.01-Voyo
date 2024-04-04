@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as app_global;
+import 'profile.dart' as profile;
 import 'availibility.dart';
 
 class ChangementStatutPage extends StatefulWidget {
-  const ChangementStatutPage({Key? key, required this.title}) : super(key: key);
+  const ChangementStatutPage({Key? key, required this.title, required this.idUser}) : super(key: key);
 
   final String title;
+  final int idUser;
 
   @override
   State<ChangementStatutPage> createState() => _ChangementStatutPageState();
@@ -19,9 +21,11 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
   List<int> availibilitiesError = [];
   bool isError = false;
 
-  final TextEditingController telephoneController = TextEditingController();
+  final TextEditingController streetController = TextEditingController();
+  final TextEditingController zipCodeController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
   final TextEditingController ribController = TextEditingController();
-  final TextEditingController tarifController = TextEditingController();
+  final TextEditingController rateController = TextEditingController();
 
   void _confirmer() {
     setState(() {
@@ -29,6 +33,22 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
       isError = (availibilitiesError.isNotEmpty);
       availibilitiesController;
     });
+    if (!isError) {
+      print("${app_global.UrlServer}Visitor/CreateVisitor?id=${widget.idUser}&street=${streetController.text}&hourlyRate=${rateController.text}&postalCode=${zipCodeController.text}&RIB=${ribController.text}&phoneNumber=${phoneController.text}");
+      app_global.sendData("${app_global.UrlServer}Visitor/CreateVisitor?id=${widget.idUser}&street=${streetController.text}&hourlyRate=${rateController.text}&postalCode=${zipCodeController.text}&RIB=${ribController.text}&phoneNumber=${phoneController.text}").then((value) {
+         returnInProfil();
+      });
+    }
+  }
+
+  void returnInProfil() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+          profile.ProfilePage(title: "profil", idUser: widget.idUser)
+      ),
+    );
   }
 
   @override
@@ -48,36 +68,47 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
                   textAlign: TextAlign.center,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextFormField(
-                      controller: telephoneController,
-                      keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(
-                        labelText: "Numéro de téléphone",
-                      ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextFormField(
+                    controller: streetController,
+                    decoration: const InputDecoration(
+                      labelText: "Adresse",
                     ),
-                    const SizedBox(height: 20.0),
-                    TextFormField(
-                      controller: ribController,
-                      maxLength: 27,
-                      decoration: const InputDecoration(
-                        labelText: "RIB/iBAN",
-                      ),
+                  ),
+                  TextFormField(
+                    controller: zipCodeController,
+                    keyboardType: TextInputType.number,
+                    maxLength: 5,
+                    decoration: const InputDecoration(
+                      labelText: "Code Postal",
                     ),
-                    const SizedBox(height: 20.0),
-                    TextFormField(
-                      controller: tarifController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: "Tarif horaire",
-                      ),
+                  ),
+                  TextFormField(
+                    controller: phoneController,
+                    keyboardType: TextInputType.phone,
+                    maxLength: 10,
+                    decoration: const InputDecoration(
+                      labelText: "Numéro de téléphone",
                     ),
-                  ],
-                ),
+                  ),
+                  TextFormField(
+                    controller: ribController,
+                    maxLength: 34,
+                    decoration: const InputDecoration(
+                      labelText: "RIB/iBAN",
+                    ),
+                  ),
+                  TextFormField(
+                    controller: rateController,
+                    keyboardType: TextInputType.number,
+                    maxLength: 5,
+                    decoration: const InputDecoration(
+                      labelText: "Tarif horaire",
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 20.0),
               Padding(
@@ -87,12 +118,10 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
                   children: [
                     const Text(
                       'Horaires',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24.0),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 20.0),
                     for (var i = 0; i < availibilitiesController.length; i++) hourlyInput(availibilitiesController[i], i),
-                    const SizedBox(height: 20.0),
                     Visibility(
                         visible: availibilitiesController.length < maxAvailibility,
                         child: Center(
@@ -112,11 +141,15 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: _confirmer,
                 style: app_global.buttonStyle,
                 child: const Text('Confirmer'),
+              ),
+              ElevatedButton(
+                onPressed: returnInProfil,
+                style: app_global.buttonStyle,
+                child: const Text('Annuler'),
               ),
             ],
           ),
@@ -153,50 +186,54 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
               });
             }
           ),
-          timeButton(context, availibility, false),
-          timeButton(context, availibility, true),
-          ElevatedButton(
+          timeButton(availibility, false),
+          timeButton(availibility, true),
+          IconButton(
             onPressed: () {
               setState(() {
                 availibilitiesController.removeAt(index);
               });
             }, 
             style: app_global.buttonStyle,
-            child: const Icon(Icons.delete)
+            icon: const Icon(Icons.delete)
             )
         ],
       ),
     );
   }
   ///Create a TimePicker button for a modifiy a availibility
-  ElevatedButton timeButton(BuildContext context, Availibility availibility, bool isTimeEnd) {
+  ElevatedButton timeButton(Availibility availibility, bool isTimeEnd) {
     return ElevatedButton(
-      onPressed: () async { final TimeOfDay? time = await showTimePicker(
-        context: context,
-        initialTime: availibility.getTime(isTimeEnd),
-        helpText: "Choissiez une heure",
-        hourLabelText: "Heure",
-        minuteLabelText: "Minute",
-        cancelText: "Annuler",
-        errorInvalidText: "Heure invalide",
-        );
-        setState(() {
-          if (time != null) {
-            if (isTimeEnd) {
-              availibility.endTime = TimeOfDay(hour: time.hour, minute: time.minute);
-              availibility.endMinute = translateStringHour(time.hour)*60 + time.minute;
-
-            } else {
-              availibility.startTime = TimeOfDay(hour: time.hour, minute: time.minute);
-              availibility.startMinute = translateStringHour(time.hour)*60 + time.minute;
-            }
-          }
-        });
-      }, 
+      onPressed: () => timePickerFunction(availibility, isTimeEnd),
       style: app_global.buttonStyle,
       child: Text(translateTime(availibility.getTime(isTimeEnd), "h"))
     );
   }
+
+  void timePickerFunction(Availibility availibility, bool isTimeEnd) async {
+    final TimeOfDay? time = await showTimePicker(
+      context: context,
+      initialTime: availibility.getTime(isTimeEnd),
+      helpText: "Choissiez une heure",
+      hourLabelText: "Heure",
+      minuteLabelText: "Minute",
+      cancelText: "Annuler",
+      errorInvalidText: "Heure invalide",
+    );
+    setState(() {
+      if (time != null) {
+        if (isTimeEnd) {
+          availibility.endTime = TimeOfDay(hour: time.hour, minute: time.minute);
+          availibility.endMinute = translateStringHour(time.hour)*60 + time.minute;
+
+        } else {
+          availibility.startTime = TimeOfDay(hour: time.hour, minute: time.minute);
+          availibility.startMinute = translateStringHour(time.hour)*60 + time.minute;
+        }
+      }
+    });
+  }
+
 
   ///Add a empty availibility in the availibilitiesController
   void addAvailibility() {

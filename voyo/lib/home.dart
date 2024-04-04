@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
-import 'visite.dart' as visitePage;
 import 'listVisitor.dart' as listVisitor;
 import 'package:dio/dio.dart';
 
@@ -275,21 +274,7 @@ Padding Visit({
             ),
           ],
         ),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => visitePage.VisitePage(
-                title: "Demande de visite",
-                name: name,
-                surname: surname,
-                city: city,
-                rate: rate,
-                cost: cost,
-              ),
-            ),
-          );
-        },
+        onPressed: () {},
       ),
     ),
   );

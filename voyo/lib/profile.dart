@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:dio/dio.dart';
 import 'globals.dart' as app_global;
 import 'statuschange.dart' as status_change;
 import 'availibility.dart';
@@ -8,6 +7,10 @@ import 'availibility.dart';
 //####__CONSTANTS__####\\
 
 Image placeholder = Image.asset("assets/images/placeholder.webp", width: 140, height: 180,);
+TextStyle sectionStyle = const TextStyle(
+  fontSize: 20,
+  fontWeight: FontWeight.bold,
+);
 
 //####__PROFIL_PAGE__#####\\
 
@@ -24,7 +27,6 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   
   //####__SUPPORTS_VAR__####\\
-  
   XFile? imagePick;
   ///Image height depending on edit
   double heightLabel = 180;
@@ -39,6 +41,9 @@ class _ProfilePageState extends State<ProfilePage> {
   //####__DATA_VAR__####\\
 
   bool isVisitor = false;
+  ///Defined if the visitor has been validated by an administrator
+  bool isValid = true;
+  bool isActive = true;
   int idVisitor = -1; 
   String statut = "";
   String name = "";
@@ -47,6 +52,10 @@ class _ProfilePageState extends State<ProfilePage> {
   String hourlyRate = "";
   String imageUrl = "";
   int rating = 0;
+  String street = "";
+  String zipCode = "";
+  String phone = "";
+  String rib = "";
   List<Availibility> availibilities = [];
   List<Comment> comments = [];
 
@@ -56,6 +65,10 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController firstNameController = TextEditingController();
   TextEditingController cityController = TextEditingController();
   TextEditingController hourlyRateController = TextEditingController();
+  TextEditingController streetController = TextEditingController();
+  TextEditingController zipCodeController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController ribController = TextEditingController();
   List<Availibility> availibilitiesController = [];
 
   //####__WIDGET__####\\
@@ -64,6 +77,10 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget firstNameWidget = Container();
   Widget cityWidget = Container();
   Widget hourlyRateWidget = Container();
+  Widget streetWidget = Container();
+  Widget zipCodeWidget = Container();
+  Widget phoneWidget = Container();
+  Widget ribWidget = Container();
   ///Yellow underline for information label
   Border borderInformation = const Border ();
   AppBar editAppBar = AppBar(toolbarHeight: 0.0);
@@ -78,6 +95,11 @@ class _ProfilePageState extends State<ProfilePage> {
     if (isEdit) {editMode();
     } else {viewingMode();}
 
+    Widget image = placeholder;
+    if (imageUrl != "") {
+      image = Image.network('${app_global.UrlServer}/image/$imageUrl', width: 140,height: 180, errorBuilder: (context, error, stackTrace) => placeholder);
+    }
+
     return app_global.Menu(
       Scaffold(
         appBar: editAppBar,
@@ -86,6 +108,38 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column (
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Visibility(
+                visible: !isValid,
+                child: const Center(
+                  child: 
+                    Text(
+                    "Ce compte n'a pas encore était validé par un administrateur.",
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic
+                    ),
+                  ),
+                ),
+              ),
+              Visibility(
+                visible: app_global.idUser == 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Désactiver le compte :",
+                      style: TextStyle(fontSize: 16),
+                      ),
+                    Switch(
+                      value: !isActive,
+                      onChanged: (value) {
+                        setState(() {
+                          isActive = !isActive;
+                        });
+                      }
+                    ),
+                  ],
+                ) 
+              ),
               Visibility(
                 visible: !isEdit,
                 child: Row (
@@ -102,16 +156,21 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                   ),
-                  Padding(
+                  Container (
                     padding: const EdgeInsets.all(16.0),
-                    child: Center(
-                      child: ElevatedButton(
-                        style: app_global.buttonStyle,
-                        child: const Icon(Icons.edit_sharp),
-                        onPressed: () => editprofile(),
+                    width: 130,
+                    child: Visibility(
+                      visible: widget.idUser == app_global.idUser,
+                      child: Center(
+                        child: IconButton(
+                          onPressed: () => editprofile(),
+                          style: app_global.buttonStyle,
+                          icon: const Icon(Icons.edit_sharp),
+                          ),
                         ),
                       ),
                     ),
+                  
                   ],
                 ),
               ),
@@ -120,23 +179,22 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     Padding (
                       padding: const EdgeInsets.only(left: 16, right: 16),
-                      child: Image.network('${app_global.UrlServer}/image/$imageUrl', 
-                        width: 140,
-                        height: 180, 
-                        errorBuilder: (context, error, stackTrace) => placeholder,
-                        ),
+                      child: image,
                     ),
-                    Positioned(
-                      left: 0,
-                      bottom: 0,
-                      child: ElevatedButton(
-                        onPressed: () async { final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
-                          imagePick = image;
-                        }, 
-                        style: app_global.buttonStyle,
-                        child: const Icon(Icons.photo_size_select_actual_outlined)
-                      ),
-                    )
+                    Visibility(
+                      visible: widget.idUser == app_global.idUser,
+                      child: Positioned(
+                        left: 10,
+                        bottom: 10,
+                        child: IconButton(
+                          onPressed: () async { final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                            imagePick = image;
+                          }, 
+                          style: app_global.buttonStyle,
+                          icon: const Icon(Icons.photo_size_select_actual_outlined)
+                        ),
+                      )
+                    ),
                   ],
                 ),
 
@@ -168,7 +226,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                            const status_change.ChangementStatutPage(title: "Changement de statut")
+                            status_change.ChangementStatutPage(title: "Changement de statut", idUser: widget.idUser,)
                         ),
                       );
                     },
@@ -197,12 +255,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Column ( 
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text (
+                      Text (
                         'Horaires',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        )
+                        style: sectionStyle
                       ),
                       if (isEdit) for (var i = 0; i < availibilitiesController.length; i++) hourlyInput(availibilitiesController[i], i)
                       else for (var i = 0; i < availibilities.length; i++) hourlyLabel(availibilities[i]),
@@ -231,6 +286,47 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
 
               Visibility(
+                visible: isVisitor && widget.idUser == app_global.idUser,
+                child: Container (
+                  alignment: Alignment.centerLeft,
+                  margin: const EdgeInsets.only(top: 16, left: 16),
+                  child: Column (
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text (
+                        'Données privées',
+                        style: sectionStyle
+                      ),
+                      Row (
+                        children: [
+                          Visibility(
+                            visible: !isEdit,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                labelPrivateData("Adresse :"),
+                                labelPrivateData("Code Postal : "),
+                                labelPrivateData("Téléphone : "),
+                                labelPrivateData("RIB : ")
+                              ]
+                            ),
+                          ),
+                          Column(
+                            children: [
+                              profileInformation(streetWidget),
+                              profileInformation(zipCodeWidget), 
+                              profileInformation(phoneWidget), 
+                              profileInformation(ribWidget)
+                            ]
+                          )
+                        ],
+                      )
+                    ]
+                  ),
+                )
+              ),
+
+              Visibility(
                 visible: isVisitor && !isEdit && comments.isNotEmpty,
                 child: Container (
                   alignment: Alignment.center,
@@ -238,12 +334,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Column (
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text (
-                        'Commentaire',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        )
+                      Text (
+                        'Commentaires',
+                        style: sectionStyle
                       ),
                       if (comments.isNotEmpty) commentWidget(comments[selectedComments]),
                       Row(
@@ -286,8 +379,14 @@ class _ProfilePageState extends State<ProfilePage> {
         if (jsonData["User"] == null) {
         }
           isVisitor = jsonData["User"] != null;
+          switch (jsonData["State"]) {
+            case "Attente": isValid = false;
+              break;
+            case "Refuser": isVisitor = false;
+          }
           if (isVisitor) {
             setState(() {
+              isActive = jsonData["User"]["IsActive"];
               idVisitor = jsonData["Id"];
               name = jsonData["User"]["Name"];
               firstName = jsonData["User"]["FirstName"];
@@ -295,6 +394,14 @@ class _ProfilePageState extends State<ProfilePage> {
               hourlyRate = jsonData["HourlyRate"].toString();
               imageUrl = jsonData["User"]["ProfilPicture"];
               rating = jsonData["Rating"];
+              street = jsonData["Street"];
+              zipCode = jsonData["PostalCode"].toString();
+              if (zipCode.length < 5) {
+                zipCode = "0$zipCode";
+              }
+              phone = jsonData["User"]["PhoneNumber"];
+              rib = jsonData["RIB"].toString();
+              //rib = "**** **** ${rib.substring(rib.length-5)}";
             });
 
             app_global.fetchData("${app_global.UrlServer}Availibility/GetAvailibiltyByVisitor?id=${jsonData["Id"]}").then((List<dynamic>? jsonDataAv) {
@@ -312,7 +419,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 initAvailibilitiesController();
               }
               }).catchError((error) {
-                print('\nUne erreur est survenue lors de la récupération des données : $error');
             });
             app_global.fetchData("${app_global.UrlServer}Visit/GetComment?idvisitor=${jsonData["Id"]}").then((List<dynamic>? jsonDataCom) {
               if (jsonDataCom != null) {
@@ -326,11 +432,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 });
               }
             }).catchError((error) {
-              print('\nUne erreur est survenue lors de la récupération des données : $error');
             });
 
           }else {
             setState(() {
+              isActive = jsonData["IsActive"];
               name = jsonData["Name"];
               firstName = jsonData["FirstName"];
               city = jsonData["City"];
@@ -340,9 +446,8 @@ class _ProfilePageState extends State<ProfilePage> {
       }
       }).catchError((error) {
         isVisitor = false;
-        print('\nUne erreur est survenue lors de la récupération des données : $error');
     });
-  }
+  } 
 
   //####__DISPLAY_MODE__####\\
 
@@ -361,6 +466,10 @@ class _ProfilePageState extends State<ProfilePage> {
     firstNameWidget = editProfileText(firstName);
     cityWidget = editProfileText(city);
     hourlyRateWidget = editProfileText("$hourlyRate€");
+    streetWidget = editProfileText(street);
+    zipCodeWidget = editProfileText(zipCode);
+    phoneWidget = editProfileText(phone);
+    ribWidget = editProfileText(rib);
     editAppBar = AppBar(toolbarHeight: 0.0);
     availibilitiesError.clear();
   }
@@ -372,19 +481,18 @@ class _ProfilePageState extends State<ProfilePage> {
     firstNameController.text = firstName;
     cityController.text = city;
     hourlyRateController.text = hourlyRate;
+    streetController.text = street;
+    zipCodeController.text = zipCode;
+    phoneController.text = phone;
 
-    nameWidget = inputProfileEdit(nameController, "Prénom");
-    firstNameWidget = inputProfileEdit(firstNameController, "Nom");
-    cityWidget = inputProfileEdit(cityController, "Ville");
-    
-    hourlyRateWidget = TextFormField(
-      controller: hourlyRateController,
-      decoration: const InputDecoration(
-        labelText: "Tarif Horaire",
-      ),
-      keyboardType: TextInputType.number,
-      maxLength: 5,
-    );
+    nameWidget = inputProfileEdit(nameController, "Prénom", TextInputType.text, null);
+    firstNameWidget = inputProfileEdit(firstNameController, "Nom", TextInputType.text, null);
+    cityWidget = inputProfileEdit(cityController, "Ville", TextInputType.text, null);
+    hourlyRateWidget = inputProfileEdit(hourlyRateController, "Tarif Horaire", TextInputType.number, 5);
+    streetWidget = inputProfileEdit(streetController, "Adresse", TextInputType.text, null);
+    zipCodeWidget = inputProfileEdit(zipCodeController, "Code Postal", TextInputType.number, 5);
+    phoneWidget = inputProfileEdit(phoneController, "Téléphone", TextInputType.phone, 10);
+    ribWidget = inputProfileEdit(ribController, "RIB", TextInputType.text, 34);
 
     editAppBar = AppBar(
       backgroundColor: app_global.backgroundColor,
@@ -460,9 +568,13 @@ class _ProfilePageState extends State<ProfilePage> {
         });
       });
       if (isVisitor) {
-        app_global.sendData("${app_global.UrlServer}Visitor/ModifyVisitor?id=$idVisitor&hourlyRate=${hourlyRateController.text}").then((value) {
+        print("${app_global.UrlServer}Visitor/ModifyVisitor?id=$idVisitor&street=${streetController.text}&hourlyRate=${hourlyRateController.text}&phoneNumber=${phoneController.text}&PostalCode=${zipCodeController.text}");
+        app_global.sendData("${app_global.UrlServer}Visitor/ModifyVisitor?id=$idVisitor&street=${streetController.text}&hourlyRate=${hourlyRateController.text}&phoneNumber=${phoneController.text}&PostalCode=${zipCodeController.text}").then((value) {
           setState(() {
             hourlyRate = hourlyRateController.text;
+            street = streetController.text;
+            zipCode = zipCodeController.text;
+            phone = phoneController.text;
           });
         });
         app_global.sendData("${app_global.UrlServer}Availibility/DeleteAvailibilty?id=$idVisitor").then((value) {
@@ -515,12 +627,24 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
   ///Create a input information (String Data) for the edit mode
-  TextFormField inputProfileEdit(TextEditingController textController, String label) {
+  TextFormField inputProfileEdit(TextEditingController textController, String label, TextInputType keyboardType, int? maxLength) {
     return TextFormField(
       controller: textController,
+      keyboardType: keyboardType,
+      maxLength: maxLength,
       decoration: InputDecoration(
         labelText: label,
       )
+    );
+  }
+
+  Text labelPrivateData(String label) {
+    return Text(
+      label, 
+      style: const TextStyle(
+        fontSize: 16,
+        fontStyle: FontStyle.italic,
+      ),
     );
   }
 
@@ -566,49 +690,52 @@ class _ProfilePageState extends State<ProfilePage> {
               });
             }
           ),
-          timeButton(context, availibility, false),
-          timeButton(context, availibility, true),
-          ElevatedButton(
+          timeButton(availibility, false),
+          timeButton(availibility, true),
+          IconButton(
             onPressed: () {
               setState(() {
                 availibilitiesController.removeAt(index);
               });
             }, 
             style: app_global.buttonStyle,
-            child: const Icon(Icons.delete)
+            icon: const Icon(Icons.delete)
             )
         ],
       ),
     );
   }
   ///Create a TimePicker button for a modifiy a availibility
-  ElevatedButton timeButton(BuildContext context, Availibility availibility, bool isTimeEnd) {
+  ElevatedButton timeButton(Availibility availibility, bool isTimeEnd) {
     return ElevatedButton(
-      onPressed: () async { final TimeOfDay? time = await showTimePicker(
-        context: context,
-        initialTime: availibility.getTime(isTimeEnd),
-        helpText: "Choissiez une heure",
-        hourLabelText: "Heure",
-        minuteLabelText: "Minute",
-        cancelText: "Annuler",
-        errorInvalidText: "Heure invalide",
-        );
-        setState(() {
-          if (time != null) {
-            if (isTimeEnd) {
-              availibility.endTime = TimeOfDay(hour: time.hour, minute: time.minute);
-              availibility.endMinute = translateStringHour(time.hour)*60 + time.minute;
-
-            } else {
-              availibility.startTime = TimeOfDay(hour: time.hour, minute: time.minute);
-              availibility.startMinute = translateStringHour(time.hour)*60 + time.minute;
-            }
-          }
-        });
-      }, 
+      onPressed: () => timePickerFunction(availibility, isTimeEnd),
       style: app_global.buttonStyle,
       child: Text(translateTime(availibility.getTime(isTimeEnd), "h"))
     );
+  }
+
+  void timePickerFunction(Availibility availibility, bool isTimeEnd) async {
+    final TimeOfDay? time = await showTimePicker(
+      context: context,
+      initialTime: availibility.getTime(isTimeEnd),
+      helpText: "Choissiez une heure",
+      hourLabelText: "Heure",
+      minuteLabelText: "Minute",
+      cancelText: "Annuler",
+      errorInvalidText: "Heure invalide",
+    );
+    setState(() {
+      if (time != null) {
+        if (isTimeEnd) {
+          availibility.endTime = TimeOfDay(hour: time.hour, minute: time.minute);
+          availibility.endMinute = translateStringHour(time.hour)*60 + time.minute;
+
+        } else {
+          availibility.startTime = TimeOfDay(hour: time.hour, minute: time.minute);
+          availibility.startMinute = translateStringHour(time.hour)*60 + time.minute;
+        }
+      }
+    });
   }
 
   //####__COMMENT_MANAGEMENT__####\\

@@ -182,7 +182,6 @@ Row etoile(int nbetoile, double w, double h) {
   );
 }
 
-
 Future<List<dynamic>?> fetchData(String urlString) async {
   var url = Uri.parse(urlString);
 
