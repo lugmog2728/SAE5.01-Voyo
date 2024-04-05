@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:dio/dio.dart';
 import 'globals.dart' as app_global;
 import 'statuschange.dart' as status_change;
 import 'availibility.dart';
@@ -44,6 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
   bool isVisitor = false;
   ///Defined if the visitor has been validated by an administrator
   bool isValid = true;
+  bool isActive = true;
   int idVisitor = -1; 
   String statut = "";
   String name = "";
@@ -95,6 +95,13 @@ class _ProfilePageState extends State<ProfilePage> {
     if (isEdit) {editMode();
     } else {viewingMode();}
 
+    String information = "";
+    if (!isActive) {
+      information = "Ce compte est désactivé";
+    } else if (!isValid) {
+      information = "Ce compte n'a pas encore était validé par un administrateur.";
+    }
+
     Widget image = placeholder;
     if (imageUrl != "") {
       image = Image.network('${app_global.UrlServer}/image/$imageUrl', width: 140,height: 180, errorBuilder: (context, error, stackTrace) => placeholder);
@@ -109,20 +116,36 @@ class _ProfilePageState extends State<ProfilePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Visibility(
-                visible: !isValid,
-                child: const Center(
+                visible: !isValid || !isActive,
+                child: Center(
                   child: 
                     Text(
-                    "Ce compte n'a pas encore était validé par un administrateur.",
-                    style: TextStyle(
+                    information,
+                    style: const TextStyle(
                       fontStyle: FontStyle.italic
                     ),
                   ),
                 ),
               ),
               Visibility(
-                visible: widget.idUser == 0,
-                child: Container(),
+                visible: app_global.idUser == 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Désactiver le compte :",
+                      style: TextStyle(fontSize: 16),
+                      ),
+                    Switch(
+                      value: !isActive,
+                      onChanged: (value) {
+                        setState(() {
+                          isActive = !isActive;
+                        });
+                      }
+                    ),
+                  ],
+                ) 
               ),
               Visibility(
                 visible: !isEdit,
@@ -173,8 +196,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: IconButton(
                           onPressed: () async { final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
                             imagePick = image;
-                            String? t = image?.readAsString() as String?;
-                            print(t);
                           }, 
                           style: app_global.buttonStyle,
                           icon: const Icon(Icons.photo_size_select_actual_outlined)
@@ -204,7 +225,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
 
               Visibility(
-                visible: !isVisitor,
+                visible: !isVisitor && widget.idUser == app_global.idUser,
                 child: Center (
                   child: ElevatedButton(
                     onPressed: () {
@@ -221,7 +242,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
               ),
-              
 
               Visibility (
                 visible: isVisitor && !isEdit,
@@ -285,21 +305,24 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       Row (
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              labelPrivateData("Adresse :"),
-                              labelPrivateData("Code Postal : "),
-                              labelPrivateData("Téléphone : "),
-                              labelPrivateData("RIB : ")
-                            ]
+                          Visibility(
+                            visible: !isEdit,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                labelPrivateData("Adresse :"),
+                                labelPrivateData("Code Postal : "),
+                                labelPrivateData("Téléphone : "),
+                                //labelPrivateData("RIB : ")
+                              ]
+                            ),
                           ),
                           Column(
                             children: [
                               profileInformation(streetWidget),
                               profileInformation(zipCodeWidget), 
                               profileInformation(phoneWidget), 
-                              profileInformation(ribWidget)
+                              //profileInformation(ribWidget)
                             ]
                           )
                         ],
@@ -369,6 +392,7 @@ class _ProfilePageState extends State<ProfilePage> {
           }
           if (isVisitor) {
             setState(() {
+              isActive = jsonData["User"]["IsActive"];
               idVisitor = jsonData["Id"];
               name = jsonData["User"]["Name"];
               firstName = jsonData["User"]["FirstName"];
@@ -386,7 +410,7 @@ class _ProfilePageState extends State<ProfilePage> {
               //rib = "**** **** ${rib.substring(rib.length-5)}";
             });
 
-            app_global.fetchData("${app_global.UrlServer}Availibility/GetAvailibiltyByVisitor?id=${jsonData["Id"]}").then((List<dynamic>? jsonDataAv) {
+            app_global.fetchData("${app_global.UrlServer}Availibility/GetAvailibiltyByVisitor?id=${widget.idUser}").then((List<dynamic>? jsonDataAv) {
               if (jsonDataAv != null) {
                 for (dynamic availibility in jsonDataAv) {
                   List<String> lstStart = availibility["Start"].toString().split(":");
@@ -418,6 +442,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
           }else {
             setState(() {
+              isActive = jsonData["IsActive"];
               name = jsonData["Name"];
               firstName = jsonData["FirstName"];
               city = jsonData["City"];

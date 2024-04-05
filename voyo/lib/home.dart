@@ -15,8 +15,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var listVisit = [];
+  var listVisitTemp = [];
+  var listCost = [];
+  var listName = [""];
+  var listHouseType = [""];
   var city = "";
-  var id = 5;
+  var id = 3;
 
   @override
   void initState() {
@@ -26,11 +30,30 @@ class _HomePageState extends State<HomePage> {
 
   void getDataVisitor() async {
     try {
+      setState(() {
+        listName = [];
+        listHouseType = [];
+        listCost = [];
+        listVisitTemp = [];
+        listVisit = [];
+      });
+
       var response =
-          await Dio().get('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=$id');
+          await Dio().get('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=$id&city=${city}');
       if (response.statusCode == 200) {
+        listVisitTemp = json.decode(response.data) as List;
+        for (var visit in listVisitTemp) {
+          listName.add(await GetNameUser(visit));
+          listHouseType.add(await GetHouseTypeName(visit['HousingTypeId']));
+          listHouseType.add(await GetHouseTypeName(visit['HousingTypeId']));
+          listCost.add((await GetCost(visit, listHouseType.last)));
+        }
+        debugPrint(listName.toString());
         setState(() {
-          listVisit = json.decode(response.data) as List;
+          listName = listName;
+          listHouseType = listHouseType;
+          listCost = listCost;
+          listVisit = listVisitTemp;
         });
       } else {
         print(response.statusCode);
@@ -40,27 +63,51 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<String> GetHouseTypeName(id) async {
+    try {
+      var response = await Dio()
+          .get('${AppGlobal.UrlServer}House/GetTypeHouseById?id=${id}');
+      if (response.statusCode == 200) {
+        return json.decode(response.data);
+      } else {
+        print(response.statusCode);
+      }
+    } catch (e) {
+      print(e);
+    }
+    return "error";
+  }
+
+  Future<String> GetCost(visit, typehouse) async {
+    try {
+      var response = await Dio().get(
+          '${AppGlobal.UrlServer}Visitor/GetVisitorByID?id=${visit['VisitorId'].toString()}&typeHouse=${typehouse}');
+      if (response.statusCode == 200) {
+        return json.decode(response.data)['Price'].toString();
+      } else {
+        print(response.statusCode);
+      }
+    } catch (e) {
+      print(e);
+    }
+    return "Error";
+  }
+
   Future<String> GetNameUser(visit) async {
     try {
       if (visit['VisitorId'] != id) {
         var response = await Dio().get(
-            '${AppGlobal.UrlServer}ser/GetVisitorByID?id=${visit['VisitorId']}');
+            '${AppGlobal.UrlServer}Visitor/GetVisitorByID?id=${visit['VisitorId'].toString()}');
         if (response.statusCode == 200) {
           return json.decode(response.data)['User']['Name'];
-          setState(() {
-            listVisit = json.decode(response.data) as List;
-          });
         } else {
           print(response.statusCode);
         }
       } else {
-        var response = await Dio()
-            .get('${AppGlobal.UrlServer}ser/GetUserByID?id=${visit['UserId']}');
+        var response = await Dio().get(
+            '${AppGlobal.UrlServer}User/GetUserByID?id=${visit['UserId'].toString()}');
         if (response.statusCode == 200) {
           return json.decode(response.data)['User']['Name'];
-          setState(() {
-            listVisit = json.decode(response.data) as List;
-          });
         } else {
           print(response.statusCode);
         }
@@ -74,81 +121,83 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return AppGlobal.Menu(
-      Stack(
-        children: [
-          SingleChildScrollView(
-            child: Wrap(
-              children: [
-                Form(
-                  autovalidateMode: AutovalidateMode.always,
-                  onChanged: () {
-                    Form.of(primaryFocus!.context!).save();
-                  },
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.only(left: 4.0, right: 4.0, bottom: 2),
-                    child: Expanded(
-                      child: TextFormField(
-                        textAlign: TextAlign.center,
-                        decoration: InputDecoration(
-                          hintText: "Sélectionnez une ville",
-                          filled: true,
-                          fillColor: AppGlobal.inputColor,
-                          border: InputBorder.none,
+      Expanded(
+        child: Stack(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Wrap(
+                  children: [
+                    Form(
+                      autovalidateMode: AutovalidateMode.always,
+                      onChanged: () {
+                        Form.of(primaryFocus!.context!).save();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 4.0, right: 4.0, bottom: 2),
+                        child: Expanded(
+                          child: TextFormField(
+                            textAlign: TextAlign.center,
+                            decoration: InputDecoration(
+                              hintText: "Sélectionnez une ville",
+                              filled: true,
+                              fillColor: AppGlobal.inputColor,
+                              border: InputBorder.none,
+                            ),
+                            onSaved: (String? value) {
+                              setState(() {
+                                city = value ?? "";
+                              });
+                              getDataVisitor();
+                            },
+                          ),
                         ),
-                        onSaved: (String? value) {
-                          setState(() {
-                            city = value ?? "";
-                          });
-                          getDataVisitor();
-                        },
                       ),
                     ),
-                  ),
+                    for (int index = 0; index < listVisit.length; index++)
+                      Visit(
+                        name: listName[index].toString(),
+                        city: listVisit[index]['Street'].toString() +
+                            " " +
+                            listVisit[index]['City'].toString() +
+                            " " +
+                            listVisit[index]['PostalCode'].toString(),
+                        cost: listCost[index],
+                        typeHouse: listHouseType[index],
+                        context: context,
+                      ),
+                  ],
                 ),
-                for (var visit in listVisit)
-                  Visit(
-                    name: "name",
-                    surname: visit['statut'],
-                    city: visit['Street'] +
-                        " " +
-                        visit['City'] +
-                        " " +
-                        visit['PostalCode'],
-                    rate: visit['statut'],
-                    cost: "10",
-                    typeHouse: visit['statut'],
-                    user: visit['statut'],
-                    context: context,
-                  ),
-              ],
+              ),
             ),
-          ),
-          Positioned(
-            bottom: 10,
-            right: 10,
-            child: IconButton(
-              style: OutlinedButton.styleFrom(
-                backgroundColor: AppGlobal.secondaryColor,
-              ),
-              icon: const Icon(
-                Icons.add,
-                color: Colors.black,
-                size: 50,
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const listVisitor.listVisitor(
-                      title: "Demande de visite",
+            Expanded(child: Container()),
+            Positioned(
+              bottom: 10,
+              right: 10,
+              child: IconButton(
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: AppGlobal.secondaryColor,
+                ),
+                icon: const Icon(
+                  Icons.add,
+                  color: Colors.black,
+                  size: 50,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const listVisitor.listVisitor(
+                        title: "Demande de visite",
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       widget,
       context,
@@ -160,9 +209,6 @@ Padding Visit({
   required String typeHouse,
   required String city,
   required String name,
-  required String surname,
-  required String rate,
-  required String user,
   required String cost,
   required BuildContext context,
 }) {
@@ -214,13 +260,7 @@ Padding Visit({
                       ),
                     ),
                     Text(
-                      city,
-                      style: const TextStyle(
-                        color: Colors.black,
-                      ),
-                    ),
-                    Text(
-                      user,
+                      name,
                       style: const TextStyle(
                         color: Colors.black,
                       ),
