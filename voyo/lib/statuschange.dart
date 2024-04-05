@@ -34,9 +34,14 @@ class _ChangementStatutPageState extends State<ChangementStatutPage> {
       availibilitiesController;
     });
     if (!isError) {
-      print("${app_global.UrlServer}Visitor/CreateVisitor?id=${widget.idUser}&street=${streetController.text}&hourlyRate=${rateController.text}&postalCode=${zipCodeController.text}&RIB=${ribController.text}&phoneNumber=${phoneController.text}");
-      app_global.sendData("${app_global.UrlServer}Visitor/CreateVisitor?id=${widget.idUser}&street=${streetController.text}&hourlyRate=${rateController.text}&postalCode=${zipCodeController.text}&RIB=${ribController.text}&phoneNumber=${phoneController.text}").then((value) {
-         returnInProfil();
+      app_global.sendData("${app_global.UrlServer}User/ModifyUser?id=${widget.idUser}&phoneNumber=${phoneController.text}");
+      app_global.sendData("${app_global.UrlServer}Visitor/CreateVisitor?id=${widget.idUser}&street=${streetController.text}&hourlyRate=${rateController.text}&postalCode=${zipCodeController.text}&RIB=${ribController.text}").then((value) {
+        for (Availibility availibility in availibilitiesController) {
+          String start = translateTime(availibility.startTime, ":");
+          String end = translateTime(availibility.endTime, ":");
+          app_global.sendData("${app_global.UrlServer}Availibility/SetAvailibilty?id=4&day=${availibility.day}&start=$start&end=$end");
+        } 
+        returnInProfil();
       });
     }
   }
