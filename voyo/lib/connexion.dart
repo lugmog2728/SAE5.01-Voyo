@@ -24,13 +24,15 @@ class _ConnexionPageState extends State<ConnexionPage> {
     final password = _passwordController.text;
 
     final response = await http.post(
-      Uri.parse('http://172.26.240.10:1080/voyo/User/Connexion'),
+      Uri.parse('${AppGlobal.UrlServer}User/Connexion'),
       body: {
         'email': email,
         'password': password,
       },
     );
-
+    print('${AppGlobal.UrlServer}User/Connexion');
+    print(email);
+    print(password);
     if (response.statusCode == 200) {
       final userData = jsonDecode(response.body);
       if (userData['Id'] != null) {
