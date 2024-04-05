@@ -108,9 +108,6 @@ class _HomePageState extends State<HomePage> {
             '${AppGlobal.UrlServer}User/GetUserByID?id=${visit['UserId'].toString()}');
         if (response.statusCode == 200) {
           return json.decode(response.data)['User']['Name'];
-          setState(() {
-            listVisit = json.decode(response.data) as List;
-          });
         } else {
           print(response.statusCode);
         }
@@ -161,16 +158,13 @@ class _HomePageState extends State<HomePage> {
                     for (int index = 0; index < listVisit.length; index++)
                       Visit(
                         name: listName[index].toString(),
-                        surname: listVisit[index]['statut'].toString(),
                         city: listVisit[index]['Street'].toString() +
                             " " +
                             listVisit[index]['City'].toString() +
                             " " +
                             listVisit[index]['PostalCode'].toString(),
-                        rate: listVisit[index]['statut'].toString(),
                         cost: listCost[index],
                         typeHouse: listHouseType[index],
-                        user: listName[index].toString(),
                         context: context,
                       ),
                   ],
@@ -215,9 +209,6 @@ Padding Visit({
   required String typeHouse,
   required String city,
   required String name,
-  required String surname,
-  required String rate,
-  required String user,
   required String cost,
   required BuildContext context,
 }) {
@@ -269,7 +260,7 @@ Padding Visit({
                       ),
                     ),
                     Text(
-                      user,
+                      name,
                       style: const TextStyle(
                         color: Colors.black,
                       ),
