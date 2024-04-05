@@ -95,6 +95,13 @@ class _ProfilePageState extends State<ProfilePage> {
     if (isEdit) {editMode();
     } else {viewingMode();}
 
+    String information = "";
+    if (!isActive) {
+      information = "Ce compte est désactivé";
+    } else if (!isValid) {
+      information = "Ce compte n'a pas encore était validé par un administrateur.";
+    }
+
     Widget image = placeholder;
     if (imageUrl != "") {
       image = Image.network('${app_global.UrlServer}/image/$imageUrl', width: 140,height: 180, errorBuilder: (context, error, stackTrace) => placeholder);
@@ -109,12 +116,12 @@ class _ProfilePageState extends State<ProfilePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Visibility(
-                visible: !isValid,
-                child: const Center(
+                visible: !isValid || !isActive,
+                child: Center(
                   child: 
                     Text(
-                    "Ce compte n'a pas encore était validé par un administrateur.",
-                    style: TextStyle(
+                    information,
+                    style: const TextStyle(
                       fontStyle: FontStyle.italic
                     ),
                   ),
@@ -218,7 +225,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
 
               Visibility(
-                visible: !isVisitor,
+                visible: !isVisitor && widget.idUser == app_global.idUser,
                 child: Center (
                   child: ElevatedButton(
                     onPressed: () {
@@ -235,7 +242,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
               ),
-              
 
               Visibility (
                 visible: isVisitor && !isEdit,
@@ -307,7 +313,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 labelPrivateData("Adresse :"),
                                 labelPrivateData("Code Postal : "),
                                 labelPrivateData("Téléphone : "),
-                                labelPrivateData("RIB : ")
+                                //labelPrivateData("RIB : ")
                               ]
                             ),
                           ),
@@ -316,7 +322,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               profileInformation(streetWidget),
                               profileInformation(zipCodeWidget), 
                               profileInformation(phoneWidget), 
-                              profileInformation(ribWidget)
+                              //profileInformation(ribWidget)
                             ]
                           )
                         ],
@@ -404,7 +410,7 @@ class _ProfilePageState extends State<ProfilePage> {
               //rib = "**** **** ${rib.substring(rib.length-5)}";
             });
 
-            app_global.fetchData("${app_global.UrlServer}Availibility/GetAvailibiltyByVisitor?id=${jsonData["Id"]}").then((List<dynamic>? jsonDataAv) {
+            app_global.fetchData("${app_global.UrlServer}Availibility/GetAvailibiltyByVisitor?id=${widget.idUser}").then((List<dynamic>? jsonDataAv) {
               if (jsonDataAv != null) {
                 for (dynamic availibility in jsonDataAv) {
                   List<String> lstStart = availibility["Start"].toString().split(":");
