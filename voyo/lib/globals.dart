@@ -3,6 +3,7 @@
 library my_prj.globals;
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'home.dart' as homePage;
@@ -248,6 +249,29 @@ Future<bool> sendData(String urlString) async {
     await http.get(url);
     return true;
   } catch (e) {
+    return false;
+  }
+}
+
+Future<bool> sendImage(String urlString, File image) async {
+  List<int> imageBytes = await image.readAsBytes();
+
+  var response = await http.put(
+    Uri.parse(urlString),
+    body: imageBytes,
+    headers: {
+      'Content-Type': 'image/jpeg', // Remplacer le type MIME selon votre besoin
+    },
+  );
+
+  // Vérifier la réponse
+  if (response.statusCode == 200) {
+    // L'image a été téléchargée avec succès
+    print('Image uploaded successfully');
+    return true;
+  } else {
+    // Gérer les erreurs
+    print('Failed to upload image');
     return false;
   }
 }
