@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
 import 'listVisitor.dart' as listVisitor;
 import 'package:dio/dio.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title});
 
@@ -19,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   var listName = [""];
   var listHouseType = [""];
   var city = "";
-  var id = 6;
+  var id = 3;
 
   @override
   void initState() {
@@ -29,27 +30,31 @@ class _HomePageState extends State<HomePage> {
 
   void getDataVisitor() async {
     try {
-      listName = [];
-      listHouseType = [];
-      listCost = [];
+      setState(() {
+        listName = [];
+        listHouseType = [];
+        listCost = [];
+        listVisitTemp = [];
+        listVisit = [];
+      });
+
       var response =
           await Dio().get('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=$id');
       if (response.statusCode == 200) {
         listVisitTemp = json.decode(response.data) as List;
-        for (var visit in listVisitTemp){
-
+        for (var visit in listVisitTemp) {
           listName.add(await GetNameUser(visit));
           listHouseType.add(await GetHouseTypeName(visit['HousingTypeId']));
           listHouseType.add(await GetHouseTypeName(visit['HousingTypeId']));
-          listCost.add((await GetCost(visit,listHouseType.last)).toString());
+          listCost.add((await GetCost(visit, listHouseType.last)));
         }
-    setState(() {
-      listName = listName;
-      listHouseType = listHouseType;
-      listVisit = listVisitTemp;
-      listCost = listCost;
-    });
-
+        debugPrint(listName.toString());
+        setState(() {
+          listName = listName;
+          listHouseType = listHouseType;
+          listCost = listCost;
+          listVisit = listVisitTemp;
+        });
       } else {
         print(response.statusCode);
       }
@@ -60,42 +65,37 @@ class _HomePageState extends State<HomePage> {
 
   Future<String> GetHouseTypeName(id) async {
     try {
-        var response = await Dio().get(
-            '${AppGlobal.UrlServer}House/GetTypeHouseById?id=${id}');
-        if (response.statusCode == 200) {
-          return json.decode(response.data);
-        } else {
-          print(response.statusCode);
-        }
+      var response = await Dio()
+          .get('${AppGlobal.UrlServer}House/GetTypeHouseById?id=${id}');
+      if (response.statusCode == 200) {
+        return json.decode(response.data);
+      } else {
+        print(response.statusCode);
+      }
     } catch (e) {
       print(e);
     }
     return "error";
   }
 
-  Future<int> GetCost(visit, typehouse) async {
+  Future<String> GetCost(visit, typehouse) async {
     try {
-      debugPrint('Visitor/GetVisitorByID?id=${visit['VisitorId'].toString()}&typeHouse=${typehouse}');
-
-        var response = await Dio().get(
-            '${AppGlobal.UrlServer}Visitor/GetVisitorByID?id=${visit['VisitorId'].toString()}&typeHouse=${typehouse}');
-        if (response.statusCode == 200) {
-          return json.decode(response.data)['Price'];
-        } else {
-          print(response.statusCode);
-        }
+      var response = await Dio().get(
+          '${AppGlobal.UrlServer}Visitor/GetVisitorByID?id=${visit['VisitorId'].toString()}&typeHouse=${typehouse}');
+      if (response.statusCode == 200) {
+        return json.decode(response.data)['Price'].toString();
+      } else {
+        print(response.statusCode);
+      }
     } catch (e) {
       print(e);
     }
-    return 0;
-
+    return "Error";
   }
 
   Future<String> GetNameUser(visit) async {
     try {
-
       if (visit['VisitorId'] != id) {
-
         var response = await Dio().get(
             '${AppGlobal.UrlServer}Visitor/GetVisitorByID?id=${visit['VisitorId'].toString()}');
         if (response.statusCode == 200) {
@@ -104,8 +104,8 @@ class _HomePageState extends State<HomePage> {
           print(response.statusCode);
         }
       } else {
-        var response = await Dio()
-            .get('${AppGlobal.UrlServer}User/GetUserByID?id=${visit['UserId'].toString()}');
+        var response = await Dio().get(
+            '${AppGlobal.UrlServer}User/GetUserByID?id=${visit['UserId'].toString()}');
         if (response.statusCode == 200) {
           return json.decode(response.data)['User']['Name'];
           setState(() {
@@ -116,7 +116,6 @@ class _HomePageState extends State<HomePage> {
         }
       }
     } catch (e) {
-      debugPrint( visit['UserId'].toString());
       print(e);
     }
     return "error";
@@ -126,85 +125,85 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return AppGlobal.Menu(
       Expanded(
-        child:Stack(
-        children: [
-        Expanded(
-        child:SingleChildScrollView(
-            child: Wrap(
-              children: [
-                Form(
-                  autovalidateMode: AutovalidateMode.always,
-                  onChanged: () {
-                    Form.of(primaryFocus!.context!).save();
-                  },
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.only(left: 4.0, right: 4.0, bottom: 2),
-                    child: Expanded(
-                      child: TextFormField(
-                        textAlign: TextAlign.center,
-                        decoration: InputDecoration(
-                          hintText: "Sélectionnez une ville",
-                          filled: true,
-                          fillColor: AppGlobal.inputColor,
-                          border: InputBorder.none,
+        child: Stack(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Wrap(
+                  children: [
+                    Form(
+                      autovalidateMode: AutovalidateMode.always,
+                      onChanged: () {
+                        Form.of(primaryFocus!.context!).save();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 4.0, right: 4.0, bottom: 2),
+                        child: Expanded(
+                          child: TextFormField(
+                            textAlign: TextAlign.center,
+                            decoration: InputDecoration(
+                              hintText: "Sélectionnez une ville",
+                              filled: true,
+                              fillColor: AppGlobal.inputColor,
+                              border: InputBorder.none,
+                            ),
+                            onSaved: (String? value) {
+                              setState(() {
+                                city = value ?? "";
+                              });
+                              getDataVisitor();
+                            },
+                          ),
                         ),
-                        onSaved: (String? value) {
-                          setState(() {
-                            city = value ?? "";
-                          });
-                          getDataVisitor();
-                        },
                       ),
                     ),
-                  ),
+                    for (int index = 0; index < listVisit.length; index++)
+                      Visit(
+                        name: listName[index].toString(),
+                        surname: listVisit[index]['statut'].toString(),
+                        city: listVisit[index]['Street'].toString() +
+                            " " +
+                            listVisit[index]['City'].toString() +
+                            " " +
+                            listVisit[index]['PostalCode'].toString(),
+                        rate: listVisit[index]['statut'].toString(),
+                        cost: listCost[index],
+                        typeHouse: listHouseType[index],
+                        user: listName[index].toString(),
+                        context: context,
+                      ),
+                  ],
                 ),
-
-                for(int index = 0; index < listVisit.length ; index++)
-                  Visit(
-                    name: listName[index].toString(),
-                    surname: listVisit[index]['statut'].toString(),
-                    city: listVisit[index]['Street'].toString() +
-                        " " +
-                        listVisit[index]['City'].toString() +
-                        " " +
-                        listVisit[index]['PostalCode'].toString(),
-                    rate: listVisit[index]['statut'].toString(),
-                    cost: listCost[index],
-                    typeHouse: listHouseType[index],
-                    user: listName[index].toString(),
-                    context: context,
-                  ),
-              ],
+              ),
             ),
-          ),
-        ),
-          Positioned(
-            bottom: 10,
-            right: 10,
-            child: IconButton(
-              style: OutlinedButton.styleFrom(
-                backgroundColor: AppGlobal.secondaryColor,
-              ),
-              icon: const Icon(
-                Icons.add,
-                color: Colors.black,
-                size: 50,
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const listVisitor.listVisitor(
-                      title: "Demande de visite",
+            Expanded(child: Container()),
+            Positioned(
+              bottom: 10,
+              right: 10,
+              child: IconButton(
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: AppGlobal.secondaryColor,
+                ),
+                icon: const Icon(
+                  Icons.add,
+                  color: Colors.black,
+                  size: 50,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const listVisitor.listVisitor(
+                        title: "Demande de visite",
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
       widget,
       context,
