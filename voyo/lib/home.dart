@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
       });
 
       var response =
-          await Dio().get('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=$id');
+          await Dio().get('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=$id&city=${city}');
       if (response.statusCode == 200) {
         listVisitTemp = json.decode(response.data) as List;
         for (var visit in listVisitTemp) {
