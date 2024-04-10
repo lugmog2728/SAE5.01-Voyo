@@ -17,7 +17,7 @@ Color backgroundColor = const Color(0xFFFCFAD3);
 Color inputColor = const Color(0xFFFEE486);
 Color subInputColor = const Color(0xFFE4CC76);
 Color buttonback = const Color(0xFFFFFEE8);
-String UrlServer = "http://172.26.240.10:1080/voyo/";
+String UrlServer = "http://172.26.213.3/";
 int idUser = 1;
 
 ButtonStyle buttonStyle = ElevatedButton.styleFrom(
