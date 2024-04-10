@@ -1,15 +1,13 @@
 // ignore_for_file: library_prefixes
-
 import 'package:flutter/material.dart';
-import 'pay.dart';
 import 'globals.dart' as AppGlobal;
-import 'package:intl/intl.dart';
-import "availibility.dart";
 import 'profile.dart';
+import 'rdv_close.dart';
+
 
 // ignore: must_be_immutable
 class ViewVisitPage extends StatefulWidget {
-  ViewVisitPage({
+  const ViewVisitPage({
     Key? key,
     required this.title,
     required this.idVisit,
@@ -120,8 +118,6 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
     }
   }
 
-
-
   String whoIsConnect(){
     if (visitor['User']['Id'] == AppGlobal.idUser) {
       return "visitor";
@@ -131,11 +127,11 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return AppGlobal.Menu(
       SingleChildScrollView(
         child: Column(
           children: [
+            Text(visit["statut"]),
             Row(
               children: [
                 Container(
@@ -231,11 +227,13 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
                   child: const Text('Accepter la demande'),
                 )
             else
-              if (false == true)
-                const Text(""),
               if (visit["statut"] == "Démarrer")
-                const Text("La visite est en cours"),
-                const Text("vous recevrez le compte rendu une fois terminé"),
+                const Column(
+                  children: [
+                    Text("La visite est en cours"),
+                    Text("vous recevrez le compte rendu une fois terminé"),
+                  ],
+                ),
               if (visit["statut"] == "Payer")
                 const Text("En attente d'une réponse du visiteur"),
               if (visit["statut"] == "Confirmer")
@@ -243,7 +241,16 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
               if (visit["statut"] == "Terminer")
                 ElevatedButton(
                   style: AppGlobal.buttonStyle,
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RdvClosePage(
+                          idVisit: widget.idVisit,
+                        ),
+                      ),
+                    );
+                  },
                   child: const Text('Clore la visite'),
                 ),
           ]
