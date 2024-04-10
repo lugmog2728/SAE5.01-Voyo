@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, valid_regexps
 
 library my_prj.globals;
 
@@ -17,8 +17,8 @@ Color backgroundColor = const Color(0xFFFCFAD3);
 Color inputColor = const Color(0xFFFEE486);
 Color subInputColor = const Color(0xFFE4CC76);
 Color buttonback = const Color(0xFFFFFEE8);
-String UrlServer = "http://172.26.213.3/";
-int idUser = 1;
+String UrlServer = "http://172.26.240.10:1080/voyo/";
+int idUser = 3;
 
 ButtonStyle buttonStyle = ElevatedButton.styleFrom(
   backgroundColor: primaryColor,
@@ -253,25 +253,34 @@ Future<bool> sendData(String urlString) async {
   }
 }
 
-Future<bool> sendImage(String urlString, File image) async {
-  List<int> imageBytes = await image.readAsBytes();
+Future<String> sendImage(String urlString, File image) async {
+  try {
+    List<int> imageBytes = await image.readAsBytes();
 
-  var response = await http.put(
-    Uri.parse(urlString),
-    body: imageBytes,
-    headers: {
-      'Content-Type': 'image/jpeg', // Remplacer le type MIME selon votre besoin
-    },
-  );
+    String car = "";
+    for (int bytes in imageBytes) {
+      if (car == "") {
+        car = "$car$bytes";
+      } else {
+        car = "$car,$bytes";
+      }
+    }
 
-  // Vérifier la réponse
-  if (response.statusCode == 200) {
-    // L'image a été téléchargée avec succès
-    print('Image uploaded successfully');
-    return true;
-  } else {
-    // Gérer les erreurs
-    print('Failed to upload image');
-    return false;
+    var response = await http.post(
+      Uri.parse(urlString),
+      body: car,//imageBytes.toString().replaceFirst(RegExp(r'['), '').replaceFirst(RegExp(r']'), ''),
+    );
+
+    // Vérifier la réponse
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      // Gérer les erreurs
+      print('Failed to upload image');
+      return '';
+    }
+  } catch (e) {
+    print('Error uploading image: $e');
+    return '';
   }
 }
