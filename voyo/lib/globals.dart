@@ -112,7 +112,7 @@ Scaffold Menu(content, widget, context) {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          const homePage.HomePage(title: "Page acceuil")),
+                          homePage.HomePage(title: "Page acceuil", id: widget.id)),
                 );
               },
               tooltip: 'Home',

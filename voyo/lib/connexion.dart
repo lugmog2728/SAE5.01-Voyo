@@ -40,7 +40,7 @@ class _ConnexionPageState extends State<ConnexionPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => homePage.HomePage(title: 'Accueil'),
+            builder: (context) => homePage.HomePage(title: 'Accueil',id: userData['Id'] ),
           ),
         );
       } else {

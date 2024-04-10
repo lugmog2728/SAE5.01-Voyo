@@ -74,15 +74,6 @@ class _NewAccountPageState extends State<NewAccountPage> {
             );
             return;
           }
-          else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                  const homePage.HomePage(title: 'Accueil')
-              ),
-            );
-          }
         } else {
           print(
               'La requête pour vérifier l\'email a échoué avec le code d\'état: ${response
@@ -100,7 +91,14 @@ class _NewAccountPageState extends State<NewAccountPage> {
       try {
         final response = await http.get(Uri.parse(requestUrl));
         if (response.statusCode == 200) {
-          Navigator.pushReplacementNamed(context, '/home');
+          int id = jsonDecode(response.body);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    homePage.HomePage(title: 'Accueil', id: id)
+            ),
+          );
         } else {
           print(
               'La requête pour créer l\'utilisateur a échoué avec le code d\'état: ${response
