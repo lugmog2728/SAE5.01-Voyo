@@ -491,6 +491,8 @@ class _ProfilePageState extends State<ProfilePage> {
     ribWidget = editProfileText(rib);
     editAppBar = AppBar(toolbarHeight: 0.0);
     availibilitiesError.clear();
+    imageWidget = Image.network('${app_global.UrlServer}/image/$imageUrl', width: 140,height: 180, 
+      errorBuilder: (context, error, stackTrace) => placeholder);
   }
   ///Change the display in the edit mode
   void editMode() {

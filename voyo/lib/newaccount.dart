@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'globals.dart' as AppGlobal;
 import 'package:http/http.dart' as http;
 import 'home.dart' as homePage;
@@ -15,14 +17,15 @@ class NewAccountPage extends StatefulWidget {
 
 class _NewAccountPageState extends State<NewAccountPage> {
   DateTime? _selectedDate;
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _firstNameController = TextEditingController();
-  TextEditingController _cityController = TextEditingController();
-  TextEditingController _phoneNumberController = TextEditingController();
-  TextEditingController _profilPictureController = TextEditingController();
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController cityController = TextEditingController();
+  TextEditingController phoneNumberController = TextEditingController();
+  String imageUrl = "";
+  Widget imageWidget = const Text("Photo");
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
@@ -39,16 +42,15 @@ class _NewAccountPageState extends State<NewAccountPage> {
   }
 
   Future<void> _submitForm() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
+    if (formKey.currentState!.validate()) {
+      formKey.currentState!.save();
       String baseUrl = '${AppGlobal.UrlServer}User/AddUser';
-      String name = _nameController.text;
-      String email = _emailController.text;
-      String password = _passwordController.text;
-      String firstName = _firstNameController.text;
-      String city = _cityController.text;
-      String phoneNumber = _phoneNumberController.text;
-      String profilPicture = _profilPictureController.text;
+      String name = nameController.text;
+      String email = emailController.text;
+      String password = passwordController.text;
+      String firstName = firstNameController.text;
+      String city = cityController.text;
+      String phoneNumber = phoneNumberController.text;
 
       String getUsersUrl = '${AppGlobal.UrlServer}User/GetUsersByName';
       try {
@@ -86,7 +88,7 @@ class _NewAccountPageState extends State<NewAccountPage> {
       }
 
       String requestUrl =
-          '$baseUrl?name=$name&email=$email&password=$password&firstName=$firstName&city=$city&phoneNumber=$phoneNumber&profilPicture=$profilPicture';
+          '$baseUrl?name=$name&email=$email&password=$password&firstName=$firstName&city=$city&phoneNumber=$phoneNumber&profilPicture=$imageUrl';
 
       try {
         final response = await http.get(Uri.parse(requestUrl));
@@ -119,7 +121,7 @@ class _NewAccountPageState extends State<NewAccountPage> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -145,7 +147,7 @@ class _NewAccountPageState extends State<NewAccountPage> {
                           onSaved: (String? value) {
                             debugPrint('Value for Nom saved as $value');
                           },
-                          controller: _nameController,
+                          controller: nameController,
                         ),
                       ),
                     ),
@@ -169,7 +171,7 @@ class _NewAccountPageState extends State<NewAccountPage> {
                           onSaved: (String? value) {
                             debugPrint('Value for Prénom saved as $value');
                           },
-                          controller: _firstNameController,
+                          controller: firstNameController,
                         ),
                       ),
                     ),
@@ -187,7 +189,7 @@ class _NewAccountPageState extends State<NewAccountPage> {
                           filled: true,
                           fillColor: AppGlobal.buttonback,
                           border: InputBorder.none,
-                          suffixIcon: Icon(Icons.calendar_today),
+                          suffixIcon: const Icon(Icons.calendar_today),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -228,7 +230,7 @@ class _NewAccountPageState extends State<NewAccountPage> {
                           onSaved: (String? value) {
                             debugPrint('Value for Ville saved as $value');
                           },
-                          controller: _cityController,
+                          controller: cityController,
                         ),
                       ),
                     ),
@@ -252,7 +254,7 @@ class _NewAccountPageState extends State<NewAccountPage> {
                           onSaved: (String? value) {
                             debugPrint('Value for Code postal saved as $value');
                           },
-                          controller: _phoneNumberController,
+                          controller: phoneNumberController,
                         ),
                       ),
                     ),
@@ -277,7 +279,7 @@ class _NewAccountPageState extends State<NewAccountPage> {
                     onSaved: (String? value) {
                       debugPrint('Value for Adresse postal saved as $value');
                     },
-                    controller: _cityController,
+                    controller: cityController,
                   ),
                 ),
                 Padding(
@@ -299,7 +301,7 @@ class _NewAccountPageState extends State<NewAccountPage> {
                     onSaved: (String? value) {
                       debugPrint('Value for Adresse mail saved as $value');
                     },
-                    controller: _emailController,
+                    controller: emailController,
                   ),
                 ),
                 Padding(
@@ -322,7 +324,7 @@ class _NewAccountPageState extends State<NewAccountPage> {
                     onSaved: (String? value) {
                       debugPrint('Value for Mot de passe saved as $value');
                     },
-                    controller: _passwordController,
+                    controller: passwordController,
                   ),
                 ),
                 Padding(
@@ -330,27 +332,29 @@ class _NewAccountPageState extends State<NewAccountPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: TextFormField(
-                          textAlign: TextAlign.center,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Photo",
-                            filled: true,
-                            fillColor: AppGlobal.buttonback,
-                          ),
-                          onSaved: (String? value) {
-                            debugPrint('Value for Photo saved as $value');
-                          },
-                          controller: _profilPictureController,
+                      Container (
+                        decoration: BoxDecoration (
+                          color: AppGlobal.subInputColor
                         ),
+                        margin: const EdgeInsets.all(16),
+                        width: 100,
+                        height: 100,
+                        child: Center (child: imageWidget)
                       ),
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.yellow,
-                          onPrimary: Colors.white,
-                        ),
-                        onPressed: _submitForm,
+                        style: AppGlobal.buttonStyle,
+                        onPressed: () async { final XFile? newImg = await ImagePicker().pickImage(source: ImageSource.gallery);
+                            if (newImg != null) {
+                              File file = File(newImg.path);
+                              AppGlobal.sendImage("${AppGlobal.UrlServer}message/upload?extension=png", file).then((String value) {
+                                imageUrl = value;
+                                setState(() {
+                                  imageWidget = Image.network('${AppGlobal.UrlServer}/image/$imageUrl', width: 140,height: 180, 
+                                    errorBuilder: (context, error, stackTrace) => const Text("Photo"));
+                                });
+                              });
+                            }
+                          }, 
                         child: const Text(
                           'Parcourir',
                           style: TextStyle(color: Colors.black),
@@ -363,8 +367,8 @@ class _NewAccountPageState extends State<NewAccountPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.yellow,
-                      onPrimary: Colors.white,
+                      backgroundColor: Colors.yellow,
+                      foregroundColor: Colors.white,
                     ),
                     onPressed: _submitForm,
                     child: const Text(
