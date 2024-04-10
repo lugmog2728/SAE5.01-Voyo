@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 library my_prj.globals;
 
 import 'dart:convert';
@@ -211,6 +213,26 @@ Future<Map<String, dynamic>?> fetchDataMap(String urlString) async {
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonData = json.decode(response.body);
       return jsonData;
+    } else {
+      print('Erreur de requête : ${response.statusCode}');
+      return null;
+    }
+  } catch (e) {
+    print('Erreur de connexion : $e');
+    return null;
+  }
+}
+
+Future<String?> fetchDataString(String urlString) async {
+  var url = Uri.parse(urlString);
+
+  try {
+    var response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      String jsonData = response.body;
+      String decodedData = json.decode(jsonData);
+      return decodedData.replaceAll('"', '');
     } else {
       print('Erreur de requête : ${response.statusCode}');
       return null;

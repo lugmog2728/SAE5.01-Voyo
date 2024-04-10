@@ -32,12 +32,18 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
   // ignore: prefer_typing_uninitialized_variables
   var pointToCheck;
 
+  String _whoIsConnect = "";
+
   @override
   void initState() {
     super.initState();
     fetchVisit().then((_) {
+      fetchHouseById();
       fetchVisitor();
       fetchUser();
+      setState(() {
+        _whoIsConnect = whoIsConnect();
+      });
     });
     fetchPTC();
   }
@@ -47,11 +53,26 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
       final Map<String, dynamic>? jsonData = await AppGlobal.fetchDataMap(
           '${AppGlobal.UrlServer}Visit/GetVisitDemandeById?id=${widget.idVisit}');
       if (jsonData != null) {
-        visit = jsonData;
-        //print(visit);
+        setState(() {
+          visit = jsonData;
+        });
       }
     } catch (error) {
       print('Error fetching visit: $error');
+    }
+  }
+
+  Future<void> fetchHouseById() async {
+    try {
+      final jsonData = await AppGlobal.fetchDataString(
+          '${AppGlobal.UrlServer}House/GetTypeHouseById?id=${visit['HousingTypeId']}');
+      if (jsonData != null) {
+        setState(() {
+          visit['HousingTypeId'] = jsonData;
+        });
+      }
+    } catch (error) {
+      print('Error fetching housingTypeId: $error');
     }
   }
 
@@ -60,8 +81,9 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
       final List? jsonData = await AppGlobal.fetchData(
           '${AppGlobal.UrlServer}Pointcheck/GetPointByIdVisit?id=${widget.idVisit}');
       if (jsonData != null) {
-        pointToCheck = jsonData;
-        //print(pointToCheck[0]['Id']);
+        setState(() {
+          pointToCheck = jsonData;
+        });
       }
     } catch (error) {
       print('Error fetching ptc: $error');
@@ -71,9 +93,12 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
   Future<void> fetchUser() async {
     try {
       final Map<String, dynamic>? jsonData = await AppGlobal.fetchDataMap(
-          '${AppGlobal.UrlServer}User/GetUserByID?UserId=${visit['UserId']}');
+          '${AppGlobal.UrlServer}User/GetUserByID?id=${visit['UserId']}');
       if (jsonData != null) {
-        user = jsonData;
+        setState(() {
+          user = jsonData;
+          print(user);
+        });
       }
     } catch (error) {
       print('Error fetching user: $error');
@@ -82,16 +107,24 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
 
   Future<void> fetchVisitor() async {
     try {
-      print('${AppGlobal.UrlServer}Visitor/GetVisitorByID?Id=${visit['VisitorId']}');
       final Map<String, dynamic>? jsonData = await AppGlobal.fetchDataMap(
           '${AppGlobal.UrlServer}Visitor/GetVisitorByID?Id=${visit['VisitorId']}');
       if (jsonData != null) {
-        visitor = jsonData;
-        print(visitor['Id']);
+        setState(() {
+          visitor = jsonData;
+        });
+
       }
     } catch (error) {
       print('Error fetching visitors: $error');
     }
+  }
+
+  String whoIsConnect(){
+    if (visitor['User']['Id'] == AppGlobal.idUser) {
+      return "visitor";
+    }
+    return "user";
   }
 
   @override
@@ -99,7 +132,80 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
     return AppGlobal.Menu(
       SingleChildScrollView(
         child: Column(
-          children: [],
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Logement",
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Text(
+                        "Type de logement : ${visit['HousingTypeId']}",
+                        style: const TextStyle(fontSize: 16.0),
+                      ),
+                      Text(
+                        "Ville : ${visit['City']} (${visit['PostalCode']})",
+                        style: const TextStyle(fontSize: 16.0),
+                      ),
+                      Text(
+                        "Adresse : ${visit['Street']}",
+                        style: const TextStyle(fontSize: 16.0),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            if (_whoIsConnect == "user")
+              Profil(context, visitor['User']['Id'], visitor['User']['Name'], visitor['User']['FirstName'])
+            else
+              if (user['User'] == null)
+                Profil(context, user['Id'], user['Name'], user['FirstName'])
+              else
+                Profil(context, user['User']['Id'], user['User']['Name'], user['User']['FirstName']),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Point à vérifier",
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8.0),
+                        for (var point in pointToCheck)
+                          Text(
+                            "${point['Wording']}",
+                            style: const TextStyle(fontSize: 16.0),
+                          )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (_whoIsConnect == "visitor" )
+              ElevatedButton(
+                style: AppGlobal.buttonStyle,
+                onPressed: () {},
+                child: Text('Accepter la demande'), // Texte affiché sur le bouton
+              )
+          ]
         ),
       ),
       widget,
@@ -108,95 +214,70 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
   }
 }
 
-Padding Visitor(context, id, name, surname, city, rate, cost, price, star) => Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Expanded(
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppGlobal.inputColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
+
+
+Padding Profil(BuildContext context, int id, String name, String surname) {
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Container(
+      width: 200,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.zero,
+          backgroundColor: AppGlobal.inputColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
           ),
-          child: Row(
-            children: [
-              Padding(
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProfilePage(title: 'Profile', idUser: id)),
+          );
+        },
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                alignment: Alignment.center,
+                height: 100,
+                width: 100,
+                color: AppGlobal.subInputColor,
+                child: const Text(
+                  "Photo",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Container(
-                    alignment: Alignment.center,
-                    height: 100,
-                    width: 100,
-                    color: AppGlobal.subInputColor,
-                    child: const Text(
-                      "Photo",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
+                child: Wrap(
+                  direction: Axis.vertical,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
                         color: Colors.black,
                       ),
-                    )),
-              ),
-              Expanded(
-                flex: 8,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Wrap(
-                    direction: Axis.vertical,
-                    children: [
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          color: Colors.black,
-                        ),
+                    ),
+                    Text(
+                      surname,
+                      style: const TextStyle(
+                        color: Colors.black,
                       ),
-                      Text(
-                        surname,
-                        style: const TextStyle(
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        city,
-                        style: const TextStyle(
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        rate + "€/h",
-                        style: const TextStyle(
-                          color: Colors.black,
-                        ),
-                      ),
-
-                      AppGlobal.etoile(star, 20, 50)
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              Expanded(
-                flex: 3,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    alignment: Alignment.center,
-                    height: 100,
-                    width: 100,
-                    child: Text(price + "€",
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.black,
-                        )),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ProfilePage(title: 'Profile', idUser: id)), 
-            );
-          },
-
+            ),
+          ],
         ),
       ),
-    );
+    ),
+  );
+}
