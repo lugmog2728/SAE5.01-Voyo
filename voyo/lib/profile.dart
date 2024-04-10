@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'globals.dart' as app_global;
@@ -70,6 +72,7 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController ribController = TextEditingController();
   List<Availibility> availibilitiesController = [];
+  String imageUrlController = "";
 
   //####__WIDGET__####\\
 
@@ -81,6 +84,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget zipCodeWidget = Container();
   Widget phoneWidget = Container();
   Widget ribWidget = Container();
+  Image imageWidget = placeholder;
   ///Yellow underline for information label
   Border borderInformation = const Border ();
   AppBar editAppBar = AppBar(toolbarHeight: 0.0);
@@ -92,19 +96,17 @@ class _ProfilePageState extends State<ProfilePage> {
     if (isVisitor) {statut = "Visiteur";
     } else {statut = "Utilisateur";}
 
-    if (isEdit) {editMode();
-    } else {viewingMode();}
+    if (isEdit) {
+      editMode();
+    } else {
+      viewingMode();
+    }
 
     String information = "";
     if (!isActive) {
-      information = "Ce compte est désactivé";
+      information = "Ce compte est désactivé.";
     } else if (!isValid) {
       information = "Ce compte n'a pas encore était validé par un administrateur.";
-    }
-
-    Widget image = placeholder;
-    if (imageUrl != "") {
-      image = Image.network('${app_global.UrlServer}/image/$imageUrl', width: 140,height: 180, errorBuilder: (context, error, stackTrace) => placeholder);
     }
 
     return app_global.Menu(
@@ -186,16 +188,27 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     Padding (
                       padding: const EdgeInsets.only(left: 16, right: 16),
-                      child: image,
+                      child: imageWidget,
                     ),
                     Visibility(
-                      visible: widget.idUser == app_global.idUser,
+                      visible: isEdit,
                       child: Positioned(
                         left: 10,
                         bottom: 10,
                         child: IconButton(
-                          onPressed: () async { final XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
-                            imagePick = image;
+                          onPressed: () async { final XFile? newImg = await ImagePicker().pickImage(source: ImageSource.gallery);
+                            if (newImg != null) {
+                              File file = File(newImg.path);
+                              app_global.sendImage("${app_global.UrlServer}message/upload?extension=png", file).then((String value) {
+                                print("Après le chargement de l'image : $imageUrlController");
+                                imageUrlController = value;
+                                print("Après la récupération du nom : $imageUrlController");
+                                setState(() {
+                                  imageWidget = Image.network('${app_global.UrlServer}/image/$imageUrlController', width: 140,height: 180, 
+                                    errorBuilder: (context, error, stackTrace) => placeholder);
+                                });
+                              });
+                            }
                           }, 
                           style: app_global.buttonStyle,
                           icon: const Icon(Icons.photo_size_select_actual_outlined)
@@ -481,15 +494,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
   ///Change the display in the edit mode
   void editMode() {
-    heightLabel = 300;
-    borderInformation = const Border();
-    nameController.text = name;
-    firstNameController.text = firstName;
-    cityController.text = city;
-    hourlyRateController.text = hourlyRate;
-    streetController.text = street;
-    zipCodeController.text = zipCode;
-    phoneController.text = phone;
 
     nameWidget = inputProfileEdit(nameController, "Prénom", TextInputType.text, null);
     firstNameWidget = inputProfileEdit(firstNameController, "Nom", TextInputType.text, null);
@@ -546,6 +550,19 @@ class _ProfilePageState extends State<ProfilePage> {
 
   ///Change the mode to diplay
   void editprofile() {
+    heightLabel = 300;
+    borderInformation = const Border();
+    nameController.text = name;
+    firstNameController.text = firstName;
+    cityController.text = city;
+    hourlyRateController.text = hourlyRate;
+    streetController.text = street;
+    zipCodeController.text = zipCode;
+    phoneController.text = phone;
+    print("Avant l'edit mode : $imageUrlController");
+    imageUrlController = imageUrl;
+    print("Après l'edit mode: $imageUrlController");
+
     setState(() {
       isEdit = !isEdit;
     });
@@ -566,15 +583,19 @@ class _ProfilePageState extends State<ProfilePage> {
       availibilitiesController;
     });
     if (!isError) {
-      app_global.sendData("${app_global.UrlServer}User/ModifyUser?id=${widget.idUser}&name=${nameController.text}&firstName=${firstNameController.text}&city=${cityController.text}").then((value) {
+      print("Avant le fetch : $imageUrlController");
+      print("${app_global.UrlServer}User/ModifyUser?id=${widget.idUser}&name=${nameController.text}&firstName=${firstNameController.text}&city=${cityController.text}&profilPicture=$imageUrlController");
+      app_global.sendData("${app_global.UrlServer}User/ModifyUser?id=${widget.idUser}&name=${nameController.text}&firstName=${firstNameController.text}&city=${cityController.text}&profilPicture=$imageUrlController").then((value) {
         setState(() {
           name = nameController.text;
           firstName = firstNameController.text;
           city = cityController.text;
+          imageUrl = imageUrlController;
+          imageWidget = Image.network('${app_global.UrlServer}/image/$imageUrl', width: 140,height: 180, 
+            errorBuilder: (context, error, stackTrace) => placeholder);
         });
       });
       if (isVisitor) {
-        print("${app_global.UrlServer}Visitor/ModifyVisitor?id=$idVisitor&street=${streetController.text}&hourlyRate=${hourlyRateController.text}&phoneNumber=${phoneController.text}&PostalCode=${zipCodeController.text}");
         app_global.sendData("${app_global.UrlServer}Visitor/ModifyVisitor?id=$idVisitor&street=${streetController.text}&hourlyRate=${hourlyRateController.text}&phoneNumber=${phoneController.text}&PostalCode=${zipCodeController.text}").then((value) {
           setState(() {
             hourlyRate = hourlyRateController.text;
