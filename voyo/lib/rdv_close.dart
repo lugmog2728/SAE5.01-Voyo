@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as app_global;
+import 'home.dart' as home;
 
 class RdvClosePage extends StatefulWidget {
   const RdvClosePage({Key? key, required this.idVisit}) : super(key: key);
@@ -21,6 +22,7 @@ class PointToCheck {
 
 class _RdvClosePageState extends State<RdvClosePage> {
   List<PointToCheck> points = [];// State for whether each point is open
+  TextEditingController commentController = TextEditingController();
   int rating = 0; // State for the selected rating
 
   @override
@@ -85,14 +87,12 @@ class _RdvClosePageState extends State<RdvClosePage> {
                     style: TextStyle(fontSize: 16),
                     ),
                   TextFormField(
+                    controller: commentController,
                     keyboardType: TextInputType.multiline,
                     maxLines: 3,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                     ),
-                    onChanged: (value) {
-                      // Action lorsque le commentaire est modifié
-                    },
                   ),
                 ],
               ),
@@ -101,9 +101,7 @@ class _RdvClosePageState extends State<RdvClosePage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
-                onPressed: () {
-                  // Action lorsque le bouton Valider est pressé
-                },
+                onPressed: () => finishVisit(),
                 style: app_global.buttonStyle,
                 child: const Text('Valider'),
               ),
@@ -114,6 +112,19 @@ class _RdvClosePageState extends State<RdvClosePage> {
       widget,
       context,
     );
+  }
+
+  void finishVisit() {
+    print("${app_global.UrlServer}Visit/SetComment?id=${widget.idVisit}&comment=${commentController.text}&rate=$rating");
+    app_global.sendData("${app_global.UrlServer}Visit/SetComment?id=${widget.idVisit}&comment=${commentController.text}&rate=$rating").then((value) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+            const home.HomePage(title: "Page d'accueil")
+        ),
+      );
+    });
   }
 
   @override
