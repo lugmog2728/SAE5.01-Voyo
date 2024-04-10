@@ -10,8 +10,6 @@ class HomePage extends StatefulWidget {
 
   final String title;
 
-
-
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -23,7 +21,6 @@ class _HomePageState extends State<HomePage> {
   var listName = [""];
   var listHouseType = [""];
   var city = "";
-
 
   @override
   void initState() {
@@ -40,9 +37,10 @@ class _HomePageState extends State<HomePage> {
         listVisitTemp = [];
         listVisit = [];
       });
-      debugPrint('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=${AppGlobal.idUser}&city=${city}');
-      var response =
-          await Dio().get('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=${AppGlobal.idUser}&city=${city}');
+      debugPrint(
+          '${AppGlobal.UrlServer}Visit/GetVisitDemande?id=${AppGlobal.idUser}&city=${city}');
+      var response = await Dio().get(
+          '${AppGlobal.UrlServer}Visit/GetVisitDemande?id=${AppGlobal.idUser}&city=${city}');
       if (response.statusCode == 200) {
         listVisitTemp = json.decode(response.data) as List;
         for (var visit in listVisitTemp) {
@@ -192,7 +190,7 @@ class _HomePageState extends State<HomePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>  listVisitor.listVisitor(
+                      builder: (context) => listVisitor.listVisitor(
                         title: "Demande de visite",
                         id: AppGlobal.idUser,
                       ),

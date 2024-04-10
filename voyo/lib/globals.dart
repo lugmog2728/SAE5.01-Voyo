@@ -17,13 +17,11 @@ Color backgroundColor = const Color(0xFFFCFAD3);
 Color inputColor = const Color(0xFFFEE486);
 Color subInputColor = const Color(0xFFE4CC76);
 Color buttonback = const Color(0xFFFFFEE8);
-String UrlServer = "http://172.26.213.3/";
+String UrlServer = "http://172.26.240.10/";
 int idUser = 1;
 
 ButtonStyle buttonStyle = ElevatedButton.styleFrom(
-  backgroundColor: primaryColor,
-  foregroundColor: Colors.black
-);
+    backgroundColor: primaryColor, foregroundColor: Colors.black);
 
 BoxDecoration TitleDecoration() {
   return BoxDecoration(
@@ -161,7 +159,6 @@ Scaffold Menu(content, widget, context) {
   );
 }
 
-
 Scaffold MenuConnexion(content, widget, context) {
   return Scaffold(
     appBar: AppBar(
@@ -194,8 +191,7 @@ Scaffold MenuConnexion(content, widget, context) {
             child: Expanded(
               child: FloatingActionButton(
                 backgroundColor: secondaryColor,
-                onPressed: () {
-                },
+                onPressed: () {},
                 tooltip: 'Account',
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
@@ -228,8 +224,7 @@ Scaffold MenuConnexion(content, widget, context) {
             ),
             child: FloatingActionButton(
               backgroundColor: primaryColor,
-              onPressed: () {
-              },
+              onPressed: () {},
               tooltip: 'Home',
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
@@ -251,8 +246,7 @@ Scaffold MenuConnexion(content, widget, context) {
             child: Expanded(
               child: FloatingActionButton(
                 backgroundColor: secondaryColor,
-                onPressed: () {
-                },
+                onPressed: () {},
                 tooltip: 'Chat',
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
@@ -279,7 +273,7 @@ Row etoile(int nbetoile, double w, double h) {
       height: h,
     ));
   }
-  for (var i = 0; i < 5-nbetoile; i++) {
+  for (var i = 0; i < 5 - nbetoile; i++) {
     list.add(Image.asset(
       'assets/images/etoileVide.png',
       width: w,
@@ -377,7 +371,8 @@ Future<String> sendImage(String urlString, File image) async {
 
     var response = await http.post(
       Uri.parse(urlString),
-      body: car,//imageBytes.toString().replaceFirst(RegExp(r'['), '').replaceFirst(RegExp(r']'), ''),
+      body:
+          car, //imageBytes.toString().replaceFirst(RegExp(r'['), '').replaceFirst(RegExp(r']'), ''),
     );
 
     // Vérifier la réponse

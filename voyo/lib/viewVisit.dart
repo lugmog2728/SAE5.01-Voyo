@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
 import 'profile.dart';
 import 'rdv_close.dart';
+import 'listpoint.dart' as Points;
 
 
 // ignore: must_be_immutable
@@ -203,7 +204,16 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
                 ElevatedButton(
                   style: AppGlobal.buttonStyle,
                   onPressed: () {
-                    AppGlobal.sendData("${AppGlobal.UrlServer}Visit/StartVisit?id=${widget.idVisit}");
+                    //AppGlobal.sendData("${AppGlobal.UrlServer}Visit/StartVisit?id=${widget.idVisit}");
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Points.PointsPage(
+                          title: "Demande de visite",
+                          idVisit: widget.idVisit,
+                        ),
+                      ),
+                    );
                   },
                   child: const Text('Débuter la visite'),
                 )
