@@ -198,8 +198,8 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
                 ),
               ],
             ),
-            if (_whoIsConnect == "visitor" )
-              if ( visit["statut"] == "Confirmer")
+            if (_whoIsConnect == "visitor")
+              if (visit["statut"] == "Confirmer")
                 ElevatedButton(
                   style: AppGlobal.buttonStyle,
                   onPressed: () {
@@ -207,7 +207,7 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
                   },
                   child: const Text('Débuter la visite'),
                 )
-              else if ( visit["statut"] == "Payer")
+              else if (visit["statut"] == "Payer")
                 ElevatedButton(
                   style: AppGlobal.buttonStyle,
                   onPressed: () {
@@ -222,23 +222,22 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
                         ),
                       );
                     });
-
                   },
                   child: const Text('Accepter la demande'),
                 )
-            else
+            else if (_whoIsConnect == "user")
               if (visit["statut"] == "Démarrer")
                 const Column(
                   children: [
                     Text("La visite est en cours"),
                     Text("vous recevrez le compte rendu une fois terminé"),
                   ],
-                ),
-              if (visit["statut"] == "Payer")
-                const Text("En attente d'une réponse du visiteur"),
-              if (visit["statut"] == "Confirmer")
-                const Text("La visite a été acceptée, elle débutera bientôt"),
-              if (visit["statut"] == "Terminer")
+                )
+              else if (visit["statut"] == "Payer")
+                const Text("En attente d'une réponse du visiteur")
+              else if (visit["statut"] == "Confirmer")
+                const Text("La visite a été acceptée, elle débutera bientôt")
+              else if (visit["statut"] == "Terminer")
                 ElevatedButton(
                   style: AppGlobal.buttonStyle,
                   onPressed: () {
@@ -252,7 +251,7 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
                     );
                   },
                   child: const Text('Clore la visite'),
-                ),
+                )
           ]
         ),
       ),

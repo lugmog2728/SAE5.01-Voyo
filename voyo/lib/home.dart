@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
 import 'listVisitor.dart' as listVisitor;
 import 'package:dio/dio.dart';
+import 'viewVisit.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title});
@@ -167,6 +168,7 @@ class _HomePageState extends State<HomePage> {
                             listVisit[index]['PostalCode'].toString(),
                         cost: listCost[index],
                         typeHouse: listHouseType[index],
+                        id: listVisit[index]["Id"],
                         context: context,
                       ),
                   ],
@@ -213,6 +215,7 @@ Padding Visit({
   required String city,
   required String name,
   required String cost,
+  required int id,
   required BuildContext context,
 }) {
   return Padding(
@@ -292,7 +295,17 @@ Padding Visit({
             ),
           ],
         ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ViewVisitPage(
+                title: 'Visite',
+                idVisit: id,
+              ),
+            ),
+          );
+        },
       ),
     ),
   );
