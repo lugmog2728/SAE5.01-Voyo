@@ -41,6 +41,7 @@ class _VisitePageState extends State<VisitePage> {
   String? visitorCost ="";
   String? visitorPrice = "";
   int? visitorRating = 0;
+  String imageUrl = "";
 
   bool isInvalid = false;
 
@@ -97,6 +98,7 @@ class _VisitePageState extends State<VisitePage> {
           visitorSurname = jsonData['User']['FirstName'];
           visitorName = jsonData['User']['Name'];
           visitorCity = jsonData['User']['City'];
+          imageUrl = jsonData['User']['ProfilPicture'];
           visitorHoulyRate = jsonData['HourlyRate'].toString();
           visitorCost = jsonData['Cost'].toString();
           visitorPrice = jsonData['Price'].toString();
@@ -255,7 +257,7 @@ class _VisitePageState extends State<VisitePage> {
                     ),
                   ],
                 ),
-                Visitor(context, widget.idVisitor, visitorName, visitorSurname, visitorCity, visitorHoulyRate, visitorCost, visitorPrice, visitorRating),
+                Visitor(context, widget.idVisitor, visitorName, visitorSurname, visitorCity, visitorHoulyRate, visitorCost, visitorPrice, visitorRating, imageUrl),
                 for (TextEditingController point in pointToCheck)
                   Container(
                     padding: const EdgeInsets.all(8.0),
@@ -357,7 +359,7 @@ class _VisitePageState extends State<VisitePage> {
   }
 }
 
-Padding Visitor(context, id, name, surname, city, rate, cost, price, star) => Padding(
+Padding Visitor(context, id, name, surname, city, rate, cost, price, star, imageUrl) => Padding(
       padding: const EdgeInsets.all(8.0),
       child: Expanded(
         child: ElevatedButton(
@@ -369,20 +371,14 @@ Padding Visitor(context, id, name, surname, city, rate, cost, price, star) => Pa
           ),
           child: Row(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                    alignment: Alignment.center,
-                    height: 100,
-                    width: 100,
-                    color: AppGlobal.subInputColor,
-                    child: const Text(
-                      "Photo",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black,
-                      ),
-                    )),
+              Container(
+                alignment: Alignment.center,
+                margin:  const EdgeInsets.all(8.0),
+                height: 100,
+                width: 100,
+                color: AppGlobal.subInputColor,
+                child: Image.network("${AppGlobal.UrlServer}image/$imageUrl", width: 100, height: 100,
+                  errorBuilder: (context, error, stackTrace) => Image.asset("assets/images/placeholder.webp",width: 100, height: 100)),
               ),
               Expanded(
                 flex: 8,
