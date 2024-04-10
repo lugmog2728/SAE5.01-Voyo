@@ -115,7 +115,7 @@ class _PayPageState extends State<PayPage> {
                     // Add payment logic here
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => HomePage.HomePage(title: 'Home',id: widget.id)), // Remplace la page actuelle par la page d'accueil
+                      MaterialPageRoute(builder: (context) => HomePage.HomePage(title: 'Home')), // Remplace la page actuelle par la page d'accueil
                     );
                   },
                   child: const Text(

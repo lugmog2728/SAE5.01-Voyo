@@ -91,12 +91,12 @@ class _NewAccountPageState extends State<NewAccountPage> {
       try {
         final response = await http.get(Uri.parse(requestUrl));
         if (response.statusCode == 200) {
-          int id = jsonDecode(response.body);
+          AppGlobal.idUser = jsonDecode(response.body);
           Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                    homePage.HomePage(title: 'Accueil', id: id)
+                    homePage.HomePage(title: 'Accueil')
             ),
           );
         } else {

@@ -71,7 +71,7 @@ Scaffold Menu(content, widget, context) {
                     MaterialPageRoute(
                         builder: (context) => profilPage.ProfilePage(
                               title: "Profile",
-                              idUser: idUser,
+                              idUser: widget.id,
                             )),
                   );
                 },
@@ -112,7 +112,7 @@ Scaffold Menu(content, widget, context) {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          homePage.HomePage(title: "Page acceuil", id: widget.id)),
+                          homePage.HomePage(title: "Page acceuil")),
                 );
               },
               tooltip: 'Home',
@@ -141,7 +141,7 @@ Scaffold Menu(content, widget, context) {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            const chatPage.ChatPage(title: "Discussion")),
+                             chatPage.ChatPage(title: "Discussion" )),
                   );
                 },
                 tooltip: 'Chat',

@@ -5,10 +5,10 @@ import 'listVisitor.dart' as listVisitor;
 import 'package:dio/dio.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key, required this.title, required this.id});
+  const HomePage({Key? key, required this.title});
 
   final String title;
-  final int id;
+
 
 
   @override
@@ -39,9 +39,9 @@ class _HomePageState extends State<HomePage> {
         listVisitTemp = [];
         listVisit = [];
       });
-
+      debugPrint('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=${AppGlobal.idUser}&city=${city}');
       var response =
-          await Dio().get('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=${widget.id}&city=${city}');
+          await Dio().get('${AppGlobal.UrlServer}Visit/GetVisitDemande?id=${AppGlobal.idUser}&city=${city}');
       if (response.statusCode == 200) {
         listVisitTemp = json.decode(response.data) as List;
         for (var visit in listVisitTemp) {
@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<String> GetNameUser(visit) async {
     try {
-      if (visit['VisitorId'] != widget.id) {
+      if (visit['VisitorId'] != AppGlobal.idUser) {
         var response = await Dio().get(
             '${AppGlobal.UrlServer}Visitor/GetVisitorByID?id=${visit['VisitorId'].toString()}');
         if (response.statusCode == 200) {
@@ -192,7 +192,7 @@ class _HomePageState extends State<HomePage> {
                     MaterialPageRoute(
                       builder: (context) =>  listVisitor.listVisitor(
                         title: "Demande de visite",
-                        id: widget.id,
+                        id: AppGlobal.idUser,
                       ),
                     ),
                   );

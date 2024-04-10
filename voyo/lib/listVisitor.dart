@@ -287,7 +287,6 @@ Padding Visitor({
                 title: "Demande de visite",
                 idVisitor: id,
                 houseType: houseType,
-                id: widget.id
               ),
             ),
           );

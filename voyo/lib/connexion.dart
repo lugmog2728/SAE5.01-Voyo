@@ -36,11 +36,12 @@ class _ConnexionPageState extends State<ConnexionPage> {
     if (response.statusCode == 200) {
       final userData = jsonDecode(response.body);
       if (userData['Id'] != null) {
+        AppGlobal.idUser = userData['Id'];
         // Connexion réussie
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => homePage.HomePage(title: 'Accueil',id: userData['Id'] ),
+            builder: (context) => homePage.HomePage(title: 'Accueil' ),
           ),
         );
       } else {
