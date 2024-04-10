@@ -3,9 +3,10 @@ import 'globals.dart' as AppGlobal;
 import 'home.dart' as HomePage; // Importer la page d'accueil
 
 class PayPage extends StatefulWidget {
-  const PayPage({Key? key, required this.title}) : super(key: key);
+  const PayPage({Key? key, required this.title, required this.id}) : super(key: key);
 
   final String title;
+  final int id;
 
   @override
   State<PayPage> createState() => _PayPageState();

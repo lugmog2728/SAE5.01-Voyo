@@ -20,6 +20,7 @@ class VisitePage extends StatefulWidget {
   final int idVisitor;
   String houseType;
 
+
   @override
   State<VisitePage> createState() => _VisitePageState();
 }
@@ -130,7 +131,7 @@ class _VisitePageState extends State<VisitePage> {
     });
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const PayPage(title: 'Pay')), // Provide the title parameter
+      MaterialPageRoute(builder: (context) => PayPage(title: 'Pay',id: widget.idVisitor)), // Provide the title parameter
     );
     return true;
 

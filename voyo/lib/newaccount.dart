@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
 import 'package:http/http.dart' as http;
+import 'home.dart' as homePage;
 
 class NewAccountPage extends StatefulWidget {
   const NewAccountPage({Key? key, required this.title}) : super(key: key);
@@ -74,7 +75,9 @@ class _NewAccountPageState extends State<NewAccountPage> {
             return;
           }
         } else {
-          print('La requête pour vérifier l\'email a échoué avec le code d\'état: ${response.statusCode}');
+          print(
+              'La requête pour vérifier l\'email a échoué avec le code d\'état: ${response
+                  .statusCode}');
           // Gérer l'erreur en conséquence
         }
       } catch (e) {
@@ -88,9 +91,18 @@ class _NewAccountPageState extends State<NewAccountPage> {
       try {
         final response = await http.get(Uri.parse(requestUrl));
         if (response.statusCode == 200) {
-          Navigator.pushReplacementNamed(context, '/home');
+          AppGlobal.idUser = jsonDecode(response.body);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    homePage.HomePage(title: 'Accueil')
+            ),
+          );
         } else {
-          print('La requête pour créer l\'utilisateur a échoué avec le code d\'état: ${response.statusCode}');
+          print(
+              'La requête pour créer l\'utilisateur a échoué avec le code d\'état: ${response
+                  .statusCode}');
           // Gérer l'erreur en conséquence
         }
       } catch (e) {
@@ -102,7 +114,7 @@ class _NewAccountPageState extends State<NewAccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AppGlobal.Menu(
+    return AppGlobal.MenuConnexion(
       SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -184,10 +196,12 @@ class _NewAccountPageState extends State<NewAccountPage> {
                           return null;
                         },
                         onSaved: (String? value) {
-                          debugPrint('Value for Date de naissance saved as $value');
+                          debugPrint(
+                              'Value for Date de naissance saved as $value');
                         },
                         controller: TextEditingController(
-                            text: _selectedDate != null ? _selectedDate!.toString().substring(0, 10) : ''),
+                            text: _selectedDate != null ? _selectedDate!
+                                .toString().substring(0, 10) : ''),
                       ),
                     ),
                   ),

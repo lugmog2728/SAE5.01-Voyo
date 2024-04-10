@@ -36,11 +36,12 @@ class _ConnexionPageState extends State<ConnexionPage> {
     if (response.statusCode == 200) {
       final userData = jsonDecode(response.body);
       if (userData['Id'] != null) {
+        AppGlobal.idUser = userData['Id'];
         // Connexion réussie
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => homePage.HomePage(title: 'Accueil'),
+            builder: (context) => homePage.HomePage(title: 'Accueil' ),
           ),
         );
       } else {
@@ -59,7 +60,7 @@ class _ConnexionPageState extends State<ConnexionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AppGlobal.Menu(
+    return AppGlobal.MenuConnexion(
       Wrap(
         children: [
           Form(

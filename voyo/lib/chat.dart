@@ -14,7 +14,6 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  var userId = 2;
   var userIdOther = 0;
   var listMessengers = [];
   var messenger = "";
@@ -36,7 +35,7 @@ class _ChatPageState extends State<ChatPage> {
   void getMessengers() async {
     try {
       var response = await Dio()
-          .get('${AppGlobal.UrlServer}Message/GetMessagers?id=${userId}');
+          .get('${AppGlobal.UrlServer}Message/GetMessagers?id=${AppGlobal.idUser}');
       if (response.statusCode == 200) {
         setState(() {
           listMessengers = json.decode(response.data) as List;
@@ -57,10 +56,10 @@ class _ChatPageState extends State<ChatPage> {
   void SendMessage() async {
     try {
       debugPrint(
-          '${AppGlobal.UrlServer}message/SendMessage?message=${message.text}&dateCreate=${DateTime.now().toString().substring(0, 19)}&useridsend=${userId}&useridrecieve=${userIdOther}');
+          '${AppGlobal.UrlServer}message/SendMessage?message=${message.text}&dateCreate=${DateTime.now().toString().substring(0, 19)}&useridsend=${AppGlobal.idUser}&useridrecieve=${userIdOther}');
 
       var response = await Dio().get(
-          '${AppGlobal.UrlServer}message/SendMessage?message=${message.text}&dateCreate=${DateTime.now().toString().substring(0, 19)}&useridsend=${userId}&useridrecieve=${userIdOther}');
+          '${AppGlobal.UrlServer}message/SendMessage?message=${message.text}&dateCreate=${DateTime.now().toString().substring(0, 19)}&useridsend=${AppGlobal.idUser}&useridrecieve=${userIdOther}');
       if (response.statusCode == 200) {
         print("success");
       } else {
@@ -74,11 +73,11 @@ class _ChatPageState extends State<ChatPage> {
   void getMessages() async {
     try {
       var response = await Dio().get(
-          '${AppGlobal.UrlServer}Message/RecieveMessage?useridsend=${userId}&useridrecieve=${userIdOther}');
+          '${AppGlobal.UrlServer}Message/RecieveMessage?useridsend=${AppGlobal.idUser}&useridrecieve=${userIdOther}');
       if (response.statusCode == 200) {
         setState(() {
           print(
-              'Message/RecieveMessage?useridsend=${userId}&useridrecieve=${userIdOther}');
+              'Message/RecieveMessage?useridsend=${AppGlobal.idUser}&useridrecieve=${userIdOther}');
           if (listMessage.length < (json.decode(response.data) as List).length){
             listMessage = json.decode(response.data) as List;
             _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -167,7 +166,7 @@ class _ChatPageState extends State<ChatPage> {
                 controller: _scrollController,
                 child: Column(children: [
                   for (var message in listMessage)
-                    if (message['UserIdRecieve'] == userId)
+                    if (message['UserIdRecieve'] == AppGlobal.idUser)
                       messageIn(message['Body'])
                     else
                       messageOut(message['Body'])

@@ -5,9 +5,10 @@ import 'choose_visitor.dart' as visitePage;
 import 'package:dio/dio.dart';
 
 class listVisitor extends StatefulWidget {
-  const listVisitor({Key? key, required this.title});
+  const listVisitor({Key? key, required this.title, required this.id});
 
   final String title;
+  final int id;
 
   @override
   State<listVisitor> createState() => _HomePageState();
@@ -169,6 +170,7 @@ class _HomePageState extends State<listVisitor> {
                 id: visitor['User']['Id'],
                 houseType : houseType,
                 context: context,
+                widget: widget
               ),
           ],
         ),
@@ -188,6 +190,7 @@ Padding Visitor({
   required int id,
   required String houseType,
   required BuildContext context,
+  widget
 }) {
   return Padding(
     padding: const EdgeInsets.all(8.0),
@@ -283,7 +286,7 @@ Padding Visitor({
               builder: (context) => visitePage.VisitePage(
                 title: "Demande de visite",
                 idVisitor: id,
-                houseType: houseType
+                houseType: houseType,
               ),
             ),
           );
