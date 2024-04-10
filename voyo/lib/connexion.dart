@@ -59,7 +59,7 @@ class _ConnexionPageState extends State<ConnexionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AppGlobal.Menu(
+    return AppGlobal.MenuConnexion(
       Wrap(
         children: [
           Form(
