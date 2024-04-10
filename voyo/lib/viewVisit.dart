@@ -32,18 +32,19 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
   // ignore: prefer_typing_uninitialized_variables
   var pointToCheck;
 
-  String _whoIsConnect = "";
-
+  String _whoIsConnect ="";
+  
   @override
   void initState() {
     super.initState();
     fetchVisit().then((_) {
       fetchHouseById();
-      fetchVisitor();
-      fetchUser();
-      setState(() {
-        _whoIsConnect = whoIsConnect();
+      fetchVisitor().then((_) {
+        setState(() {
+          _whoIsConnect = whoIsConnect();
+        });
       });
+      fetchUser();
     });
     fetchPTC();
   }
@@ -97,7 +98,6 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
       if (jsonData != null) {
         setState(() {
           user = jsonData;
-          print(user);
         });
       }
     } catch (error) {
@@ -120,6 +120,8 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
     }
   }
 
+
+
   String whoIsConnect(){
     if (visitor['User']['Id'] == AppGlobal.idUser) {
       return "visitor";
@@ -129,6 +131,7 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
 
   @override
   Widget build(BuildContext context) {
+
     return AppGlobal.Menu(
       SingleChildScrollView(
         child: Column(
@@ -166,12 +169,12 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
               ],
             ),
             if (_whoIsConnect == "user")
-              Profil(context, visitor['User']['Id'], visitor['User']['Name'], visitor['User']['FirstName'])
-            else
+            Profil(context, visitor['User']['Id'], visitor['User']['Name'], visitor['User']['FirstName'], visitor['User']['ProfilPicture'])
+            else if (_whoIsConnect == "visitor")
               if (user['User'] == null)
-                Profil(context, user['Id'], user['Name'], user['FirstName'])
+                Profil(context, user['Id'], user['Name'], user['FirstName'], user['ProfilPicture'])
               else
-                Profil(context, user['User']['Id'], user['User']['Name'], user['User']['FirstName']),
+                Profil(context, user['User']['Id'], user['User']['Name'], user['User']['FirstName'], user['User']['ProfilPicture']),
             Row(
               children: [
                 Expanded(
@@ -200,11 +203,49 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
               ],
             ),
             if (_whoIsConnect == "visitor" )
-              ElevatedButton(
-                style: AppGlobal.buttonStyle,
-                onPressed: () {},
-                child: Text('Accepter la demande'), // Texte affiché sur le bouton
-              )
+              if ( visit["statut"] == "Confirmer")
+                ElevatedButton(
+                  style: AppGlobal.buttonStyle,
+                  onPressed: () {
+                    AppGlobal.sendData("${AppGlobal.UrlServer}Visit/StartVisit?id=${widget.idVisit}");
+                  },
+                  child: const Text('Débuter la visite'),
+                )
+              else if ( visit["statut"] == "Payer")
+                ElevatedButton(
+                  style: AppGlobal.buttonStyle,
+                  onPressed: () {
+                    AppGlobal.sendData("${AppGlobal.UrlServer}Visit/ConfirmedVisit?id=${widget.idVisit}").then((_){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewVisitPage(
+                            title: "Demande de visite",
+                            idVisit: widget.idVisit,
+                          ),
+                        ),
+                      );
+                    });
+
+                  },
+                  child: const Text('Accepter la demande'),
+                )
+            else
+              if (false == true)
+                const Text(""),
+              if (visit["statut"] == "Démarrer")
+                const Text("La visite est en cours"),
+                const Text("vous recevrez le compte rendu une fois terminé"),
+              if (visit["statut"] == "Payer")
+                const Text("En attente d'une réponse du visiteur"),
+              if (visit["statut"] == "Confirmer")
+                const Text("La visite a été acceptée, elle débutera bientôt"),
+              if (visit["statut"] == "Terminer")
+                ElevatedButton(
+                  style: AppGlobal.buttonStyle,
+                  onPressed: () {},
+                  child: const Text('Clore la visite'),
+                ),
           ]
         ),
       ),
@@ -216,7 +257,7 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
 
 
 
-Padding Profil(BuildContext context, int id, String name, String surname) {
+Padding Profil(BuildContext context, int id, String name, String surname, String imageUrl) {
   return Padding(
     padding: const EdgeInsets.all(8.0),
     child: Container(
@@ -237,21 +278,14 @@ Padding Profil(BuildContext context, int id, String name, String surname) {
         },
         child: Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                alignment: Alignment.center,
-                height: 100,
-                width: 100,
-                color: AppGlobal.subInputColor,
-                child: const Text(
-                  "Photo",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.black,
-                  ),
-                ),
-              ),
+            Container(
+              alignment: Alignment.center,
+              margin: const EdgeInsets.all(8.0),
+              height: 100,
+              width: 100,
+              color: AppGlobal.subInputColor,
+              child: Image.network("${AppGlobal.UrlServer}image/$imageUrl", width: 100, height: 100,
+              errorBuilder: (context, error, stackTrace) => Image.asset("assets/images/placeholder.webp",width: 100, height: 100)),
             ),
             Expanded(
               child: Padding(
