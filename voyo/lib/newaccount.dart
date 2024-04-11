@@ -234,7 +234,7 @@ class _NewAccountPageState extends State<NewAccountPage> {
                         ),
                       ),
                     ),
-                    Expanded(
+                    /*Expanded(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextFormField(
@@ -257,10 +257,10 @@ class _NewAccountPageState extends State<NewAccountPage> {
                           controller: phoneNumberController,
                         ),
                       ),
-                    ),
+                    ),*/
                   ],
                 ),
-                Padding(
+                /*Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
                     textAlign: TextAlign.center,
@@ -281,7 +281,7 @@ class _NewAccountPageState extends State<NewAccountPage> {
                     },
                     controller: cityController,
                   ),
-                ),
+                ),*/
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(

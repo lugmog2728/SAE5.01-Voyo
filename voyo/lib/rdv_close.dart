@@ -15,9 +15,10 @@ class RdvClosePage extends StatefulWidget {
 class PointToCheck {
   String wording;
   String comment;
+  String imageUrl;
   bool isVisible;
 
-  PointToCheck(this.wording, this.comment, this.isVisible);
+  PointToCheck(this.wording, this.comment, this.imageUrl, this.isVisible);
 }
 
 class _RdvClosePageState extends State<RdvClosePage> {
@@ -135,7 +136,7 @@ class _RdvClosePageState extends State<RdvClosePage> {
     app_global.fetchData("${app_global.UrlServer}Pointcheck/GetPointByIdVisit?id=${widget.idVisit}").then((List<dynamic>? jsonData) {
       if (jsonData != null) {
         for (dynamic pointToCheck in jsonData) {
-          points.add(PointToCheck(pointToCheck["Wording"], pointToCheck["Comment"], false));
+          points.add(PointToCheck(pointToCheck["Wording"], pointToCheck["Comment"],pointToCheck["Picture"], false));
         }
         setState(() {
           points;
@@ -192,6 +193,8 @@ class _RdvClosePageState extends State<RdvClosePage> {
             child: Column(
               children: [
                 Text(point.comment),
+                Image.network('${app_global.UrlServer}/image/${point.imageUrl}', width: 140,height: 180, 
+                  errorBuilder: (context, error, stackTrace) => Container())
               ],
             ),
           )

@@ -1,9 +1,6 @@
-// ignore_for_file: library_prefixes
-
 import 'package:flutter/material.dart';
 import 'pay.dart';
 import 'globals.dart' as AppGlobal;
-import 'package:intl/intl.dart';
 import "availibility.dart";
 import 'profile.dart';
 
@@ -20,7 +17,6 @@ class VisitePage extends StatefulWidget {
   final int idVisitor;
   String houseType;
 
-
   @override
   State<VisitePage> createState() => _VisitePageState();
 }
@@ -34,15 +30,17 @@ class _VisitePageState extends State<VisitePage> {
   TextEditingController CPController = TextEditingController();
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
-  String? visitorName ="";
-  String? visitorSurname ="";
-  String? visitorCity ="";
-  String? visitorHoulyRate ="";
-  String? visitorCost ="";
+  String? visitorName = "";
+  String? visitorSurname = "";
+  String? visitorCity = "";
+  String? visitorHoulyRate = "";
+  String? visitorCost = "";
   String? visitorPrice = "";
   int? visitorRating = 0;
+  String imageUrl = "";
 
   bool isInvalid = false;
+  int? idDemande;
 
   @override
   void initState() {
@@ -97,19 +95,23 @@ class _VisitePageState extends State<VisitePage> {
           visitorSurname = jsonData['User']['FirstName'];
           visitorName = jsonData['User']['Name'];
           visitorCity = jsonData['User']['City'];
+          imageUrl = jsonData['User']['ProfilPicture'];
           visitorHoulyRate = jsonData['HourlyRate'].toString();
           visitorCost = jsonData['Cost'].toString();
           visitorPrice = jsonData['Price'].toString();
           visitorRating = jsonData['Rating'];
+          idDemande = jsonData['idDemande'];
         });
       }
     } catch (error) {
       print('Error fetching visitors: $error');
     }
   }
-  
+
   Future<bool> SendDemandeVisit() async {
-    if (villeController.text.isEmpty || rueController.text.isEmpty || CPController.text.isEmpty) {
+    if (villeController.text.isEmpty ||
+        rueController.text.isEmpty ||
+        CPController.text.isEmpty) {
       setState(() {
         isInvalid = true;
       });
@@ -124,17 +126,19 @@ class _VisitePageState extends State<VisitePage> {
       }
       concatenatedPTC += pointToCheck[i].text;
     }
-    var url='${AppGlobal.UrlServer}visit/CreateDemande?housingType=$selectedHousingType&visitorId=${widget.idVisitor}&userId=${AppGlobal.idUser}&dateVisit=${DateFormat('yyyy-MM-dd').format(selectedDate)}%20${'$hours:$minutes:00.000'}&city=${villeController.text}&street=${rueController.text}&postalCode=${CPController.text}&points=${concatenatedPTC}';
+    var url =
+        '${AppGlobal.UrlServer}visit/CreateDemande?housingType=$selectedHousingType&visitorId=${widget.idVisitor}&userId=${AppGlobal.idUser}&city=${villeController.text}&street=${rueController.text}&postalCode=${CPController.text}&points=${concatenatedPTC}';
     AppGlobal.sendData(url);
     setState(() {
       isInvalid = false;
     });
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PayPage(title: 'Pay',id: widget.idVisitor)), // Provide the title parameter
+      MaterialPageRoute(
+        builder: (context) => PayPage(title: 'Pay', idDemande: 50),
+      ), // Provide the title parameter
     );
     return true;
-
   }
 
   @override
@@ -171,7 +175,8 @@ class _VisitePageState extends State<VisitePage> {
                   const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Veuiller compléter les champs adresses',
+                      Text(
+                        'Veuiller compléter les champs adresses',
                         style: TextStyle(color: Colors.red),
                       ),
                     ],
@@ -255,7 +260,9 @@ class _VisitePageState extends State<VisitePage> {
                     ),
                   ],
                 ),
-                Visitor(context, widget.idVisitor, visitorName, visitorSurname, visitorCity, visitorHoulyRate, visitorCost, visitorPrice, visitorRating),
+                Visitor(context, widget.idVisitor, visitorName, visitorSurname,
+                    visitorCity, visitorHoulyRate, visitorCost, visitorPrice,
+                    visitorRating, imageUrl),
                 for (TextEditingController point in pointToCheck)
                   Container(
                     padding: const EdgeInsets.all(8.0),
@@ -275,18 +282,17 @@ class _VisitePageState extends State<VisitePage> {
                           ),
                         ),
                         Visibility(
-                          visible: true,
-                          child: IconButton(
-                            icon: const Icon(Icons.remove),
-                            onPressed: () {
-                              setState(() {
-                                pointToCheck.remove(point);
-                              });
-                            },
-                          )
-                        )
+                            visible: true,
+                            child: IconButton(
+                              icon: const Icon(Icons.remove),
+                              onPressed: () {
+                                setState(() {
+                                  pointToCheck.remove(point);
+                                });
+                              },
+                            ))
                       ],
-                    )
+                    ),
                   ),
                 Container(
                   margin: const EdgeInsets.only(bottom: 16.0),
@@ -331,8 +337,6 @@ class _VisitePageState extends State<VisitePage> {
                             ),
                             onPressed: () {
                               SendDemandeVisit();
-
-
                             },
                             child: const Expanded(
                               child: Text(
@@ -357,7 +361,9 @@ class _VisitePageState extends State<VisitePage> {
   }
 }
 
-Padding Visitor(context, id, name, surname, city, rate, cost, price, star) => Padding(
+Padding Visitor(context, id, name, surname, city, rate, cost, price, star,
+    imageUrl) =>
+    Padding(
       padding: const EdgeInsets.all(8.0),
       child: Expanded(
         child: ElevatedButton(
@@ -369,20 +375,19 @@ Padding Visitor(context, id, name, surname, city, rate, cost, price, star) => Pa
           ),
           child: Row(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                    alignment: Alignment.center,
-                    height: 100,
+              Container(
+                alignment: Alignment.center,
+                margin: const EdgeInsets.all(8.0),
+                height: 100,
+                width: 100,
+                color: AppGlobal.subInputColor,
+                child: Image.network(
+                    "${AppGlobal.UrlServer}image/$imageUrl",
                     width: 100,
-                    color: AppGlobal.subInputColor,
-                    child: const Text(
-                      "Photo",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black,
-                      ),
-                    )),
+                    height: 100,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Image.asset("assets/images/placeholder.webp",
+                            width: 100, height: 100)),
               ),
               Expanded(
                 flex: 8,
@@ -415,7 +420,6 @@ Padding Visitor(context, id, name, surname, city, rate, cost, price, star) => Pa
                           color: Colors.black,
                         ),
                       ),
-
                       AppGlobal.etoile(star, 20, 50)
                     ],
                   ),
@@ -442,10 +446,13 @@ Padding Visitor(context, id, name, surname, city, rate, cost, price, star) => Pa
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ProfilePage(title: 'Profile', idUser: id)), 
+              MaterialPageRoute(
+                  builder: (context) => ProfilePage(
+                    title: 'Profile',
+                    idUser: id,
+                  )),
             );
           },
-
         ),
       ),
     );

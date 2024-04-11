@@ -18,7 +18,7 @@ class _HomePageState extends State<HomePage> {
   var listVisit = [];
   var listVisitTemp = [];
   var listCost = [];
-  var listName = [""];
+  var listUser = [];
   var listHouseType = [""];
   var city = "";
 
@@ -26,12 +26,13 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getDataVisitor();
+    print("Bonjour");
   }
 
   void getDataVisitor() async {
     try {
       setState(() {
-        listName = [];
+        listUser = [];
         listHouseType = [];
         listCost = [];
         listVisitTemp = [];
@@ -44,14 +45,12 @@ class _HomePageState extends State<HomePage> {
       if (response.statusCode == 200) {
         listVisitTemp = json.decode(response.data) as List;
         for (var visit in listVisitTemp) {
-          listName.add(await GetNameUser(visit));
-          listHouseType.add(await GetHouseTypeName(visit['HousingTypeId']));
+          listUser.add(await GetNameUser(visit));
           listHouseType.add(await GetHouseTypeName(visit['HousingTypeId']));
           listCost.add((await GetCost(visit, listHouseType.last)));
         }
-        debugPrint(listName.toString());
         setState(() {
-          listName = listName;
+          listUser = listUser;
           listHouseType = listHouseType;
           listCost = listCost;
           listVisit = listVisitTemp;
@@ -94,22 +93,28 @@ class _HomePageState extends State<HomePage> {
     return "Error";
   }
 
-  Future<String> GetNameUser(visit) async {
+  Future<dynamic> GetNameUser(visit) async {
     try {
       if (visit['VisitorId'] != AppGlobal.idUser) {
         var response = await Dio().get(
             '${AppGlobal.UrlServer}Visitor/GetVisitorByID?id=${visit['VisitorId'].toString()}');
         if (response.statusCode == 200) {
-          return json.decode(response.data)['User']['Name'];
+          return json.decode(response.data)['User'];
         } else {
+          print("error 1");
           print(response.statusCode);
         }
       } else {
         var response = await Dio().get(
             '${AppGlobal.UrlServer}User/GetUserByID?id=${visit['UserId'].toString()}');
         if (response.statusCode == 200) {
-          return json.decode(response.data)['User']['Name'];
+          if (json.decode(response.data)['User'] == null) {
+            return json.decode(response.data);
+          } else {
+            return json.decode(response.data)['User'];
+          }
         } else {
+          print("error 2");
           print(response.statusCode);
         }
       }
@@ -158,7 +163,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     for (int index = 0; index < listVisit.length; index++)
                       Visit(
-                        name: listName[index].toString(),
+                        name: listUser[index]['Name'].toString(),
                         city: listVisit[index]['Street'].toString() +
                             " " +
                             listVisit[index]['City'].toString() +
@@ -166,6 +171,7 @@ class _HomePageState extends State<HomePage> {
                             listVisit[index]['PostalCode'].toString(),
                         cost: listCost[index],
                         typeHouse: listHouseType[index],
+                        imageUrl: listUser[index]['ProfilPicture'].toString(),
                         id: listVisit[index]["Id"],
                         context: context,
                       ),
@@ -209,6 +215,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 Padding Visit({
+  required String imageUrl,
   required String typeHouse,
   required String city,
   required String name,
@@ -228,21 +235,14 @@ Padding Visit({
         ),
         child: Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                alignment: Alignment.center,
-                height: 100,
-                width: 100,
-                color: AppGlobal.subInputColor,
-                child: const Text(
-                  "Photo",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.black,
-                  ),
-                ),
-              ),
+            Container(
+              alignment: Alignment.center,
+              margin: const EdgeInsets.all(8.0),
+              height: 100,
+              width: 100,
+              color: AppGlobal.subInputColor,
+              child: Image.network("${AppGlobal.UrlServer}image/$imageUrl", width: 100, height: 100,
+              errorBuilder: (context, error, stackTrace) => Image.asset("assets/images/placeholder.webp",width: 100, height: 100)),
             ),
             Expanded(
               flex: 8,

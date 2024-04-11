@@ -169,6 +169,8 @@ class _HomePageState extends State<listVisitor> {
                 cost: visitor['Price'].toString(),
                 id: visitor['User']['Id'],
                 houseType : houseType,
+                imageUrl: visitor['User']['ProfilPicture'],
+                nbetoile: visitor['Rating'],
                 context: context,
                 widget: widget
               ),
@@ -189,6 +191,8 @@ Padding Visitor({
   required String cost,
   required int id,
   required String houseType,
+  required String imageUrl,
+  required int nbetoile,
   required BuildContext context,
   widget
 }) {
@@ -204,21 +208,14 @@ Padding Visitor({
         ),
         child: Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                alignment: Alignment.center,
-                height: 100,
-                width: 100,
-                color: AppGlobal.subInputColor,
-                child: const Text(
-                  "Photo",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.black,
-                  ),
-                ),
-              ),
+            Container(
+              alignment: Alignment.center,
+              margin: const EdgeInsets.all(8.0),
+              height: 100,
+              width: 100,
+              color: AppGlobal.subInputColor,
+              child: Image.network("${AppGlobal.UrlServer}image/$imageUrl", width: 100, height: 100,
+              errorBuilder: (context, error, stackTrace) => Image.asset("assets/images/placeholder.webp",width: 100, height: 100)),
             ),
             Expanded(
               flex: 8,
@@ -251,10 +248,7 @@ Padding Visitor({
                         color: Colors.black,
                       ),
                     ),
-                    Image.asset(
-                      'assets/images/etoile.png',
-                      width: 100,
-                    )
+                    AppGlobal.etoile(nbetoile, 10, 20)
                   ],
                 ),
               ),
