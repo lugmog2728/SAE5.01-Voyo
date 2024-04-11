@@ -149,11 +149,27 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ) 
               ),
+
+
+
               Visibility(
                 visible: !isEdit,
                 child: Row (
-                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  Container (
+                    padding: const EdgeInsets.all(16.0),
+                    width: 130,
+                    child: Visibility(
+                      visible: widget.idUser == app_global.idUser,
+                      child: Center(
+                        child: IconButton(
+                          onPressed: () => editprofile(),
+                          style: app_global.buttonStyle,
+                          icon: const Icon(Icons.logout),
+                        ),
+                      ),
+                    ),
+                  ),
                   Padding (
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
@@ -179,7 +195,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ),
-                  
                   ],
                 ),
               ),

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'globals.dart' as AppGlobal;
-import 'rdv_close.dart' as rdvclose;
+import 'home.dart' as homePage;
 import 'listVisitor.dart' as listVisitor;
 import 'package:dio/dio.dart';
 
@@ -74,15 +74,16 @@ class _PointsPageState extends State<PointsPage> {
         else
           Pictures = Pictures + picture + ";";
       Pictures = Pictures.substring(0, Pictures.length - 1);
+      Dio().get(
+          '${AppGlobal.UrlServer}Visit/FinishVisit?id=${widget.idVisit}');
       var response = await Dio().get(
           '${AppGlobal.UrlServer}Pointcheck/SetPointByIdVisit?id=${widget.idVisit}&pointChecks=$Checks&pictures=Pictures');
       if (response.statusCode == 200) {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => rdvclose.RdvClosePage(
-                idVisit: widget.idVisit,
-              )),
+              builder: (context) => homePage.HomePage(title: 'Accueil' ),
+          ),
         );
       } else {
         print(response.statusCode);
