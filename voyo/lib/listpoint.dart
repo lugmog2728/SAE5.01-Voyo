@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'globals.dart' as AppGlobal;
+import 'rdv_close.dart' as rdvclose;
 import 'listVisitor.dart' as listVisitor;
 import 'package:dio/dio.dart';
 
@@ -19,6 +20,7 @@ class PointsPage extends StatefulWidget {
 class _PointsPageState extends State<PointsPage> {
   var text = "";
   var listPoint = [];
+  var listComment = [];
   var listExpanded = [];
   var listImage = [];
 
@@ -30,8 +32,7 @@ class _PointsPageState extends State<PointsPage> {
 
   void GetPoints() async {
     try {
-      var listExpandedTemp = [];
-      var listImageTemp = [];
+
       var response = await Dio().get(
           '${AppGlobal.UrlServer}Pointcheck/GetPointByIdVisit?id=${widget.idVisit}');
       if (response.statusCode == 200) {
@@ -39,12 +40,14 @@ class _PointsPageState extends State<PointsPage> {
           listPoint = json.decode(response.data) as List;
         });
         for (var point in listPoint) {
-          listExpandedTemp.add(false);
-          listImageTemp.add("");
+          listExpanded.add(false);
+          listImage.add("");
+          listComment.add("");
         }
         setState(() {
-          listExpanded = listExpandedTemp;
-          listImage = listImageTemp;
+          listExpanded;
+          listImage;
+          listComment;
         });
       } else {
         print(response.statusCode);
@@ -56,22 +59,31 @@ class _PointsPageState extends State<PointsPage> {
 
   void SetPoints() async {
     try {
-      var listExpandedTemp = [];
-      var listImageTemp = [];
+
+      var Checks = "";
+      for (var comment in listComment)
+        if (comment == "")
+          Checks = Checks + " ;";
+        else
+        Checks = Checks + comment + ";";
+      Checks = Checks.substring(0, Checks.length - 1);
+      var Pictures = "";
+      for (var picture in listImage)
+        if (picture == "")
+          Pictures = Pictures + " ;";
+        else
+          Pictures = Pictures + picture + ";";
+      Pictures = Pictures.substring(0, Pictures.length - 1);
       var response = await Dio().get(
-          '${AppGlobal.UrlServer}Pointcheck/GetPointByIdVisit?id=${widget.idVisit}');
+          '${AppGlobal.UrlServer}Pointcheck/SetPointByIdVisit?id=${widget.idVisit}&pointChecks=$Checks&pictures=Pictures');
       if (response.statusCode == 200) {
-        setState(() {
-          listPoint = json.decode(response.data) as List;
-        });
-        for (var point in listPoint) {
-          listExpandedTemp.add(false);
-          listImageTemp.add("");
-        }
-        setState(() {
-          listExpanded = listExpandedTemp;
-          listImage = listImageTemp;
-        });
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => rdvclose.RdvClosePage(
+                idVisit: widget.idVisit,
+              )),
+        );
       } else {
         print(response.statusCode);
       }
@@ -91,7 +103,7 @@ class _PointsPageState extends State<PointsPage> {
                 listExpanded[point], point),
           ElevatedButton(
             onPressed: () {
-
+              SetPoints();
             },
             child: Text("Valider"),
             style: AppGlobal.buttonStyle,
@@ -213,11 +225,14 @@ class _PointsPageState extends State<PointsPage> {
               padding: EdgeInsets.all(5),
               child: Column(children: [
                 TextFormField(
-                  initialValue: "",
+                  initialValue: Value,
                   decoration: InputDecoration(
                       hintText: "Commentaire", border: InputBorder.none),
-                  onSaved: (String? value) {
-                    Value = value!;
+                  onChanged: (String? value) {
+                    listComment[index] = value!;
+                    setState(() {
+                      listComment;
+                    });
                   },
                 ),
                 Image.network(

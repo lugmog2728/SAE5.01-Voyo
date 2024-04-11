@@ -204,7 +204,7 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
                 ElevatedButton(
                   style: AppGlobal.buttonStyle,
                   onPressed: () {
-                    //AppGlobal.sendData("${AppGlobal.UrlServer}Visit/StartVisit?id=${widget.idVisit}");
+                    AppGlobal.sendData("${AppGlobal.UrlServer}Visit/StartVisit?id=${widget.idVisit}");
                     Navigator.push(
                       context,
                       MaterialPageRoute(
