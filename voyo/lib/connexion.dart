@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
 import 'home.dart' as homePage;
+import 'user_check.dart' as user_check;
 import 'newaccount.dart' as newAccountPage;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -38,12 +39,21 @@ class _ConnexionPageState extends State<ConnexionPage> {
       if (userData['Id'] != null) {
         AppGlobal.idUser = userData['Id'];
         // Connexion réussie
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => homePage.HomePage(title: 'Accueil' ),
-          ),
-        );
+        if (AppGlobal.idUser == 0) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => user_check.UserCheckPage(title: "Validation visiteur")
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => homePage.HomePage(title: "Accueil")
+            ),
+          );
+        }
       } else {
         // Connexion échouée
         setState(() {
