@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'globals.dart' as app_global;
 import 'statuschange.dart' as status_change;
+import 'connexion.dart' as connexion;
 import 'availibility.dart';
 
 //####__CONSTANTS__####\\
@@ -163,7 +164,17 @@ class _ProfilePageState extends State<ProfilePage> {
                       visible: widget.idUser == app_global.idUser,
                       child: Center(
                         child: IconButton(
-                          onPressed: () => editprofile(),
+                          onPressed: () {
+                            app_global.idUser = 1;
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => connexion.ConnexionPage(
+                                    title: 'connexion'
+                                ),
+                              ),
+                            );
+                          },
                           style: app_global.buttonStyle,
                           icon: const Icon(Icons.logout),
                         ),
