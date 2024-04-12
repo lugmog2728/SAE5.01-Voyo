@@ -80,11 +80,9 @@ class _NewAccountPageState extends State<NewAccountPage> {
           print(
               'La requête pour vérifier l\'email a échoué avec le code d\'état: ${response
                   .statusCode}');
-          // Gérer l'erreur en conséquence
         }
       } catch (e) {
         print('Erreur lors de la requête pour vérifier l\'email: $e');
-        // Gérer l'erreur en conséquence
       }
 
       String requestUrl =
@@ -105,11 +103,9 @@ class _NewAccountPageState extends State<NewAccountPage> {
           print(
               'La requête pour créer l\'utilisateur a échoué avec le code d\'état: ${response
                   .statusCode}');
-          // Gérer l'erreur en conséquence
         }
       } catch (e) {
         print('Erreur lors de la requête pour créer l\'utilisateur: $e');
-        // Gérer l'erreur en conséquence
       }
     }
   }

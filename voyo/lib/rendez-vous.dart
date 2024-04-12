@@ -45,12 +45,10 @@ class _RdvPageState extends State<RdvPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Logo
               Container(
                 alignment: Alignment.center,
                 child: Text('Logo'),
               ),
-              // Infos
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -90,9 +88,7 @@ class _RdvPageState extends State<RdvPage> {
                             ),
                             SizedBox(height: 8),
                             ElevatedButton(
-                              onPressed: () {
-                                // Action when view profile button is pressed
-                              },
+                              onPressed: () {},
                               child: Text('Voir Profil'),
                             ),
                           ],
@@ -139,16 +135,13 @@ class _RdvPageState extends State<RdvPage> {
                   ],
                 ),
               ),
-              // Boutons Annuler RDV et Débuter la visite
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
-                        // Action when cancel button is pressed
-                      },
+                      onPressed: () {},
                       style: ElevatedButton.styleFrom(
                         primary: Colors.red,
                         onPrimary: Colors.white,
@@ -156,9 +149,7 @@ class _RdvPageState extends State<RdvPage> {
                       child: Text('Annuler RDV'),
                     ),
                     ElevatedButton(
-                      onPressed: () {
-                        // Action when start visit button is pressed
-                      },
+                      onPressed: () {},
                       style: ElevatedButton.styleFrom(
                         primary: Colors.green,
                         onPrimary: Colors.white,

@@ -196,7 +196,7 @@ class _PointsPageState extends State<PointsPage> {
                 child: Row(
                   children: [
                     Text(Name),
-                    Spacer(), // use Spacer
+                    Spacer(),
                     IconButton(
                         onPressed: () async {
                           final XFile? newImg = await ImagePicker()

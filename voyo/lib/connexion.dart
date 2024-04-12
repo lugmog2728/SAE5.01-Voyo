@@ -38,7 +38,7 @@ class _ConnexionPageState extends State<ConnexionPage> {
       final userData = jsonDecode(response.body);
       if (userData['Id'] != null) {
         AppGlobal.idUser = userData['Id'];
-        // Connexion réussie
+        // Connection success
         if (AppGlobal.idUser == 0) {
           Navigator.push(
             context,
@@ -55,13 +55,12 @@ class _ConnexionPageState extends State<ConnexionPage> {
           );
         }
       } else {
-        // Connexion échouée
+        // Connection fail
         setState(() {
           _loginError = true;
         });
       }
     } else {
-      // Erreur lors de la requête
       setState(() {
         _loginError = true;
       });

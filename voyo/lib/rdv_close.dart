@@ -34,13 +34,10 @@ class _RdvClosePageState extends State<RdvClosePage> {
           children: [
             for (PointToCheck point in points) 
               buildPointRectangle(point, 0),
-            // Bouton Télécharger en PDF
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
-                onPressed: () {
-                  // Action lorsque le bouton Télécharger en PDF est pressé
-                },
+                onPressed: () {},
                 style: app_global.buttonStyle,
                 child: const Text('Télécharger en PDF'),
               ),
@@ -75,7 +72,6 @@ class _RdvClosePageState extends State<RdvClosePage> {
                   ],
                 ),
             ),
-            // Rectangle pour les commentaires
             Container(
               color: app_global.inputColor,
               margin: const EdgeInsets.all(16.0),
@@ -159,7 +155,7 @@ class _RdvClosePageState extends State<RdvClosePage> {
         InkWell(
           onTap: () {
             setState(() {
-              point.isVisible = !point.isVisible; // Invert the state
+              point.isVisible = !point.isVisible; 
             });
           },
           child: Container(
@@ -185,7 +181,7 @@ class _RdvClosePageState extends State<RdvClosePage> {
             ),
           ),
         ),
-        // Contenu du point
+     
         if (point.isVisible) 
           Container(
             padding: const EdgeInsets.all(8.0),

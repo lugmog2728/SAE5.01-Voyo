@@ -402,14 +402,13 @@ Future<String> sendImage(String urlString, File image) async {
     var response = await http.post(
       Uri.parse(urlString),
       body:
-          car, //imageBytes.toString().replaceFirst(RegExp(r'['), '').replaceFirst(RegExp(r']'), ''),
+          car, 
     );
 
-    // Vérifier la réponse
+
     if (response.statusCode == 200) {
       return response.body;
     } else {
-      // Gérer les erreurs
       print('Failed to upload image');
       return '';
     }

@@ -134,7 +134,6 @@ class _ChatPageState extends State<ChatPage> {
                               if (messenger['Value'] == value)
                                 userIdOther = messenger['Key'];
                             getMessages();
-                            // This is called when the user selects an item.
                             setState(() {
                               messenger = value!;
                             });

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
-import 'home.dart' as HomePage; // Importer la page d'accueil
+import 'home.dart' as HomePage;
 import 'package:http/http.dart' as http;
 
 class PayPage extends StatefulWidget {
@@ -22,7 +22,7 @@ class _PayPageState extends State<PayPage> {
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
-      lastDate: DateTime(DateTime.now().year + 10), // Limite à 10 ans à partir de la date actuelle
+      lastDate: DateTime(DateTime.now().year + 10),
     );
     if (pickedDate != null) {
       setState(() {
@@ -51,7 +51,7 @@ class _PayPageState extends State<PayPage> {
                     filled: true,
                     fillColor: AppGlobal.buttonback,
                   ),
-                  maxLength: 16, // Limite de 16 caractères pour le numéro de carte
+                  maxLength: 16, 
                   onSaved: (String? value) {
                     debugPrint('Card number saved as $value');
                   },
@@ -95,7 +95,7 @@ class _PayPageState extends State<PayPage> {
                             filled: true,
                             fillColor: AppGlobal.buttonback,
                           ),
-                          maxLength: 3, // Limite de 3 caractères pour le code de sécurité
+                          maxLength: 3,  
                           onSaved: (String? value) {
                             debugPrint('Security code saved as $value');
                           },
@@ -113,7 +113,7 @@ class _PayPageState extends State<PayPage> {
                     onPrimary: Colors.white,
                   ),
                   onPressed: () {
-                    // Appeler la fonction de paiement avec l'ID de la demande
+                 
                     _verifyAndPay(widget.idDemande);
                   },
                   child: const Text(
@@ -132,17 +132,17 @@ class _PayPageState extends State<PayPage> {
   }
 
   Future<void> _verifyAndPay(int idDemande) async {
-    // Vérifier le paiement en envoyant une requête à l'API
+
     var url = '${AppGlobal.UrlServer}Visit/PaidVisit?id=$idDemande';
     var response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
-      // Paiement réussi
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage.HomePage(title: 'Home')),
       );
     } else {
-      // Gérer les erreurs de paiement
+      
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Erreur lors du paiement'),
         duration: Duration(seconds: 2),
