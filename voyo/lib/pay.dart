@@ -52,9 +52,6 @@ class _PayPageState extends State<PayPage> {
                     fillColor: AppGlobal.buttonback,
                   ),
                   maxLength: 16, 
-                  onSaved: (String? value) {
-                    debugPrint('Card number saved as $value');
-                  },
                 ),
               ),
               Padding(
@@ -96,9 +93,6 @@ class _PayPageState extends State<PayPage> {
                             fillColor: AppGlobal.buttonback,
                           ),
                           maxLength: 3,  
-                          onSaved: (String? value) {
-                            debugPrint('Security code saved as $value');
-                          },
                         ),
                       ),
                     ),

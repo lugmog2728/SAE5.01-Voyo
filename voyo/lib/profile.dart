@@ -407,12 +407,10 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    print(widget.idUser);
     app_global.fetchDataMap("${app_global.UrlServer}User/GetUserByID?id=${widget.idUser}").then((Map<String, dynamic>? jsonData) {
       if (jsonData != null) {
 
           isVisitor = jsonData["User"] != null;
-          print(isVisitor);
           if (isVisitor) {
             setState(() {
               isActive = jsonData["User"]["IsActive"];
@@ -442,13 +440,12 @@ class _ProfilePageState extends State<ProfilePage> {
               rib = jsonData["RIB"].toString();
               //rib = "**** **** ${rib.substring(rib.length-5)}";
             });
-
-            app_global.fetchData("${app_global.UrlServer}Availibility/GetAvailibiltyByVisitor?id=${widget.idUser}").then((List<dynamic>? jsonDataAv) {
+            app_global.fetchData("${app_global.UrlServer}Availibility/GetAvailibiltyByVisitor?id=$idVisitor").then((List<dynamic>? jsonDataAv) {
               if (jsonDataAv != null) {
                 for (dynamic availibility in jsonDataAv) {
                   List<String> lstStart = availibility["Start"].toString().split(":");
                   List<String> lstEnd = availibility["End"].toString().split(":");
-                  Availibility av = Availibility(availibility["day"], int.parse(lstStart[0]), int.parse(lstStart[1]), int.parse(lstEnd[0]), int.parse(lstEnd[1]));
+                  Availibility av = Availibility(availibility["Day"], int.parse(lstStart[0]), int.parse(lstStart[1]), int.parse(lstEnd[0]), int.parse(lstEnd[1]));
 
                   availibilities.add(av);
                 }

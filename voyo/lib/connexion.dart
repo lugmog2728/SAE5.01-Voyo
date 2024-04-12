@@ -31,9 +31,6 @@ class _ConnexionPageState extends State<ConnexionPage> {
         'password': password,
       },
     );
-    print('${AppGlobal.UrlServer}User/Connexion');
-    print(email);
-    print(password);
     if (response.statusCode == 200) {
       final userData = jsonDecode(response.body);
       if (userData['Id'] != null) {
@@ -91,9 +88,6 @@ class _ConnexionPageState extends State<ConnexionPage> {
                         fillColor: AppGlobal.buttonback,
                         border: InputBorder.none,
                       ),
-                      onSaved: (String? value) {
-                        debugPrint('Value for field saved as $value');
-                      },
                     ),
                   ),
                 ),
@@ -110,9 +104,6 @@ class _ConnexionPageState extends State<ConnexionPage> {
                         fillColor: AppGlobal.buttonback,
                         border: InputBorder.none,
                       ),
-                      onSaved: (String? value) {
-                        debugPrint('Value for field saved as $value');
-                      },
                     ),
                   ),
                 ),

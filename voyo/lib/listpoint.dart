@@ -49,8 +49,6 @@ class _PointsPageState extends State<PointsPage> {
           listImage;
           listComment;
         });
-      } else {
-        print(response.statusCode);
       }
     } catch (e) {
       print(e);
@@ -85,9 +83,7 @@ class _PointsPageState extends State<PointsPage> {
               builder: (context) => homePage.HomePage(title: 'Accueil' ),
           ),
         );
-      } else {
-        print(response.statusCode);
-      }
+      } 
     } catch (e) {
       print(e);
     }

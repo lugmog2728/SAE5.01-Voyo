@@ -45,8 +45,6 @@ class _ChatPageState extends State<ChatPage> {
           for (var messenger in listMessengers)
             listMessengersString.add(messenger['Value']);
         });
-      } else {
-        print(response.statusCode);
       }
     } catch (e) {
       print(e);
@@ -55,16 +53,7 @@ class _ChatPageState extends State<ChatPage> {
 
   void SendMessage() async {
     try {
-      debugPrint(
-          '${AppGlobal.UrlServer}message/SendMessage?message=${message.text}&dateCreate=${DateTime.now().toString().substring(0, 19)}&useridsend=${AppGlobal.idUser}&useridrecieve=${userIdOther}');
-
-      var response = await Dio().get(
-          '${AppGlobal.UrlServer}message/SendMessage?message=${message.text}&dateCreate=${DateTime.now().toString().substring(0, 19)}&useridsend=${AppGlobal.idUser}&useridrecieve=${userIdOther}');
-      if (response.statusCode == 200) {
-        print("success");
-      } else {
-        print(response.statusCode);
-      }
+      await Dio().get('${AppGlobal.UrlServer}message/SendMessage?message=${message.text}&dateCreate=${DateTime.now().toString().substring(0, 19)}&useridsend=${AppGlobal.idUser}&useridrecieve=${userIdOther}');
     } catch (e) {
       print(e);
     }
@@ -76,16 +65,12 @@ class _ChatPageState extends State<ChatPage> {
           '${AppGlobal.UrlServer}Message/RecieveMessage?useridsend=${AppGlobal.idUser}&useridrecieve=${userIdOther}');
       if (response.statusCode == 200) {
         setState(() {
-          print(
-              'Message/RecieveMessage?useridsend=${AppGlobal.idUser}&useridrecieve=${userIdOther}');
           if (listMessage.length < (json.decode(response.data) as List).length){
             listMessage = json.decode(response.data) as List;
             _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
           }
 
         });
-      } else {
-        print(response.statusCode);
       }
     } catch (e) {
       print(e);
@@ -213,9 +198,6 @@ class _ChatPageState extends State<ChatPage> {
                                         hintText: "Message",
                                         border: InputBorder.none,
                                       ),
-                                      onSaved: (String? value) {
-                                        debugPrint('Value for field saved as ');
-                                      },
                                     ),
                                   ),
                                   ElevatedButton(

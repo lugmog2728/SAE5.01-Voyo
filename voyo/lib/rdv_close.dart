@@ -112,7 +112,6 @@ class _RdvClosePageState extends State<RdvClosePage> {
   }
 
   void finishVisit() {
-    print("${app_global.UrlServer}Visit/SetComment?id=${widget.idVisit}&comment=${commentController.text}&rate=$rating");
     app_global.sendData("${app_global.UrlServer}Visit/SetComment?id=${widget.idVisit}&comment=${commentController.text}&rate=$rating").then((value) {
       Navigator.push(
         context,
@@ -126,9 +125,7 @@ class _RdvClosePageState extends State<RdvClosePage> {
 
   @override
   void initState() {
-    print("");
     super.initState();
-    print("${app_global.UrlServer}Pointcheck/GetPointByIdVisit?id=${widget.idVisit}");
     app_global.fetchData("${app_global.UrlServer}Pointcheck/GetPointByIdVisit?id=${widget.idVisit}").then((List<dynamic>? jsonData) {
       if (jsonData != null) {
         for (dynamic pointToCheck in jsonData) {

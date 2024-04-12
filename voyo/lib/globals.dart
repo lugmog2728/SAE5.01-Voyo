@@ -376,6 +376,24 @@ Future<String?> fetchDataString(String urlString) async {
   }
 }
 
+Future<int?> fetchDataInt(String urlString) async {
+  var url = Uri.parse(urlString);
+
+  try {
+    var response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      print('Erreur de requête : ${response.statusCode}');
+      return null;
+    }
+  } catch (e) {
+    print('Erreur de connexion : $e');
+    return null;
+  }
+}
+
 Future<bool> sendData(String urlString) async {
   var url = Uri.parse(urlString);
   try {

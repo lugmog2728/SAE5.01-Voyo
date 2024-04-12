@@ -76,13 +76,9 @@ class _NewAccountPageState extends State<NewAccountPage> {
             );
             return;
           }
-        } else {
-          print(
-              'La requête pour vérifier l\'email a échoué avec le code d\'état: ${response
-                  .statusCode}');
         }
       } catch (e) {
-        print('Erreur lors de la requête pour vérifier l\'email: $e');
+        print('$e');
       }
 
       String requestUrl =
@@ -99,13 +95,9 @@ class _NewAccountPageState extends State<NewAccountPage> {
                     homePage.HomePage(title: 'Accueil')
             ),
           );
-        } else {
-          print(
-              'La requête pour créer l\'utilisateur a échoué avec le code d\'état: ${response
-                  .statusCode}');
         }
       } catch (e) {
-        print('Erreur lors de la requête pour créer l\'utilisateur: $e');
+        print('$e');
       }
     }
   }
@@ -140,9 +132,6 @@ class _NewAccountPageState extends State<NewAccountPage> {
                             }
                             return null;
                           },
-                          onSaved: (String? value) {
-                            debugPrint('Value for Nom saved as $value');
-                          },
                           controller: nameController,
                         ),
                       ),
@@ -163,9 +152,6 @@ class _NewAccountPageState extends State<NewAccountPage> {
                               return 'Veuillez entrer votre prénom';
                             }
                             return null;
-                          },
-                          onSaved: (String? value) {
-                            debugPrint('Value for Prénom saved as $value');
                           },
                           controller: firstNameController,
                         ),
@@ -193,10 +179,6 @@ class _NewAccountPageState extends State<NewAccountPage> {
                           }
                           return null;
                         },
-                        onSaved: (String? value) {
-                          debugPrint(
-                              'Value for Date de naissance saved as $value');
-                        },
                         controller: TextEditingController(
                             text: _selectedDate != null ? _selectedDate!
                                 .toString().substring(0, 10) : ''),
@@ -223,61 +205,12 @@ class _NewAccountPageState extends State<NewAccountPage> {
                             }
                             return null;
                           },
-                          onSaved: (String? value) {
-                            debugPrint('Value for Ville saved as $value');
-                          },
                           controller: cityController,
                         ),
                       ),
                     ),
-                    /*Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
-                          textAlign: TextAlign.center,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Code postal",
-                            filled: true,
-                            fillColor: AppGlobal.buttonback,
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez entrer votre code postal';
-                            }
-                            return null;
-                          },
-                          onSaved: (String? value) {
-                            debugPrint('Value for Code postal saved as $value');
-                          },
-                          controller: phoneNumberController,
-                        ),
-                      ),
-                    ),*/
                   ],
                 ),
-                /*Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextFormField(
-                    textAlign: TextAlign.center,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Adresse postal",
-                      filled: true,
-                      fillColor: AppGlobal.buttonback,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Veuillez entrer votre adresse postale';
-                      }
-                      return null;
-                    },
-                    onSaved: (String? value) {
-                      debugPrint('Value for Adresse postal saved as $value');
-                    },
-                    controller: cityController,
-                  ),
-                ),*/
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
@@ -293,9 +226,6 @@ class _NewAccountPageState extends State<NewAccountPage> {
                         return 'Veuillez entrer votre adresse mail';
                       }
                       return null;
-                    },
-                    onSaved: (String? value) {
-                      debugPrint('Value for Adresse mail saved as $value');
                     },
                     controller: emailController,
                   ),
@@ -316,9 +246,6 @@ class _NewAccountPageState extends State<NewAccountPage> {
                         return 'Veuillez entrer votre mot de passe';
                       }
                       return null;
-                    },
-                    onSaved: (String? value) {
-                      debugPrint('Value for Mot de passe saved as $value');
                     },
                     controller: passwordController,
                   ),

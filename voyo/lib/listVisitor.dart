@@ -37,8 +37,6 @@ class _HomePageState extends State<listVisitor> {
           listHouseType = json.decode(response.data).cast<String>().toList();
           houseType = listHouseType[0];
         });
-      } else {
-        print(response.statusCode);
       }
     } catch (e) {
       print(e);
@@ -53,8 +51,6 @@ class _HomePageState extends State<listVisitor> {
         setState(() {
           listVisitor = json.decode(response.data) as List;
         });
-      } else {
-        print(response.statusCode);
       }
     } catch (e) {
       print(e);

@@ -211,7 +211,6 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
   }
 
   Widget displayVisitorFooter() {
-    print("----------------------------------------Visitor : ${visit["statut"]}");
     if (visit["statut"] == "Confirmer") {
       return ElevatedButton(
         style: AppGlobal.buttonStyle,
@@ -252,7 +251,6 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
   }
 
   Widget displayUserFooter() {
-    print("----------------------------------------User  : ${visit["statut"]}");
     if (visit["statut"] == "Démarrer") {
       return const Column(
         children: [

@@ -26,7 +26,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getDataVisitor();
-    print("Bonjour");
   }
 
   void getDataVisitor() async {
@@ -38,8 +37,6 @@ class _HomePageState extends State<HomePage> {
         listVisitTemp = [];
         listVisit = [];
       });
-      debugPrint(
-          '${AppGlobal.UrlServer}Visit/GetVisitDemande?id=${AppGlobal.idUser}&city=${city}');
       var response = await Dio().get(
           '${AppGlobal.UrlServer}Visit/GetVisitDemande?id=${AppGlobal.idUser}&city=${city}');
       if (response.statusCode == 200) {
@@ -55,8 +52,6 @@ class _HomePageState extends State<HomePage> {
           listCost = listCost;
           listVisit = listVisitTemp;
         });
-      } else {
-        print(response.statusCode);
       }
     } catch (e) {
       print(e);
@@ -69,8 +64,6 @@ class _HomePageState extends State<HomePage> {
           .get('${AppGlobal.UrlServer}House/GetTypeHouseById?id=${id}');
       if (response.statusCode == 200) {
         return json.decode(response.data);
-      } else {
-        print(response.statusCode);
       }
     } catch (e) {
       print(e);
@@ -84,8 +77,6 @@ class _HomePageState extends State<HomePage> {
           '${AppGlobal.UrlServer}Visitor/GetVisitorByID?id=${visit['VisitorId'].toString()}&typeHouse=${typehouse}');
       if (response.statusCode == 200) {
         return json.decode(response.data)['Price'].toString();
-      } else {
-        print(response.statusCode);
       }
     } catch (e) {
       print(e);
@@ -100,10 +91,7 @@ class _HomePageState extends State<HomePage> {
             '${AppGlobal.UrlServer}Visitor/GetVisitorByID?id=${visit['VisitorId'].toString()}');
         if (response.statusCode == 200) {
           return json.decode(response.data)['User'];
-        } else {
-          print("error 1");
-          print(response.statusCode);
-        }
+        } 
       } else {
         var response = await Dio().get(
             '${AppGlobal.UrlServer}User/GetUserByID?id=${visit['UserId'].toString()}');
@@ -113,10 +101,7 @@ class _HomePageState extends State<HomePage> {
           } else {
             return json.decode(response.data)['User'];
           }
-        } else {
-          print("error 2");
-          print(response.statusCode);
-        }
+        } 
       }
     } catch (e) {
       print(e);

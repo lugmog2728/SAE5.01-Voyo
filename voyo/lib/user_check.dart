@@ -78,7 +78,6 @@ class _UserCheckPageState extends State<UserCheckPage> {
                 title: const Text('Validation automatique'),
                 value: valideAuto,
                 onChanged: (newValue) {
-                  print('${AppGlobal.UrlServer}Visitor/ValidationAuto?active=$newValue');
                   AppGlobal.fetchData('${AppGlobal.UrlServer}Visitor/ValidationAuto?active=$newValue');
                   setState(() {
                     visitors = [];

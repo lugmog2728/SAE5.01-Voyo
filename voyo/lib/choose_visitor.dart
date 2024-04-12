@@ -58,7 +58,7 @@ class _VisitePageState extends State<VisitePage> {
         });
       }
     }).catchError((error) {
-      print('une erreur est survenue lors de la récupération des données : $error');
+      print('$error');
     });
   }
 
@@ -128,10 +128,9 @@ class _VisitePageState extends State<VisitePage> {
     }
     var url =
         '${AppGlobal.UrlServer}visit/CreateDemande?housingType=$selectedHousingType&visitorId=${widget.idVisitor}&userId=${AppGlobal.idUser}&city=${villeController.text}&street=${rueController.text}&postalCode=${CPController.text}&points=${concatenatedPTC}';
-    print(url);
-    AppGlobal.fetchDataString(url).then((String? idVisit) {
+    AppGlobal.fetchDataInt(url).then((int? idVisit) {
       if (idVisit != null) {
-        idDemande = idVisit as int;
+        idDemande = idVisit;
         if (idDemande != -1) {
           Navigator.push(
             context,
@@ -172,7 +171,6 @@ class _VisitePageState extends State<VisitePage> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedHousingType = newValue;
-                        print(selectedHousingType);
                       });
                       fetchVisitors(newValue!);
                     },
