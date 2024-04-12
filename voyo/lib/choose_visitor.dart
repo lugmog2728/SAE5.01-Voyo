@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'pay.dart';
 import 'globals.dart' as AppGlobal;
@@ -40,7 +42,7 @@ class _VisitePageState extends State<VisitePage> {
   String imageUrl = "";
 
   bool isInvalid = false;
-  int? idDemande;
+  int idDemande = -1;
 
   @override
   void initState() {
@@ -117,8 +119,6 @@ class _VisitePageState extends State<VisitePage> {
       });
       return false;
     }
-    final hours = selectedTime.hour.toString().padLeft(2, '0');
-    final minutes = selectedTime.minute.toString().padLeft(2, '0');
     String concatenatedPTC = '';
     for (int i = 0; i < pointToCheck.length; i++) {
       if (i > 0) {
@@ -128,16 +128,23 @@ class _VisitePageState extends State<VisitePage> {
     }
     var url =
         '${AppGlobal.UrlServer}visit/CreateDemande?housingType=$selectedHousingType&visitorId=${widget.idVisitor}&userId=${AppGlobal.idUser}&city=${villeController.text}&street=${rueController.text}&postalCode=${CPController.text}&points=${concatenatedPTC}';
-    AppGlobal.sendData(url);
+    print(url);
+    AppGlobal.fetchDataString(url).then((String? idVisit) {
+      if (idVisit != null) {
+        idDemande = idVisit as int;
+        if (idDemande != -1) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PayPage(title: 'Pay', idDemande: idDemande),
+            ),          );
+        }
+      }
+    });
     setState(() {
       isInvalid = false;
     });
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PayPage(title: 'Pay', idDemande: 48),
-      ), // Provide the title parameter
-    );
+    
     return true;
   }
 

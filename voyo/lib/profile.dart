@@ -150,17 +150,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ) 
               ),
-
-
-
               Visibility(
                 visible: !isEdit,
                 child: Row (
-                children: [
-                  Container (
-                    padding: const EdgeInsets.all(16.0),
-                    width: 130,
-                    child: Visibility(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Visibility(
                       visible: widget.idUser == app_global.idUser,
                       child: Center(
                         child: IconButton(
@@ -169,8 +164,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => connexion.ConnexionPage(
-                                    title: 'connexion'
+                                builder: (context) => const connexion.ConnexionPage(
+                                  title: 'connexion'
                                 ),
                               ),
                             );
@@ -180,29 +175,24 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ),
-                  ),
-                  Padding (
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    "Statut : $statut",
-                    textAlign: TextAlign.right,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
+                    Container (
+                      margin: const EdgeInsets.all(16.0),
+                      child: Text(
+                        "Statut : $statut",
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
-                  ),
-                  Container (
-                    padding: const EdgeInsets.all(16.0),
-                    width: 130,
-                    child: Visibility(
+                    Visibility(
                       visible: widget.idUser == app_global.idUser,
                       child: Center(
                         child: IconButton(
                           onPressed: () => editprofile(),
                           style: app_global.buttonStyle,
                           icon: const Icon(Icons.edit_sharp),
-                          ),
                         ),
                       ),
                     ),
@@ -226,11 +216,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             if (newImg != null) {
                               File file = File(newImg.path);
                               app_global.sendImage("${app_global.UrlServer}message/upload?extension=png", file).then((String value) {
-                                print("Après le chargement de l'image : $imageUrlController");
                                 imageUrlController = value;
-                                print("Après la récupération du nom : $imageUrlController");
                                 setState(() {
-                                  imageWidget = Image.network('${app_global.UrlServer}/image/$imageUrlController', width: 140,height: 180, 
+                                  imageWidget = Image.network('${app_global.UrlServer}image/$imageUrlController', width: 140,height: 180, 
                                     errorBuilder: (context, error, stackTrace) => placeholder);
                                 });
                               });
@@ -419,11 +407,22 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    print(widget.idUser);
     app_global.fetchDataMap("${app_global.UrlServer}User/GetUserByID?id=${widget.idUser}").then((Map<String, dynamic>? jsonData) {
       if (jsonData != null) {
-        if (jsonData["User"] == null) {
-        }
+
           isVisitor = jsonData["User"] != null;
+          print(isVisitor);
+          if (isVisitor) {
+            setState(() {
+              isActive = jsonData["User"]["IsActive"];
+              name = jsonData["User"]["Name"];
+              firstName = jsonData["User"]["FirstName"];
+              city = jsonData["User"]["City"];
+              imageUrl = jsonData["User"]["ProfilPicture"];
+            });
+          }
+
           switch (jsonData["State"]) {
             case "Attente": isValid = false;
               break;
@@ -431,13 +430,8 @@ class _ProfilePageState extends State<ProfilePage> {
           }
           if (isVisitor) {
             setState(() {
-              isActive = jsonData["User"]["IsActive"];
               idVisitor = jsonData["Id"];
-              name = jsonData["User"]["Name"];
-              firstName = jsonData["User"]["FirstName"];
-              city = jsonData["User"]["City"];
               hourlyRate = jsonData["HourlyRate"].toString();
-              imageUrl = jsonData["User"]["ProfilPicture"];
               rating = jsonData["Rating"];
               street = jsonData["Street"];
               zipCode = jsonData["PostalCode"].toString();
@@ -517,7 +511,7 @@ class _ProfilePageState extends State<ProfilePage> {
     ribWidget = editProfileText(rib);
     editAppBar = AppBar(toolbarHeight: 0.0);
     availibilitiesError.clear();
-    imageWidget = Image.network('${app_global.UrlServer}/image/$imageUrl', width: 140,height: 180, 
+    imageWidget = Image.network('${app_global.UrlServer}image/$imageUrl', width: 140,height: 180, 
       errorBuilder: (context, error, stackTrace) => placeholder);
   }
   ///Change the display in the edit mode
@@ -587,9 +581,7 @@ class _ProfilePageState extends State<ProfilePage> {
     streetController.text = street;
     zipCodeController.text = zipCode;
     phoneController.text = phone;
-    print("Avant l'edit mode : $imageUrlController");
     imageUrlController = imageUrl;
-    print("Après l'edit mode: $imageUrlController");
 
     setState(() {
       isEdit = !isEdit;
@@ -611,15 +603,13 @@ class _ProfilePageState extends State<ProfilePage> {
       availibilitiesController;
     });
     if (!isError) {
-      print("Avant le fetch : $imageUrlController");
-      print("${app_global.UrlServer}User/ModifyUser?id=${widget.idUser}&name=${nameController.text}&firstName=${firstNameController.text}&city=${cityController.text}&profilPicture=$imageUrlController");
       app_global.sendData("${app_global.UrlServer}User/ModifyUser?id=${widget.idUser}&name=${nameController.text}&firstName=${firstNameController.text}&city=${cityController.text}&profilPicture=$imageUrlController").then((value) {
         setState(() {
           name = nameController.text;
           firstName = firstNameController.text;
           city = cityController.text;
           imageUrl = imageUrlController;
-          imageWidget = Image.network('${app_global.UrlServer}/image/$imageUrl', width: 140,height: 180, 
+          imageWidget = Image.network('${app_global.UrlServer}image/$imageUrl', width: 140,height: 180, 
             errorBuilder: (context, error, stackTrace) => placeholder);
         });
       });
@@ -817,7 +807,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(100),
-                  child: Image.network('${app_global.UrlServer}/image/${comment.img}', 
+                  child: Image.network('${app_global.UrlServer}image/${comment.img}', 
                     errorBuilder: (context, error, stackTrace) => placeholder,
                   ),
                 ),

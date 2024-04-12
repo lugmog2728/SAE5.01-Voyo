@@ -7,6 +7,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'home.dart' as homePage;
+import 'user_check.dart' as user_check;
+import 'user_management.dart' as user_management;
 import 'chat.dart' as chatPage;
 import 'profile.dart' as profilPage;
 import 'package:http/http.dart' as http;
@@ -17,7 +19,7 @@ Color backgroundColor = const Color(0xFFFCFAD3);
 Color inputColor = const Color(0xFFFEE486);
 Color subInputColor = const Color(0xFFE4CC76);
 Color buttonback = const Color(0xFFFFFEE8);
-String UrlServer = "http://172.26.240.10/";
+String UrlServer = "http://172.26.213.1/";
 int idUser = 1;
 
 ButtonStyle buttonStyle = ElevatedButton.styleFrom(
@@ -32,6 +34,13 @@ BoxDecoration TitleDecoration() {
 }
 
 Scaffold Menu(content, widget, context) {
+  Icon icon;
+  if (idUser == 0) {
+    icon = const Icon(Icons.manage_accounts);
+  } else {
+    icon = const Icon(Icons.message);
+  }
+
   return Scaffold(
     appBar: AppBar(
       automaticallyImplyLeading: false,
@@ -106,12 +115,23 @@ Scaffold Menu(content, widget, context) {
             child: FloatingActionButton(
               backgroundColor: primaryColor,
               onPressed: () {
-                Navigator.push(
+                if (idUser != 0) {
+                  Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
                           const homePage.HomePage(title: "Page acceuil")),
-                );
+                  );
+                } else {
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const user_check.UserCheckPage(title: "Validation visiteur")
+                    )
+                  );
+                }
+                
               },
               tooltip: 'Home',
               shape: const RoundedRectangleBorder(
@@ -135,12 +155,22 @@ Scaffold Menu(content, widget, context) {
               child: FloatingActionButton(
                 backgroundColor: secondaryColor,
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            const chatPage.ChatPage(title: "Discussion")),
-                  );
+                  if (idUser != 0) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const chatPage.ChatPage(title: "Discussion")),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const user_management.UserManagementPage(title: "Gestion utilisateur")
+                      )
+                    );
+                  }
                 },
                 tooltip: 'Chat',
                 shape: const RoundedRectangleBorder(
@@ -149,7 +179,7 @@ Scaffold Menu(content, widget, context) {
                   ),
                 ),
                 elevation: 0,
-                child: const Icon(Icons.message),
+                child: icon,
               ),
             ),
           ),

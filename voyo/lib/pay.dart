@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'globals.dart' as AppGlobal;
 import 'home.dart' as HomePage; // Importer la page d'accueil
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class PayPage extends StatefulWidget {

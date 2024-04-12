@@ -132,7 +132,6 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
       SingleChildScrollView(
         child: Column(
           children: [
-            Text(visit["statut"]),
             Row(
               children: [
                 Container(
@@ -200,68 +199,9 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
               ],
             ),
             if (_whoIsConnect == "visitor")
-              if (visit["statut"] == "Confirmer")
-                ElevatedButton(
-                  style: AppGlobal.buttonStyle,
-                  onPressed: () {
-                    AppGlobal.sendData("${AppGlobal.UrlServer}Visit/StartVisit?id=${widget.idVisit}");
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Points.PointsPage(
-                          title: "Demande de visite",
-                          idVisit: widget.idVisit,
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text('Débuter la visite'),
-                )
-              else if (visit["statut"] == "Payer")
-                ElevatedButton(
-                  style: AppGlobal.buttonStyle,
-                  onPressed: () {
-                    AppGlobal.sendData("${AppGlobal.UrlServer}Visit/ConfirmedVisit?id=${widget.idVisit}").then((_){
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ViewVisitPage(
-                            title: "Demande de visite",
-                            idVisit: widget.idVisit,
-                          ),
-                        ),
-                      );
-                    });
-                  },
-                  child: const Text('Accepter la demande'),
-                )
+              displayVisitorFooter()
             else if (_whoIsConnect == "user")
-              if (visit["statut"] == "Démarrer")
-                const Column(
-                  children: [
-                    Text("La visite est en cours"),
-                    Text("vous recevrez le compte rendu une fois terminé"),
-                  ],
-                )
-              else if (visit["statut"] == "Payer")
-                const Text("En attente d'une réponse du visiteur")
-              else if (visit["statut"] == "Confirmer")
-                const Text("La visite a été acceptée, elle débutera bientôt")
-              else if (visit["statut"] == "Terminer")
-                ElevatedButton(
-                  style: AppGlobal.buttonStyle,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RdvClosePage(
-                          idVisit: widget.idVisit,
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text('Clore la visite'),
-                )
+              displayUserFooter()
           ]
         ),
       ),
@@ -269,8 +209,80 @@ class _ViewVisitePageState extends State<ViewVisitPage> {
       context,
     );
   }
-}
 
+  Widget displayVisitorFooter() {
+    print("----------------------------------------Visitor : ${visit["statut"]}");
+    if (visit["statut"] == "Confirmer") {
+      return ElevatedButton(
+        style: AppGlobal.buttonStyle,
+        onPressed: () {
+          AppGlobal.sendData("${AppGlobal.UrlServer}Visit/StartVisit?id=${widget.idVisit}");
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Points.PointsPage(
+                title: "Demande de visite",
+                idVisit: widget.idVisit,
+              ),
+            ),
+          );
+        },
+        child: const Text('Débuter la visite'),
+      );
+    } else if (visit["statut"] == "Payer") {
+      return ElevatedButton(
+        style: AppGlobal.buttonStyle,
+        onPressed: () {
+          AppGlobal.sendData("${AppGlobal.UrlServer}Visit/ConfirmedVisit?id=${widget.idVisit}").then((_){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ViewVisitPage(
+                  title: "Demande de visite",
+                  idVisit: widget.idVisit,
+                ),
+              ),
+            );
+          });
+        },
+        child: const Text('Accepter la demande'),
+      );
+    }
+    return Container(); 
+  }
+
+  Widget displayUserFooter() {
+    print("----------------------------------------User  : ${visit["statut"]}");
+    if (visit["statut"] == "Démarrer") {
+      return const Column(
+        children: [
+          Text("La visite est en cours"),
+          Text("vous recevrez le compte rendu une fois terminé"),
+        ],
+      );
+    } else if (visit["statut"] == "Payer") {
+      return const Text("En attente d'une réponse du visiteur");
+    } else if (visit["statut"] == "Confirmer") {
+      return const Text("La visite a été acceptée, elle débutera bientôt");
+    } else if (visit["statut"] == "Terminer") {
+      return ElevatedButton(
+        style: AppGlobal.buttonStyle,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RdvClosePage(
+                idVisit: widget.idVisit,
+              ),
+            ),
+          );
+        },
+        child: const Text('Clore la visite'),
+      );
+    }
+    return Container();
+  }
+}
 
 
 Padding Profil(BuildContext context, int id, String name, String surname, String imageUrl) {

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'globals.dart' as AppGlobal;
 import 'home.dart' as homePage;
-import 'listVisitor.dart' as listVisitor;
 import 'package:dio/dio.dart';
 
 class PointsPage extends StatefulWidget {
@@ -39,7 +38,8 @@ class _PointsPageState extends State<PointsPage> {
         setState(() {
           listPoint = json.decode(response.data) as List;
         });
-        for (var point in listPoint) {
+        var _;
+        for (_ in listPoint) {
           listExpanded.add(false);
           listImage.add("");
           listComment.add("");
