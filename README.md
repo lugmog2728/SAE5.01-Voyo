@@ -1,16 +1,18 @@
 Tuteur:
 Clément Raievsky
+
 Groupe:
 Alex Micoulet
 Clément Boulay 
 Lucas Gardanne
 Yanis Ben Salah
+
 Projet: Application mobile VOYO
 
 les documents sont situés dans la branche "Document"
 
 Afin de pouvoir éxécuter l'application, il faut:
-- Importer le fichier contenant le script SQL de la base
+- Importer le fichier contenant le script SQL de la base (documentation/SQL)
 - Préparer l'API (voyo-server)
     - changer l'ip dans l'appsetting de server (voyo-server/Build/appsettings.json)
         ip = l'ip du poste faisant tourner l'API
@@ -30,3 +32,18 @@ Les branches:
         Le code de l'application mobile
     Voyo-server
         Le code de l'API
+
+
+Rendus:
+
+code du projet: Voyo
+API: Voyo-server
+
+jeux d’essais:
+    base SQL -> documentation
+
+scénarios de test: 
+    guide d'utilsation -> documentation 
+
+guide d’utilisation: 
+    documentation
